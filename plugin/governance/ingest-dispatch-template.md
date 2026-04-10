@@ -6,6 +6,16 @@ das Ergebnis als Agent-Prompt. Der Subagent liest diese Datei nie direkt.
 
 ---
 
+## Modellwahl
+
+| Dokumentgroesse | Modell | Begruendung |
+|-----------------|--------|-------------|
+| >200 Seiten (Lehrbuecher, Dissertationen, Kommentare) | **Opus** | Braucht 1M Context, komplexe Zusammenhaenge |
+| ≤200 Seiten (Papers, Berichte, Normen, Leitfaeden) | **Sonnet** | Reicht fuer fokussierte Extraktion, guenstiger |
+
+Der Hauptagent bestimmt die Seitenzahl beim PDF-Lokalisieren (Phase 0.1)
+und waehlt das Modell entsprechend beim Agent-Dispatch (`model: "opus"` oder `model: "sonnet"`).
+
 ## Platzhalter
 
 | Platzhalter | Inhalt |
