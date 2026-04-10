@@ -3,7 +3,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-HOOK="$SCRIPT_DIR/hooks/check-wiki-write.sh"
+HOOK="$SCRIPT_DIR/plugin/hooks/check-wiki-write.sh"
 PASS=0; FAIL=0
 
 assert_allow() {
