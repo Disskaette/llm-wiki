@@ -116,6 +116,23 @@ Plan dokumentiert:
 - Welche MOCs muessen aktualisiert werden?
 - Welche neuen Vokabular-Terme werden benoetigt?
 
+### Phase 0.6: Dispatch vorbereiten
+
+<NICHT-VERHANDELBAR>
+Subagent-Prompts werden NICHT frei formuliert. IMMER Template verwenden.
+1 Agent = 1 PDF. Mehrere PDFs werden sequentiell verarbeitet.
+</NICHT-VERHANDELBAR>
+
+1. Lade `governance/ingest-dispatch-template.md`
+2. Fuelle Platzhalter:
+   - `{{PDF_PFAD}}`: aus Phase 0.1
+   - `{{WIKI_ROOT}}`: Projektpfad + `/wiki/`
+   - `{{QUELLENSEITE_DATEI}}`: nach Naming-Konvention ableiten
+   - `{{BESTEHENDE_KONZEPTE}}`: Glob `wiki/konzepte/*.md` → Dateinamen-Liste
+   - `{{VOKABULAR_TERME}}`: `grep "^### " wiki/_vokabular.md` → Term-Liste
+3. Dispatche Agent mit ausgefuelltem Template als Prompt
+4. Warte auf Ergebnis, dann weiter mit Phase 3 (Gate-Review)
+
 ---
 
 ### Phase 1: Vollstaendige Lesung (IRON LAW — kein Skip)
@@ -189,14 +206,14 @@ Bei UPDATE-MODUS:
 
 Fuer jeden Fachbegriff der im Buch substanziell behandelt wird:
 - Existiert bereits eine Konzeptseite? → Aktualisieren (neuen Quellenverweis + Seitenangabe hinzufuegen)
-- Existiert keine? → Neue Konzeptseite anlegen
-
-Neue Konzeptseite:
-- Frontmatter gemaess governance/seitentypen.md
-- Kurze Erklaerung des Konzepts (2-5 Saetze)
-- Abschnitt "Wo nachschlagen" mit Tabelle: Quelle | Kapitel | Seiten | Schwerpunkt
-- Mindestens EIN Wikilink [[...]] zu verwandtem Konzept
-- Schlagworte aus kontrolliertem Vokabular
+- Existiert keine? → Als `konzept-kandidat` in die Quellenseite eintragen:
+  ```yaml
+  konzept-kandidaten:
+    - term: "Begriffsname"
+      kontext: "Kurzbeschreibung, Kap. X, S. Y-Z"
+  ```
+  KEINE neue Konzeptseite anlegen. Konzeptseiten werden erst durch /synthese
+  erstellt wenn >=2 Quellen den Kandidaten nennen (Schwellenwert N=2).
 
 **2c: Normseiten erstellen/aktualisieren**
 
@@ -227,6 +244,18 @@ Alle Fachbegriffe die als Schlagworte verwendet werden sollen:
 ---
 
 ### Phase 3: 4-Gate Review (IRON LAW)
+
+<NICHT-VERHANDELBAR>
+NACH Rueckkehr des Ingest-Subagents MUESSEN die folgenden Gates dispatcht werden.
+Ueberspringen ist VERBOTEN. _pending.json blockiert den naechsten Ingest mechanisch.
+
+Checkliste:
+1. check-wiki-output.sh automatisch gelaufen (PostToolUse-Hook) → Bei FAIL: Korrektur
+2. Gate 1-4 parallel dispatchen (vollstaendigkeits-pruefer, quellen-pruefer,
+   konsistenz-pruefer, vokabular-pruefer)
+3. Alle 4 PASS → weiter zu Phase 4 (Nebeneffekte)
+4. Bei FAIL: Korrektur → Re-Gate (max 3x) → Eskalation an Nutzer
+</NICHT-VERHANDELBAR>
 
 Alle generierten/aktualisierten Wiki-Seiten durchlaufen 4 Gates.
 Jedes Gate wird als unabhaengiger Subagent dispatcht.
@@ -300,6 +329,16 @@ Log-Format:
 - Neue Vokabular-Terme: indirekte-lagerung, aufhaengebewehrung
 - Gates: 4/4 PASS
 ```
+
+---
+
+### Batch-Modus
+
+Bei mehreren PDFs: sequentiell verarbeiten. Pro PDF der vollstaendige Ablauf:
+Template → Ingest-Agent → check-wiki-output.sh → 4 Gate-Agents → Nebeneffekte → naechste PDF.
+
+**KEIN paralleles Dispatchen** mehrerer Ingest-Agents — ausser der Nutzer
+fordert es explizit und akzeptiert das Risiko reduzierter Gate-Kontrolle.
 
 ---
 
