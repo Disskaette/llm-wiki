@@ -1,0 +1,15 @@
+# Spec-Index — LLM-Wiki Plugin
+
+Uebersicht aller Feature-Specs. Neue Specs werden hier eingetragen.
+Bestehende Specs werden bei neuen Anforderungen aktualisiert, nicht dupliziert.
+
+## Specs
+
+| Nr | Titel | Status | Version | Letzte Aktualisierung |
+|----|-------|--------|---------|----------------------|
+| [SPEC-001](SPEC-001-passive-hooks.md) | Passive Hook-Infrastruktur (Schreibschutz + Lock-Warnung) | Planned | 1.0 | 2026-04-10 |
+| [SPEC-002](SPEC-002-pipeline-lock-enforcement.md) | Aktive Pipeline-Lock-Hooks + Subagent-Type-Refactor | Planned | 1.0 | 2026-04-10 |
+
+## Aussenstehende Arbeiten (nicht spec-wuerdig)
+
+- **Gate-Drift-Fix (Bugfix):** `vollstaendigkeits-pruefer` + `ingest-dispatch-template` — siehe Debug-Befund Session 2026-04-10. Reine Text-Korrektur, wird direkt per Commit erledigt, kein Spec.
