@@ -38,8 +38,12 @@ Aenderungen an plugin/ greifen nach Session-Neustart.
 ## Enforcement — 3 Schichten
 
 1. **Prompt-Law** — Skill-Anweisungen, Hard Gates, Dispatch-Templates
-2. **Subagent-Review** — 4 Pruefer + 2 Reviewer + 1 Validator (parallel, unabhaengig)
-3. **Machine-Law** — PostToolUse-Hook (mechanische Checks) + PreToolUse-Hook (Pipeline-Lock)
+2. **Subagent-Review** — 4 Pruefer (Ingest) + 2 Reviewer (Synthese) + 1 Validator (parallel, unabhaengig)
+3. **Machine-Law (teilweise — nach SPEC-001):**
+   - `guard-wiki-writes.sh` (PreToolUse Edit|Write) — blockiert Wiki-Writes ausserhalb von `/ingest`, `/synthese`, `/normenupdate`, `/vokabular` via Transcript-Check
+   - `inject-lock-warning.sh` (UserPromptSubmit) — injiziert passive Lock-Warnung als `additionalContext` wenn `wiki/_pending.json` offen ist
+   - `check-wiki-output.sh` — wird von den Gate-Agents selbst aufgerufen (seit Commit `f7b08d7`)
+   - **Noch ausstehend (SPEC-002):** mechanische Pipeline-Lock-Enforcement via `guard-pipeline-lock.sh` und `advance-pipeline-lock.sh`
 
 Heuristische Checks (04 Zahlenwerte, 05 Normbezuege, 06 Seitenangaben, 09 Umlaute)
 sind WARN im Shell-Script. Die echte Pruefung macht der quellen-pruefer Agent (Gate 2).
@@ -66,7 +70,8 @@ Nach jeder Aenderung IMMER:
 ```bash
 bash plugin/hooks/check-consistency.sh plugin/    # 19/19 PASS?
 diff <(sed -n '/<!-- BEGIN HARD-GATES -->/,/<!-- END HARD-GATES -->/p' plugin/skills/using-bibliothek/SKILL.md | sed '1d;$d') plugin/governance/hard-gates.md   # Sync?
-bash tests/test-wiki-write-hook.sh                 # 14/14 PASS?
+bash tests/test-guard-wiki-writes.sh               # 5/5 PASS?
+bash tests/test-inject-lock-warning.sh             # 7/7 PASS?
 bash tests/test-gates-pending-hook.sh              # 12/12 PASS?
 ```
 
@@ -74,10 +79,11 @@ Session-Neustart noetig nach Hook-Aenderungen (Claude Code cached im RAM).
 
 ## Bekannte Patterns
 
-- `set -uo pipefail` NIE in Hooks verwenden → ERR-Trap mit default-allow JSON
+- `set -euo pipefail` in neuen Hooks OK, wenn Exit-Code-basiert (exit 0/2 + stderr) — siehe `guard-wiki-writes.sh`. Nur veraltete JSON-Response-Hooks brauchten den ERR-Trap-Workaround.
 - macOS awk hat kein `/i` Flag → `tolower()` verwenden
 - `grep -c` gibt Exit 1 bei 0 Matches → `|| VAR=0`
 - Inline-Kopie von hard-gates.md in using-bibliothek MUSS synchron bleiben
 - Heuristische Checks gehoeren in Agents, nicht in Shell-Regex (keine Endlos-Ausnahmelisten)
-- JSON-Parsing in Hooks: escaped Quotes (`\"`) mit DBLQUOTE-Workaround
+- JSON-Parsing in Hooks: `jq -r '.tool_input.file_path // empty'` statt sed-Hacks. `jq` ist auf macOS Standard.
+- Hook-Output-Format: Claude Code Hooks API 2026 erwartet `hookSpecificOutput.permissionDecision` bei PreToolUse, NICHT mehr das alte `{"decision":"block"}`. Exit 2 + stderr ist der einfachere Pfad fuer Blockieren (siehe Website_v2 Referenz).
 - Plugin-Cache ist Symlink auf plugin/ → kein manuelles Kopieren
