@@ -27,8 +27,9 @@ fi
 if [ -z "$FILE_PATH" ]; then
     COMMAND=$(echo "$INPUT" | sed -n 's/.*"command"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
     if echo "$COMMAND" | grep -q 'wiki/.*\.md' 2>/dev/null; then
-        # Nur SCHREIBENDE Bash-Kommandos blocken — Lesen ist erlaubt
-        if echo "$COMMAND" | grep -qE '(>|>>|tee |mv |cp |rm |echo .+>|sed -i|cat .+>|write)' 2>/dev/null; then
+        # Entferne harmlose Umleitungen bevor Schreib-Check
+        CLEAN_CMD=$(echo "$COMMAND" | sed 's/2>\/dev\/null//g; s/>\/dev\/null//g; s/2>&1//g; s/1>\/dev\/null//g')
+        if echo "$CLEAN_CMD" | grep -qE '(>[^&]|>>|tee |(^| )(mv|cp|rm) |sed -i)' 2>/dev/null; then
             echo '{"decision": "block", "reason": "Bash-Schreibzugriff auf wiki/ erkannt. Wiki-Seiten nur ueber /ingest, /synthese, /normenupdate, /vokabular aendern."}'
             exit 0
         fi

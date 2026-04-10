@@ -82,7 +82,7 @@ else
 fi
 
 # --- Check 4: Command-Count (Dateien ↔ tatsaechliche Skills) ---
-CMD_FILES=$(find "${PLUGIN_ROOT}/commands/" -name "*.md" -type f 2>/dev/null | wc -l | tr -d ' ')
+CMD_FILES=$(find "${PLUGIN_ROOT}/commands/" -name "*.md" -type f ! -name "using-bibliothek.md" 2>/dev/null | wc -l | tr -d ' ')
 SKILL_DIRS=$(find "${PLUGIN_ROOT}/skills/" -mindepth 1 -maxdepth 1 -type d ! -name "using-bibliothek" 2>/dev/null | wc -l | tr -d ' ')
 if [ "$CMD_FILES" -eq "$SKILL_DIRS" ]; then
     check PASS "04-command-count" ""
