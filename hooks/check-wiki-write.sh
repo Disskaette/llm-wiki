@@ -17,25 +17,30 @@ CHECK_SCRIPT="${SCRIPT_DIR}/check-wiki-output.sh"
 INPUT=$(cat || true)
 
 # Extrahiere Dateipfad — pure shell, kein python3 noetig
-# Versuche file_path (Write/Edit)
-FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+# Versuche file_path (Write/Edit) — escaped quotes temporaer ersetzen
+FILE_PATH=$(echo "$INPUT" | sed 's/\\"/DBLQUOTE/g' | sed -n 's/.*"file_path"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | sed 's/DBLQUOTE/"/g' | head -1)
 
 # Falls leer: versuche filePath (camelCase-Variante)
 if [ -z "$FILE_PATH" ]; then
-    FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"filePath"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+    FILE_PATH=$(echo "$INPUT" | sed 's/\\"/DBLQUOTE/g' | sed -n 's/.*"filePath"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | sed 's/DBLQUOTE/"/g' | head -1)
 fi
 
 # Falls Bash-Tool: pruefe ob command SCHREIBEND auf wiki/ zugreift
 # Nur blocken wenn ein Schreiboperator DIREKT auf einen wiki/-Pfad zeigt.
 # Lesende Befehle (ls, cat, wc, grep, head, tail) werden NICHT geprueft.
 if [ -z "$FILE_PATH" ]; then
-    COMMAND=$(echo "$INPUT" | sed -n 's/.*"command"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+    COMMAND=$(echo "$INPUT" | sed 's/\\"/DBLQUOTE/g' | sed -n 's/.*"command"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | sed 's/DBLQUOTE/"/g' | head -1)
+    # Bestimme bekannte Wiki-Pfade fuer praeziseres Matching
+    PROJ_ROOT="$(cd "$SCRIPT_DIR/.." 2>/dev/null && pwd)"
+    PROJ_WIKI="${PROJ_ROOT}/wiki/"
+    CWD_WIKI="${PWD}/wiki/"
     # Entferne harmlose Umleitungen
     CLEAN_CMD=$(echo "$COMMAND" | sed 's/2>\/dev\/null//g; s/>\/dev\/null//g; s/2>&1//g; s/1>\/dev\/null//g')
-    # Pruefe ob ein Schreiboperator auf wiki/ zielt (nicht nur wiki/ irgendwo im Befehl)
-    if echo "$CLEAN_CMD" | grep -qE '(>[^&]|>>|tee ).*wiki/.*\.md' 2>/dev/null || \
-       echo "$CLEAN_CMD" | grep -qE 'sed -i.*wiki/' 2>/dev/null || \
-       echo "$CLEAN_CMD" | grep -qE '(^| )(mv|cp|rm) .*wiki/' 2>/dev/null; then
+    # Pruefe ob ein Schreiboperator auf einen bekannten Wiki-Pfad zielt
+    # Fallback wiki/[a-z] fangt relative Pfade (z.B. wiki/quellen/test.md)
+    if echo "$CLEAN_CMD" | grep -qE "(>[^&]|>>|tee ).*(${PROJ_WIKI}|${CWD_WIKI}|wiki/[a-z])" 2>/dev/null || \
+       echo "$CLEAN_CMD" | grep -qE "sed -i.*(${PROJ_WIKI}|${CWD_WIKI}|wiki/[a-z])" 2>/dev/null || \
+       echo "$CLEAN_CMD" | grep -qE "(^| )(mv|cp|rm) .*(${PROJ_WIKI}|${CWD_WIKI}|wiki/[a-z])" 2>/dev/null; then
         echo '{"decision": "block", "reason": "Bash-Schreibzugriff auf wiki/ erkannt. Wiki-Seiten nur ueber /ingest, /synthese, /normenupdate, /vokabular aendern."}'
         exit 0
     fi
@@ -75,8 +80,9 @@ case "$BASENAME" in
             P_QUELLE=$(sed -n 's/.*"quelle"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$PENDING" | head -1)
 
             if [ "$P_STUFE" = "gates" ]; then
-                # Check if gate results are in the log
-                if grep -q "Gates:.*PASS" "$FILE_PATH" 2>/dev/null && grep -q "$P_QUELLE" "$FILE_PATH" 2>/dev/null; then
+                # Check if gate results are in the last 20 lines of the log
+                LAST_LINES=$(tail -20 "$FILE_PATH" 2>/dev/null || true)
+                if echo "$LAST_LINES" | grep -q "Gates:.*PASS" 2>/dev/null && echo "$LAST_LINES" | grep -q "$P_QUELLE" 2>/dev/null; then
                     sed -i '' 's/"stufe"[[:space:]]*:[[:space:]]*"gates"/"stufe":"sideeffects"/' "$PENDING"
                 fi
             elif [ "$P_STUFE" = "sideeffects" ]; then

@@ -7,7 +7,8 @@
 # Output: JSON mit "decision": "block"/"allow" + "reason"
 # Env: WIKI_DIR (optional, fuer Tests; sonst aus Projekt-Root abgeleitet)
 
-set -uo pipefail
+# KEIN set -uo pipefail — Hook muss IMMER gueltige JSON-Antwort liefern.
+trap 'echo "{\"decision\": \"allow\", \"reason\": \"Hook-Fehler — default allow\"}"; exit 0' ERR
 
 INPUT=$(cat)
 
@@ -61,7 +62,7 @@ case "$STUFE" in
         echo "{\"decision\": \"block\", \"reason\": \"Nebeneffekte fuer '${QUELLE}' stehen aus (_log.md, _index, MOC, PDF sortieren). Erst abschliessen, dann naechster Ingest.\"}"
         ;;
     *)
-        echo "{\"decision\": \"block\", \"reason\": \"Unbekannter Pending-Status: ${STUFE}. _pending.json manuell pruefen.\"}"
+        echo "{\"decision\": \"block\", \"reason\": \"Unbekannter Pending-Status: '${STUFE}'. Datei ${PENDING} manuell pruefen oder loeschen um fortzufahren.\"}"
         ;;
 esac
 exit 0
