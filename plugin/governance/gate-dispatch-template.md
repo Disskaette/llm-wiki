@@ -6,16 +6,27 @@ dieses Template verwenden.
 
 ## Wann dispatchen
 
-NACH Rückkehr des Ingest-Subagents und NACH erfolgreichem
-check-wiki-output.sh (automatisch via PostToolUse-Hook).
-
-`_pending.json` existiert mit `stufe: "gates"` → blockiert jeden
-weiteren Ingest bis alle 4 Gates PASS.
+NACH Rueckkehr des Ingest-Subagents. Der Hauptagent dispatcht die Gates,
+nicht ein Hook. Kein Ingest darf ohne abgeschlossene Gates weitergehen.
 
 ## Dispatch-Reihenfolge
 
-Gate 1-4 können PARALLEL dispatcht werden (sind unabhängig voneinander).
-Alle 4 müssen PASS (oder PASS MIT HINWEISEN) bevor Phase 4 beginnt.
+Gate 1-4 koennen PARALLEL dispatcht werden (sind unabhaengig voneinander).
+Alle 4 muessen PASS (oder PASS MIT HINWEISEN) bevor Phase 4 beginnt.
+
+## Mechanische Pruefung
+
+Jeder Gate-Agent fuehrt als ERSTEN Schritt `check-wiki-output.sh` auf die
+Quellenseite aus und meldet das Ergebnis im Pruefbericht. Das ersetzt den
+deaktivierten PostToolUse-Hook — die Pruefung laeuft jetzt IM Agent statt
+als externer Hook.
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/hooks/check-wiki-output.sh" "{{QUELLENSEITE_PFAD}}" "{{WIKI_ROOT}}/_vokabular.md" "{{WIKI_ROOT}}/"
+```
+
+Bei FAIL: Der Agent bewertet ob es ein echter Mangel oder ein False Positive ist
+(heuristische Checks 04/05/06/09 sind WARN, nicht FAIL — der Agent entscheidet).
 
 ---
 
@@ -43,6 +54,9 @@ Quellenseite: {{QUELLENSEITE_PFAD}}
 Original-PDF: {{PDF_PFAD}}
 
 ## Prüfungen
+
+0. **Mechanischer Check:** Fuehre zuerst check-wiki-output.sh auf die Quellenseite aus.
+   Melde PASS/FAIL/WARN-Ergebnisse im Pruefbericht.
 
 1. **Kapitelerfassung:** Lies das Inhaltsverzeichnis der PDF (erste 5-10 Seiten).
    Vergleiche mit dem kapitel-index im Frontmatter der Quellenseite.
@@ -107,6 +121,14 @@ Original-PDF: {{PDF_PFAD}}
 Konzeptseiten: {{KONZEPTSEITEN_PFADE}}
 
 ## Prüfungen
+
+### 0: Mechanischer Check
+
+Fuehre zuerst check-wiki-output.sh auf die Quellenseite aus:
+```bash
+bash check-wiki-output.sh "{{QUELLENSEITE_PFAD}}" "{{WIKI_ROOT}}/_vokabular.md" "{{WIKI_ROOT}}/"
+```
+Melde alle PASS/FAIL/WARN im Pruefbericht. WARN-Checks (04/05/06/09) bewertest DU kontextuell in den folgenden Parts.
 
 ### A: Kontextuelle Quellenprüfung (ersetzt Shell-Checks 04, 05, 06)
 
@@ -208,6 +230,9 @@ Wiki-Root: {{WIKI_ROOT}}
 
 ## Prüfungen
 
+0. **Mechanischer Check:** Fuehre check-wiki-output.sh auf die Quellenseite aus.
+   Melde PASS/FAIL/WARN im Pruefbericht.
+
 1. **Widersprüche:** Vergleiche Aussagen der neuen Quellenseite mit
    bestehenden Konzeptseiten. Gibt es Widersprüche?
    - Direkter Widerspruch ("X ist wahr" vs "X ist falsch")
@@ -263,6 +288,9 @@ Quellenseite: {{QUELLENSEITE_PFAD}}
 Vokabular: {{VOKABULAR_PFAD}}
 
 ## Prüfungen
+
+0. **Mechanischer Check:** Fuehre check-wiki-output.sh auf die Quellenseite aus.
+   Melde PASS/FAIL/WARN im Pruefbericht.
 
 1. **Vokabular-Abdeckung:** Jedes schlagworte-Feld muss als ### Heading
    in _vokabular.md existieren.
