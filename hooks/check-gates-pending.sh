@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# check-gates-pending.sh — PreToolUse Hook auf Agent-Tool
+# Blockiert neue Ingest/Synthese-Agents wenn Gates oder Nebeneffekte ausstehen.
+# Gate-Agents (pruefer/reviewer/validator) werden IMMER durchgelassen.
+#
+# Input: JSON auf stdin mit subagent_type und prompt
+# Output: JSON mit "decision": "block"/"allow" + "reason"
+# Env: WIKI_DIR (optional, fuer Tests; sonst aus Projekt-Root abgeleitet)
+
+set -uo pipefail
+
+INPUT=$(cat)
+
+# Wiki-Verzeichnis bestimmen
+if [ -z "${WIKI_DIR:-}" ]; then
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+    for CANDIDATE in "$PROJECT_ROOT/wiki" "$PWD/wiki"; do
+        if [ -d "$CANDIDATE" ]; then
+            WIKI_DIR="$CANDIDATE"
+            break
+        fi
+    done
+fi
+
+# Kein Wiki-Verzeichnis gefunden → durchlassen
+if [ -z "${WIKI_DIR:-}" ] || [ ! -d "${WIKI_DIR:-}" ]; then
+    echo '{"decision": "allow", "reason": "Kein Wiki-Verzeichnis gefunden"}'
+    exit 0
+fi
+
+PENDING="$WIKI_DIR/_pending.json"
+
+# Kein Pending-File → alles frei
+if [ ! -f "$PENDING" ]; then
+    echo '{"decision": "allow", "reason": "Kein offener Durchlauf"}'
+    exit 0
+fi
+
+# Subagent-Typ extrahieren
+SUBAGENT=$(echo "$INPUT" | sed -n 's/.*"subagent_type"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+
+# Gate-Agents immer durchlassen (pruefer, reviewer, validator)
+case "${SUBAGENT:-}" in
+    *pruefer*|*reviewer*|*validator*)
+        echo '{"decision": "allow", "reason": "Gate-Agent durchgelassen"}'
+        exit 0
+        ;;
+esac
+
+# Alle anderen Agents blockieren
+PENDING_CONTENT=$(cat "$PENDING")
+STUFE=$(echo "$PENDING_CONTENT" | sed -n 's/.*"stufe"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+QUELLE=$(echo "$PENDING_CONTENT" | sed -n 's/.*"quelle"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
+
+case "$STUFE" in
+    gates)
+        echo "{\"decision\": \"block\", \"reason\": \"Gate-Review fuer '${QUELLE}' steht aus. Dispatche zuerst die Gate-Agents (vollstaendigkeits-pruefer, quellen-pruefer, konsistenz-pruefer, vokabular-pruefer).\"}"
+        ;;
+    sideeffects)
+        echo "{\"decision\": \"block\", \"reason\": \"Nebeneffekte fuer '${QUELLE}' stehen aus (_log.md, _index, MOC, PDF sortieren). Erst abschliessen, dann naechster Ingest.\"}"
+        ;;
+    *)
+        echo "{\"decision\": \"block\", \"reason\": \"Unbekannter Pending-Status: ${STUFE}. _pending.json manuell pruefen.\"}"
+        ;;
+esac
+exit 0
