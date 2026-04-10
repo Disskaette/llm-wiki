@@ -23,18 +23,21 @@ if [ -z "$FILE_PATH" ]; then
     FILE_PATH=$(echo "$INPUT" | sed -n 's/.*"filePath"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
 fi
 
-# Falls Bash-Tool: pruefe ob command wiki/ referenziert
+# Falls Bash-Tool: pruefe ob command SCHREIBEND auf wiki/ zugreift
+# Nur blocken wenn ein Schreiboperator DIREKT auf einen wiki/-Pfad zeigt.
+# Lesende Befehle (ls, cat, wc, grep, head, tail) werden NICHT geprueft.
 if [ -z "$FILE_PATH" ]; then
     COMMAND=$(echo "$INPUT" | sed -n 's/.*"command"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' | head -1)
-    if echo "$COMMAND" | grep -q 'wiki/.*\.md' 2>/dev/null; then
-        # Entferne harmlose Umleitungen bevor Schreib-Check
-        CLEAN_CMD=$(echo "$COMMAND" | sed 's/2>\/dev\/null//g; s/>\/dev\/null//g; s/2>&1//g; s/1>\/dev\/null//g')
-        if echo "$CLEAN_CMD" | grep -qE '(>[^&]|>>|tee |(^| )(mv|cp|rm) |sed -i)' 2>/dev/null; then
-            echo '{"decision": "block", "reason": "Bash-Schreibzugriff auf wiki/ erkannt. Wiki-Seiten nur ueber /ingest, /synthese, /normenupdate, /vokabular aendern."}'
-            exit 0
-        fi
+    # Entferne harmlose Umleitungen
+    CLEAN_CMD=$(echo "$COMMAND" | sed 's/2>\/dev\/null//g; s/>\/dev\/null//g; s/2>&1//g; s/1>\/dev\/null//g')
+    # Pruefe ob ein Schreiboperator auf wiki/ zielt (nicht nur wiki/ irgendwo im Befehl)
+    if echo "$CLEAN_CMD" | grep -qE '(>[^&]|>>|tee ).*wiki/.*\.md' 2>/dev/null || \
+       echo "$CLEAN_CMD" | grep -qE 'sed -i.*wiki/' 2>/dev/null || \
+       echo "$CLEAN_CMD" | grep -qE '(^| )(mv|cp|rm) .*wiki/' 2>/dev/null; then
+        echo '{"decision": "block", "reason": "Bash-Schreibzugriff auf wiki/ erkannt. Wiki-Seiten nur ueber /ingest, /synthese, /normenupdate, /vokabular aendern."}'
+        exit 0
     fi
-    echo '{"decision": "allow", "reason": "Kein Wiki-Dateipfad erkannt"}'
+    echo '{"decision": "allow", "reason": "Kein Wiki-Schreibzugriff"}'
     exit 0
 fi
 
@@ -49,6 +52,12 @@ case "$FILE_PATH" in
         exit 0
         ;;
 esac
+
+# Bestimme Wiki-Root, Vokabular-Pfad und Pending-Pfad FRUEH
+# (wird von _log.md Transition und Quellenseiten-Erstellung benoetigt)
+WIKI_DIR=$(echo "$FILE_PATH" | sed 's|/wiki/.*|/wiki/|')
+VOKAB="${WIKI_DIR}_vokabular.md"
+PENDING="${WIKI_DIR}_pending.json"
 
 # Sonderdateien die KEINE Wiki-Seiten sind (kein Frontmatter noetig)
 BASENAME=$(basename "$FILE_PATH")
@@ -96,11 +105,6 @@ if [ ! -f "$FILE_PATH" ]; then
     echo '{"decision": "allow", "reason": "Datei existiert (noch) nicht"}'
     exit 0
 fi
-
-# Bestimme Wiki-Root und Vokabular-Pfad
-WIKI_DIR=$(echo "$FILE_PATH" | sed 's|/wiki/.*|/wiki/|')
-VOKAB="${WIKI_DIR}_vokabular.md"
-PENDING="${WIKI_DIR}_pending.json"
 
 # Fuehre check-wiki-output.sh aus — Exit-Code VOR || true erfassen!
 set +e
