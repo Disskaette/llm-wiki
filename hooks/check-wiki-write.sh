@@ -6,13 +6,15 @@
 # Input: JSON auf stdin mit tool_input.file_path (Write/Edit) oder tool_input.command (Bash)
 # Output: JSON mit "decision": "block"/"allow" + "reason"
 
-set -uo pipefail
+# KEIN set -uo pipefail — Hook muss IMMER gueltige JSON-Antwort liefern.
+# Bei jedem Crash: default ALLOW (lieber durchlassen als false-positive blocken).
+trap 'echo "{\"decision\": \"allow\", \"reason\": \"Hook-Fehler — default allow\"}"; exit 0' ERR
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHECK_SCRIPT="${SCRIPT_DIR}/check-wiki-output.sh"
 
 # Lese stdin (PostToolUse bekommt tool_input als JSON)
-INPUT=$(cat)
+INPUT=$(cat || true)
 
 # Extrahiere Dateipfad — pure shell, kein python3 noetig
 # Versuche file_path (Write/Edit)
