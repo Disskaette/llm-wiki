@@ -120,3 +120,42 @@ Alle `_index/*.md`-Dateien nutzen einheitliches Tabellenformat:
 |-------|-----------|-----------|----------|
 | [[gamma-verfahren]] | EC5 Anhang B | Nachgiebig verbundene Biegetraeger | false |
 ```
+
+## Graph View Konfiguration
+
+### Standard-Filter
+
+```
+-path:quellen/ -path:_index/ -file:_
+```
+
+Blendet aus: Quellenseiten, Index-Dateien, Sonderdateien (_log, _vokabular).
+Zeigt: Konzepte, Verfahren, Baustoffe, Normen, MOCs.
+
+### Gruppen-Coloring
+
+| Gruppe | Query | Farbe |
+|--------|-------|-------|
+| MOC | `path:moc/` | Rot (grosse Knoten) |
+| Konzept | `path:konzepte/` | Blau |
+| Verfahren | `path:verfahren/` | Gruen |
+| Norm | `path:normen/` | Orange |
+| Baustoff | `path:baustoffe/` | Violett |
+
+Attachments-Toggle: AUS — damit PDFs nicht im Graph erscheinen.
+
+### Local Graph
+
+Fuer taegliche Arbeit wichtiger als globaler Graph.
+Rechte Sidebar → "Open local graph". Zeigt Nachbarn der aktuell geoeffneten Seite.
+Tiefe konfigurierbar (1-3 Hops).
+
+## MOC-Hierarchie
+
+Zweistufig nach LYT-Pattern (Nick Milo):
+- `wiki/home.md` als Vault-Einstieg (Default Open File)
+- Top-MOCs (Fachbereiche): interaktiv mit Nutzer erarbeitet, nicht hartcodiert
+- Sub-MOCs (Themen): verlinken auf Konzept-/Verfahrensseiten
+- Konzeptseiten duerfen in mehreren MOCs auftauchen
+
+Obsidian-Config: `"defaultOpenFile": "home"` in `.obsidian/app.json`

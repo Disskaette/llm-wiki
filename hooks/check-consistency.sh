@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-consistency.sh — 12 Plugin-interne Konsistenzpruefungen
+# check-consistency.sh — 16 Plugin-interne Konsistenzpruefungen
 # Aufruf: ./check-consistency.sh [plugin-root]
 #
 # Exit 0 = alles konsistent
@@ -190,6 +190,39 @@ if [ -n "$MISSING_TEMPLATES" ]; then
     check FAIL "12-templates" "Fehlende Templates: ${MISSING_TEMPLATES%, }"
 else
     check PASS "12-templates" ""
+fi
+
+# --- Check 13: Ingest-Dispatch-Template existiert ---
+ROOT="$PLUGIN_ROOT"
+if [ -f "$ROOT/governance/ingest-dispatch-template.md" ]; then
+    check PASS "13-ingest-template" ""
+else
+    check FAIL "13-ingest-template" "governance/ingest-dispatch-template.md fehlt"
+fi
+
+# --- Check 14: Synthese-Dispatch-Template existiert ---
+if [ -f "$ROOT/governance/synthese-dispatch-template.md" ]; then
+    check PASS "14-synthese-template" ""
+else
+    check FAIL "14-synthese-template" "governance/synthese-dispatch-template.md fehlt"
+fi
+
+# --- Check 15: Templates enthalten Platzhalter ---
+INGEST_PH=$(grep -c '{{' "$ROOT/governance/ingest-dispatch-template.md" 2>/dev/null || echo 0)
+SYNTHESE_PH=$(grep -c '{{' "$ROOT/governance/synthese-dispatch-template.md" 2>/dev/null || echo 0)
+if [ "$INGEST_PH" -ge 5 ] && [ "$SYNTHESE_PH" -ge 5 ]; then
+    check PASS "15-template-platzhalter" ""
+else
+    check FAIL "15-template-platzhalter" "Ingest: $INGEST_PH (min 5), Synthese: $SYNTHESE_PH (min 5)"
+fi
+
+# --- Check 16: Skills referenzieren Templates ---
+INGEST_REF=$(grep -c 'ingest-dispatch-template' "$ROOT/skills/ingest/SKILL.md" 2>/dev/null || echo 0)
+SYNTHESE_REF=$(grep -c 'synthese-dispatch-template' "$ROOT/skills/synthese/SKILL.md" 2>/dev/null || echo 0)
+if [ "$INGEST_REF" -ge 1 ] && [ "$SYNTHESE_REF" -ge 1 ]; then
+    check PASS "16-skill-template-referenz" ""
+else
+    check FAIL "16-skill-template-referenz" "Ingest-Ref: $INGEST_REF, Synthese-Ref: $SYNTHESE_REF"
 fi
 
 # --- Ergebnis ---

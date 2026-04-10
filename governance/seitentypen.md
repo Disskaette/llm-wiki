@@ -56,6 +56,9 @@ kapitel-index:
     seiten: "1-42"
     relevanz: niedrig  # hoch | mittel | niedrig
     schlagworte: [term1, term2]
+konzept-kandidaten:  # Optional — vom Ingest-Agent befuellt
+  - term: "Begriffsname"
+    kontext: "Kurzbeschreibung, Kap. X, S. Y-Z"
 ---
 ```
 
@@ -70,6 +73,8 @@ schlagworte: [term1, term2]
 quellen-anzahl: 5
 created: 2026-04-09
 updated: 2026-04-09
+synth-datum: 2026-04-10  # Datum der letzten Synthese
+mocs: [moc-holzbau, moc-verbundbau]  # Optional — in welchen MOCs verlinkt
 reviewed: false
 ---
 ```

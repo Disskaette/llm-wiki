@@ -62,3 +62,21 @@ Grund: Obsidian "shortest path" Wikilink-Aufloesung verlangt Eindeutigkeit.
 
 VERBOTEN: `wiki/konzepte/querkraft.md` + `wiki/moc/querkraft.md` (Namenskollision)
 ERLAUBT: `wiki/moc/moc-querkraft.md` (Praefix unterscheidet)
+
+## Link-Konventionen
+
+Drei Link-Typen, kontextabhaengig:
+
+| Kontext | Ziel | Syntax |
+|---------|------|--------|
+| Beleg im Fliesstext | PDF mit Seitenangabe | `[[datei.pdf#page=N\|Autor Jahr, S. N]]` |
+| ## Quellen-Abschnitt | Wiki-Quellenseite | `[[quellenseite\|Autor Jahr]]` |
+| Fachbegriff | Konzeptseite | `[[konzeptname\|Anzeigename]]` |
+
+Obsidian Shortest-Path-Aufloesung: Voller Pfad nicht noetig wenn Dateiname eindeutig.
+
+### Alias-Konvention (title:-Feld)
+
+Dateinamen bleiben ASCII-lowercase. Anzeigenamen ueber:
+- Frontmatter `title:` → Obsidian zeigt in Sidebar
+- Wikilink-Alias `[[dateiname|Anzeigename]]` → schoener Name im Text

@@ -7,7 +7,7 @@ graph LR
     A["📄 PDF-Literatur\n(Normen, Papers,\nForschungsberichte)"] -->|"/ingest\n(Split bei >800K)"| B["📖 Wiki-Seiten\n(Quellen, Konzepte,\nNormen, Baustoffe)"]
     B -->|/vokabular| C["📋 Kontrolliertes\nVokabular\n(_vokabular.md)"]
     B -->|/katalog| D["🗂️ Katalog-Index\n(Quellenliste,\nAbdeckungsanalyse)"]
-    B -->|/wiki-lint| E["✅ Qualitäts-Check\n(16 Output-Checks,\n12 Konsistenz-Checks)"]
+    B -->|/wiki-lint| E["✅ Qualitäts-Check\n(16 Output-Checks,\n16 Konsistenz-Checks)"]
     D -->|/synthese| F["📝 Synthesetext\n(Quellenvergleich,\nWidersprüche)"]
     F -->|/export| G["📊 Export\n(Zusammenfassungen,\nTabellen, Formeln)"]
     E -->|/export| G
@@ -83,11 +83,19 @@ Es gibt 7 Subagents, aufgeteilt in 3 Rollen (siehe `governance/naming-konvention
 ┌─────────────────────────────────────────────────────────────┐
 │ Schicht 4: Subagent-Instanz (Dispatch)                      │
 │ → Agent (z.B. ingest-Agent) mit lokalen Constraints        │
+│ → Dispatch via ingest-dispatch-template.md /               │
+│   synthese-dispatch-template.md (parametrisierter Prompt)  │
 │ → Output läuft durch Shell-Check + Consistency-Check       │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ## Shell-Checks (Output Validierung)
+
+### check-gates-pending.sh
+
+Prueft ob eine laufende Ingest-Pipeline (`wiki/_pending.json`) offene Gates hat.
+Verhindert parallele /ingest-Laeufe auf derselben Quelle.
+Wird von /ingest am Anfang (Lock-Acquire) und am Ende (Lock-Release) aufgerufen.
 
 ### 16 Output-Checks (check-wiki-output.sh)
 
@@ -108,7 +116,7 @@ Es gibt 7 Subagents, aufgeteilt in 3 Rollen (siehe `governance/naming-konvention
 15. **Widerspruch-Marker**: [WIDERSPRUCH]-Marker muessen zwei Quellen nennen
 16. **Review-Status**: Feld `reviewed:` sollte im Frontmatter vorhanden sein
 
-### 12 Plugin-Konsistenz-Checks (check-consistency.sh)
+### 16 Plugin-Konsistenz-Checks (check-consistency.sh)
 
 Prueft die interne Konsistenz des Plugins selbst (nicht der Wiki-Daten):
 
@@ -124,6 +132,10 @@ Prueft die interne Konsistenz des Plugins selbst (nicht der Wiki-Daten):
 10. **Vokabular-Regeln**: governance/vokabular-regeln.md vorhanden
 11. **Qualitaetsstufen**: governance/qualitaetsstufen.md vorhanden
 12. **Templates**: TEMPLATE-skill.md und TEMPLATE-agent.md vorhanden
+13. **Ingest-Dispatch-Template**: governance/ingest-dispatch-template.md vorhanden
+14. **Synthese-Dispatch-Template**: governance/synthese-dispatch-template.md vorhanden
+15. **Template-Platzhalter**: Dispatch-Templates enthalten mindestens 5 `{{`-Platzhalter
+16. **Skill-Template-Referenz**: ingest/SKILL.md und synthese/SKILL.md referenzieren ihre Dispatch-Templates
 
 ## Gate-Enforcement-Klassifikation
 
@@ -163,6 +175,7 @@ Prueft die interne Konsistenz des Plugins selbst (nicht der Wiki-Daten):
 | Kontrolliertes Vokabular | Markdown | `wiki/_vokabular.md` | /vokabular | /ingest (Check), /wiki-lint |
 | Aenderungsprotokoll | Markdown | `wiki/_log.md` | Alle schreibenden Skills | /wiki-lint (Audit-Trail) |
 | BibTeX-Katalog | BibTeX | `Masterarbeit/literatur.bib` | /katalog (Export-Proposal, NICHT direkt schreiben!) | Pandoc (Kapitel-Build) |
+| Pipeline-Lock | JSON | `wiki/_pending.json` | /ingest (Lock-Datei waehrend Verarbeitung) | check-gates-pending.sh |
 
 > **Scope-Regel:** Das Bibliothek-Plugin arbeitet ausschliesslich in `wiki/`.
 > Dateien ausserhalb von `wiki/` (z.B. literatur.bib) werden NICHT geschrieben.
@@ -178,7 +191,7 @@ Prueft die interne Konsistenz des Plugins selbst (nicht der Wiki-Daten):
 - **Agents:** 7 (4 Pruefer + 2 Reviewer + 1 Validator)
 - **Hard Gates:** 10 (definiert in `governance/hard-gates.md`)
 - **Output-Checks:** 16 (check-wiki-output.sh, davon 14 aktiv + 2 deferred)
-- **Konsistenz-Checks:** 12 (check-consistency.sh)
+- **Konsistenz-Checks:** 16 (check-consistency.sh)
 - **Governance-Schichten:** 4 (Hook → Using → Gate → Subagent)
 
 ## Wiki-Verzeichnisstruktur
