@@ -89,13 +89,21 @@ Es gibt 7 Subagents, aufgeteilt in 3 Rollen (siehe `governance/naming-konvention
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Shell-Checks (Output Validierung)
+## Shell-Checks und Hooks
 
-### check-gates-pending.sh
+### Aktive Hooks (Stand SPEC-001, 2026-04-11)
 
-Prueft ob eine laufende Ingest-Pipeline (`wiki/_pending.json`) offene Gates hat.
-Verhindert parallele /ingest-Laeufe auf derselben Quelle.
-Wird von /ingest am Anfang (Lock-Acquire) und am Ende (Lock-Release) aufgerufen.
+| Hook | Event | Matcher | Zweck |
+|------|-------|---------|-------|
+| `session-start` | SessionStart | startup\|resume\|clear\|compact | Governance-Context injizieren via using-bibliothek |
+| `guard-wiki-writes.sh` | PreToolUse | Edit\|Write | Blockiert `wiki/**/*.md`-Writes ausserhalb der 4 Schreib-Skills (Transcript-Check) |
+| `inject-lock-warning.sh` | UserPromptSubmit | — | Passive Warnung wenn `wiki/_pending.json` offen ist (additionalContext-Injection) |
+
+**Noch ausstehend (SPEC-002):**
+- `guard-pipeline-lock.sh` (PreToolUse Agent) — blockiert parallele Ingest-Dispatches solange _pending.json offen
+- `advance-pipeline-lock.sh` (SubagentStop auf Gate-Agents) — zaehlt Gates, wechselt Lock-Stufe
+
+**Selbst-Check im Subagent:** Gate-Agents rufen `check-wiki-output.sh` nach jeder Datei selbst auf (seit Commit f7b08d7). Das ist die einzige automatische Output-Validierung, weil PostToolUse-Hooks nach Claude Code Hooks API 2026 nicht mehr blockieren koennen.
 
 ### 16 Output-Checks (check-wiki-output.sh)
 
@@ -175,7 +183,7 @@ Prueft die interne Konsistenz des Plugins selbst (nicht der Wiki-Daten):
 | Kontrolliertes Vokabular | Markdown | `wiki/_vokabular.md` | /vokabular | /ingest (Check), /wiki-lint |
 | Aenderungsprotokoll | Markdown | `wiki/_log.md` | Alle schreibenden Skills | /wiki-lint (Audit-Trail) |
 | BibTeX-Katalog | BibTeX | `Masterarbeit/literatur.bib` | /katalog (Export-Proposal, NICHT direkt schreiben!) | Pandoc (Kapitel-Build) |
-| Pipeline-Lock | JSON | `wiki/_pending.json` | /ingest (Lock-Datei waehrend Verarbeitung) | check-gates-pending.sh |
+| Pipeline-Lock | JSON | `wiki/_pending.json` | /ingest (Lock-Datei waehrend Verarbeitung) | `inject-lock-warning.sh` (SPEC-001, passiv) + `guard-pipeline-lock.sh` / `advance-pipeline-lock.sh` (SPEC-002, aktiv, geplant) |
 
 > **Scope-Regel:** Das Bibliothek-Plugin arbeitet ausschliesslich in `wiki/`.
 > Dateien ausserhalb von `wiki/` (z.B. literatur.bib) werden NICHT geschrieben.
@@ -192,6 +200,7 @@ Prueft die interne Konsistenz des Plugins selbst (nicht der Wiki-Daten):
 - **Hard Gates:** 10 (definiert in `governance/hard-gates.md`)
 - **Output-Checks:** 16 (check-wiki-output.sh, davon 14 aktiv + 2 deferred)
 - **Konsistenz-Checks:** 19 (check-consistency.sh)
+- **Aktive Hooks:** 3 (SessionStart + PreToolUse Edit|Write + UserPromptSubmit; SPEC-002 bringt 2 weitere)
 - **Governance-Schichten:** 4 (Hook → Using → Gate → Subagent)
 
 ## Wiki-Verzeichnisstruktur
@@ -246,4 +255,4 @@ was davon wohin uebernommen wird.
 
 ---
 
-**Version:** 1.1.0 | **Stand:** 2026-04-09
+**Version:** 1.2.0 | **Stand:** 2026-04-11

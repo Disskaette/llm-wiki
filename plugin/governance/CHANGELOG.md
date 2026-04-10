@@ -122,3 +122,57 @@
 - Governance-Dateien: 9 (inkl. obsidian-setup.md, wiki-claude-md.md)
 
 **Status:** Produktionsbereit | **Aktualisiert:** 2026-04-09
+
+---
+
+## [1.2.0] — 2026-04-11
+
+### Plugin-Struktur-Refactor
+
+- Plugin-Dateien in `plugin/`-Unterverzeichnis verschoben (Commit 4766b13)
+- Direkte Plugin-Registrierung auf `plugin/`-Pfad (Commit 99d7eb6, installed_plugins.json)
+- Cache-Verzeichnis wird nicht mehr verwendet (verwaist mit .orphaned_at-Marker)
+- Plugin liest aus `/Users/maximilianstark/Projects/llm-wiki/plugin` direkt — kein Sync-Script noetig
+
+### Hook-Infrastruktur neu (SPEC-001 — Passive Hooks)
+
+**Kritisch — Machine-Law-Wiederbelebung nach Schema-Incident:**
+
+Die bisherigen Hooks `check-wiki-write.sh` (PostToolUse) und `check-gates-pending.sh` (PreToolUse) nutzten das veraltete JSON-Response-Schema `{"decision":"block"}`, das die Claude Code Hooks API seit der 2026-Umstellung nicht mehr akzeptiert. Jeder Hook-Call produzierte "JSON validation failed", unabhaengig davon ob eine Wiki-Datei tatsaechlich betroffen war. Die Hooks wurden in den Commits 12e8a3c (PostToolUse) und 19e23c7 (PreToolUse) deaktiviert — Machine-Law-Schicht komplett offline, nur Prompt-Law + Subagent-Review aktiv.
+
+SPEC-001 baut zwei Ersatz-Hooks nach dem Website_v2-Referenzpattern (exit-code + stderr, jq fuer stdin-Parsing):
+
+- `plugin/hooks/guard-wiki-writes.sh` (PreToolUse Edit|Write): blockiert Writes auf `wiki/**/*.md` wenn kein Schreib-Skill in der Session geladen ist (Transcript-Grep nach `/ingest`, `/synthese`, `/normenupdate`, `/vokabular`). 5/5 Tests gruen.
+- `plugin/hooks/inject-lock-warning.sh` (UserPromptSubmit): passive Warnung als `hookSpecificOutput.additionalContext` wenn `wiki/_pending.json` offen ist. Blockiert nie. 7/7 Tests gruen.
+- `plugin/hooks/check-wiki-write.sh` geloescht (Commit f58055c)
+- `tests/test-wiki-write-hook.sh` geloescht
+
+### Gate-Drift-Reparatur (Bugfix aus Debug-Session 2026-04-10)
+
+- `vollstaendigkeits-pruefer` Part C/D umgeschrieben:
+  - Alte Pruefung: `relevanz: high` im Frontmatter + YAML-Feld `zusammenfassung:`
+  - Echtes Ingest-Template-Schema: `relevanz: hoch|mittel|niedrig` im `kapitel-index:`-Array + Body-Section `## Kapitel [Nr]: [Titel]`
+  - Folge: False-FAIL bei Blass-Uibel Gate 1 — der Agent meldete FAIL obwohl der Ingest korrekt war
+- `ingest-dispatch-template.md` um explizite Pflicht-Regel ergaenzt: `schlagworte:` muss mindestens 3 Eintraege enthalten (war nur im Pruefer-Agent verankert, Template zeigte es nur als Beispiel-Wert)
+  - Folge: PRB 4.14 Gate 1 FAIL weil Ingest nur 2 Schlagworte generiert hatte
+- FAIL-Kriterien in `vollstaendigkeits-pruefer` auf die korrekten Feldnamen angepasst
+
+### Modellwahl im Ingest
+
+- >200 Seiten → `model: "opus"` (1M Context noetig)
+- ≤200 Seiten → `model: "sonnet"` (guenstig, reicht)
+- Hauptagent setzt beim Dispatch `model:`-Parameter entsprechend (Commit 5f7757f)
+
+### Statistiken
+
+- Befehle: 7 | Skills: 8 | Agents: 7 | Hard Gates: 10
+- Output-Checks: 16 (14 aktiv + 2 deferred) | Konsistenz-Checks: 19
+- Aktive Hooks: 3 (SessionStart + PreToolUse Edit|Write + UserPromptSubmit)
+- Geplante Hooks: +2 (SPEC-002: guard-pipeline-lock.sh + advance-pipeline-lock.sh)
+
+### SPECs
+
+- `docs/specs/SPEC-001-passive-hooks.md` — Passive Hooks (Done nach Session-Restart + E2E-Tests)
+- `docs/specs/SPEC-002-pipeline-lock-enforcement.md` — Aktive Pipeline-Lock-Enforcement (Planned, baut auf SPEC-001)
+
+**Status:** Produktionsbereit | **Aktualisiert:** 2026-04-11

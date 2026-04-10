@@ -24,8 +24,17 @@ llm-wiki/
 └── ARCHITECTURE.md      ← Architektur-Doku (Dev-only)
 ```
 
-**Cache-Symlink:** `~/.claude/plugins/cache/.../1.1.0 → plugin/`
-Aenderungen an plugin/ greifen nach Session-Neustart.
+**Plugin-Installation:** Claude Code laedt das Plugin direkt aus diesem Repo.
+Registrierung in `~/.claude/plugins/installed_plugins.json`:
+```
+"bibliothek@llm-wiki-local" → installPath: /Users/maximilianstark/Projects/llm-wiki/plugin
+```
+Kein Cache-Symlink, kein Sync-Script. Aenderungen an `plugin/` greifen nach
+Session-Neustart automatisch (Hooks werden im RAM gecacht).
+
+Der Ordner `~/.claude/plugins/cache/llm-wiki-local/.../1.1.0/` ist verwaist
+(`.orphaned_at`-Marker) und wird nicht mehr verwendet — Relikt aus der Zeit
+vor dem `plugin/`-Subdirectory-Refactor (Commit 4766b13).
 
 ## Architektur-Prinzipien
 
