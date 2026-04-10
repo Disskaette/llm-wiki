@@ -19,7 +19,7 @@ description: "Konzeptseiten vertiefen — Quellen vergleichen, Formeln ausarbeit
 | KEIN-SCHLAGWORT-OHNE-VOKABULAR | 🔄 Delegiert | Dispatch: vokabular-pruefer |
 | KEIN-UPDATE-OHNE-DIFF | ✅ Aktiv | Phase 2 dokumentiert Diffs zwischen Alt + Neu |
 | KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ✅ Aktiv | Phase 2 markiert ALLE Widersprueche mit [WIDERSPRUCH] |
-| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ✅ Aktiv | Phase 0.5 liest ALLE referenzierten Quellen (PDF) |
+| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ✅ Aktiv | Wiki-Quellenseiten als Primaerquelle (4-Gate-geprueft), PDF-Spot-Check bei Widerspruechen/Unklarheiten |
 | KORREKTE-UMLAUTE | ✅ Aktiv | Synthese-Output wird auf Umlaute geprueft |
 
 **EXTERNER-INHALT-Marker:** Synthese liest PDFs → Wrapper erforderlich.
@@ -27,6 +27,16 @@ description: "Konzeptseiten vertiefen — Quellen vergleichen, Formeln ausarbeit
 ---
 
 ## Phasen
+
+### Phase 0.0: Konzept-Kandidaten sammeln
+
+1. Scanne alle Quellenseiten: `grep "konzept-kandidaten:" wiki/quellen/*.md`
+2. Zaehle pro Kandidat: wie viele Quellen nennen ihn?
+3. Kandidaten mit >=2 Quellen → zur Synthese-Liste hinzufuegen
+4. Meldung an Nutzer: "N neue Konzeptseiten koennen erstellt werden: [Liste]"
+5. Nutzer entscheidet welche Konzepte synthetisiert werden
+
+---
 
 ### Phase 0: Target identifizieren + Quellen laden
 
@@ -61,22 +71,47 @@ Plan dokumentiert:
 ### Phase 0.5b: PDF-Lesung (BLOCKIERENDES GATE 9)
 
 <NICHT-VERHANDELBAR>
-Alle in Phase 0 identifizierten PDF-Kapitel MUESSEN vollstaendig gelesen werden.
-Das ist Gate 9: KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG.
-Kein Skipping, kein "scheint nicht relevant".
+Synthese arbeitet primaer auf Wiki-Quellenseiten (4-Gate-gepruefte Extraktionen).
+Original-PDFs werden NUR bei Widerspruechen, unklaren Formeln oder unplausiblen
+Zahlenwerten geladen — GEZIELT, 2-5 Seiten, nicht ganze Kapitel.
+
+1. Lies alle Wiki-Quellenseiten die das Konzept behandeln (PFLICHT)
+2. Lade Original-PDFs NUR bei Bedarf (Widerspruch/Unklarheit)
+3. Vermerke jeden PDF-Spot-Check im Output:
+   "PDF verifiziert: [Datei], S. X — [Ergebnis]"
 </NICHT-VERHANDELBAR>
 
-1. **Pro referenzierte Quelle:**
-   - PDF laden (SCHREIBPFAD — siehe CLAUDE.md)
-   - Wrap: `<EXTERNER-INHALT>` marker
-   - Relevante Kapitel komplett durchlesen
-   - Extrahieren: Formeln, Zahlenwerte, Grenzen, Methoden, Widersprueche
+1. **Wiki-Quellenseiten lesen (PFLICHT):**
+   - Alle Quellenseiten die das Konzept behandeln laden
+   - Formeln, Zahlenwerte, Normbezuege, Widersprueche extrahieren
 
-2. **Kontext-Budget-Stopp:**
+2. **PDF-Spot-Check (NUR BEI BEDARF):**
+   - Bei Widerspruch zwischen Quellen: konkrete PDF-Seiten laden
+   - Bei unklarer Formel: PDF-Seite pruefen
+   - Bei unplausiblem Zahlenwert: Originalstelle verifizieren
+   - GEZIELT: nur 2-5 Seiten, nicht ganze Kapitel
+   - Wrap: `<EXTERNER-INHALT>` Marker
+
+3. **Kontext-Budget-Stopp:**
    - Falls Anzeichen von Kontext-Engpass: STOPP
-   - Meldung an den Nutzer:
-     "Synthese kann nicht abgeschlossen werden: X von Y Quellen gelesen.
-     Empfehlung: Split-Synthese aktivieren oder Session fortsetzen."
+   - Meldung: "Synthese kann nicht abgeschlossen werden: X von Y Quellen gelesen."
+
+---
+
+### Phase 0.6: Dispatch vorbereiten
+
+<NICHT-VERHANDELBAR>
+Subagent-Prompts werden NICHT frei formuliert. IMMER Template verwenden.
+</NICHT-VERHANDELBAR>
+
+1. Lade `governance/synthese-dispatch-template.md`
+2. Fuelle Platzhalter:
+   - `{{KONZEPT_NAME}}`: aus Nutzer-Anfrage oder Kandidaten-Liste
+   - `{{KONZEPT_DATEI}}`: Pfad zur bestehenden Seite oder "NEU"
+   - `{{QUELLENSEITEN_INHALT}}`: Read aller Wiki-Quellenseiten → inline einfuegen
+   - `{{WIKI_ROOT}}`: Projektpfad + `/wiki/`
+   - `{{VOKABULAR_TERME}}`: `grep "^### " wiki/_vokabular.md` → Term-Liste
+3. Dispatche Agent mit ausgefuelltem Template als Prompt
 
 ---
 
@@ -119,6 +154,16 @@ Kein Skipping, kein "scheint nicht relevant".
 ---
 
 ### Phase 2: Seite ausarbeiten + Diffs dokumentieren
+
+<NICHT-VERHANDELBAR>
+KEIN INFORMATIONSVERLUST: Fuer JEDE Quellenseite gilt:
+- Jede Formel → muss in der Konzeptseite landen
+- Jeder Zahlenwert → muss in der Vergleichstabelle landen
+- Jede Randbedingung → muss dokumentiert sein
+- Jeder Normbezug → muss mit Abschnitt erfasst sein
+
+Wenn unsicher ob relevant: AUFNEHMEN. Weglassen nur mit expliziter Begruendung.
+</NICHT-VERHANDELBAR>
 
 **2a: Struktur aufbauen:**
 
