@@ -251,10 +251,13 @@ Ueberspringen ist VERBOTEN. _pending.json blockiert den naechsten Ingest mechani
 
 Checkliste:
 1. check-wiki-output.sh automatisch gelaufen (PostToolUse-Hook) → Bei FAIL: Korrektur
-2. Gate 1-4 parallel dispatchen (vollstaendigkeits-pruefer, quellen-pruefer,
-   konsistenz-pruefer, vokabular-pruefer)
-3. Alle 4 PASS → weiter zu Phase 4 (Nebeneffekte)
-4. Bei FAIL: Korrektur → Re-Gate (max 3x) → Eskalation an Nutzer
+2. Lade `governance/gate-dispatch-template.md`
+3. Fuelle Platzhalter pro Gate-Agent (Quellenseite, PDF-Pfad, Konzeptseiten, etc.)
+4. Gate 1-4 parallel dispatchen — IMMER mit Template-Prompt, NIE frei formuliert
+5. Gate 2 (quellen-pruefer) uebernimmt die kontextuellen Checks 04, 05, 06, 09
+   die das Shell-Script nur als WARN meldet — der Agent bewertet und korrigiert
+6. Alle 4 PASS → weiter zu Phase 4 (Nebeneffekte)
+7. Bei FAIL: Korrektur → Re-Gate (max 3x) → Eskalation an Nutzer
 </NICHT-VERHANDELBAR>
 
 Alle generierten/aktualisierten Wiki-Seiten durchlaufen 4 Gates.

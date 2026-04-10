@@ -225,6 +225,37 @@ else
     check FAIL "16-skill-template-referenz" "Ingest-Ref: $INGEST_REF, Synthese-Ref: $SYNTHESE_REF"
 fi
 
+# --- Check 17: Gate-Dispatch-Template existiert ---
+if [ -f "$ROOT/governance/gate-dispatch-template.md" ]; then
+    check PASS "17-gate-template" ""
+else
+    check FAIL "17-gate-template" "governance/gate-dispatch-template.md fehlt"
+fi
+
+# --- Check 18: Gate-Template hat alle 4 Gates ---
+if [ -f "$ROOT/governance/gate-dispatch-template.md" ]; then
+    GATE_AGENTS=0
+    grep -q 'vollstaendigkeits-pruefer' "$ROOT/governance/gate-dispatch-template.md" && GATE_AGENTS=$((GATE_AGENTS+1))
+    grep -q 'quellen-pruefer' "$ROOT/governance/gate-dispatch-template.md" && GATE_AGENTS=$((GATE_AGENTS+1))
+    grep -q 'konsistenz-pruefer' "$ROOT/governance/gate-dispatch-template.md" && GATE_AGENTS=$((GATE_AGENTS+1))
+    grep -q 'vokabular-pruefer' "$ROOT/governance/gate-dispatch-template.md" && GATE_AGENTS=$((GATE_AGENTS+1))
+    if [ "$GATE_AGENTS" -ge 4 ]; then
+        check PASS "18-gate-template-vollstaendig" ""
+    else
+        check FAIL "18-gate-template-vollstaendig" "Nur $GATE_AGENTS von 4 Gate-Agents im Template"
+    fi
+else
+    check FAIL "18-gate-template-vollstaendig" "Gate-Template fehlt"
+fi
+
+# --- Check 19: Ingest-Skill referenziert Gate-Template ---
+GATE_REF=$(grep -c 'gate-dispatch-template' "$ROOT/skills/ingest/SKILL.md" 2>/dev/null || echo 0)
+if [ "$GATE_REF" -ge 1 ]; then
+    check PASS "19-skill-gate-referenz" ""
+else
+    check FAIL "19-skill-gate-referenz" "/ingest SKILL.md referenziert gate-dispatch-template nicht"
+fi
+
 # --- Ergebnis ---
 echo ""
 echo "=== Ergebnis: $PASS PASS, $FAIL FAIL ==="
