@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-consistency.sh — 16 Plugin-interne Konsistenzpruefungen
+# check-consistency.sh — 19 Plugin-interne Konsistenzpruefungen
 # Aufruf: ./check-consistency.sh [plugin-root]
 #
 # Exit 0 = alles konsistent

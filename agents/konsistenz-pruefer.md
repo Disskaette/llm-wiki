@@ -13,9 +13,8 @@ Der Konsistenzprüfer ist die dritte Kontrollstelle. Er schaut, ob neu erfasstes
 ## Governance
 
 - **Dispatcher:** `/ingest`
-- **Auslöser:** Erst nach bestandenem Gate 2 (quellen-pruefer)
-- **Abhängigkeiten:** Gate 2 (PASS oder PASS MIT HINWEISEN)
-- **Nachfolger:** vokabular-pruefer (Gate 4) — nur bei PASS
+- **Auslöser:** Nach Rückkehr des Ingest-Subagents (parallel mit anderen Gates)
+- **Abhängigkeiten:** Keine (Gates laufen parallel und unabhängig)
 - **Rollback:** Markiere Widersprüche mit `[WIDERSPRUCH]`, fordere Klärung an
 
 ## Input

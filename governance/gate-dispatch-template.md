@@ -78,6 +78,9 @@ Original-PDF: {{PDF_PFAD}}
 
 ## Gate 2: quellen-pruefer
 
+**Hinweis:** Die Parts unten sind eine vereinfachte Dispatch-Struktur.
+Die vollständige Prüflogik mit Parts A-G ist in `agents/quellen-pruefer.md` definiert.
+
 ### Platzhalter
 
 | Platzhalter | Beschreibung |

@@ -13,15 +13,14 @@ Der Vollständigkeitsprüfer prüft die erste Phase der Quellenverarbeitung: Wur
 ## Governance
 
 - **Dispatcher:** `/ingest`
-- **Auslöser:** Neue Quelle hinzugefügt oder bestehendes Kapitel überarbeitet
-- **Abhängigkeiten:** Keine vorgelagert
-- **Nachfolger:** quellen-pruefer (Gate 2) — nur bei PASS
+- **Auslöser:** Nach Rückkehr des Ingest-Subagents (parallel mit anderen Gates)
+- **Abhängigkeiten:** Keine (Gates laufen parallel und unabhängig)
 - **Rollback:** Markiere Kapitel mit `[UNVOLLSTÄNDIG]`, gib Reparaturanleitung aus
 
 ## Input
 
 - Markdown-Datei: Neu erfasstes oder aktualisiertes Kapitel aus der Ingest-Pipeline
-- Frontmatter: `relevanz`, `keywords`, `quellen_id`, `seitenbereiche`
+- Frontmatter: `relevanz`, `schlagworte`, `quellen_id`, `seitenbereiche`
 - Gesamte Kapitelstruktur: Alle Unterabschnitte
 
 ## Prüfungen & Kriterien
@@ -69,11 +68,11 @@ Zusammenfassung muss:
 
 ### Part D: Schlüsselwörter decken Kernthemen ab?
 
-Prüfe Frontmatter-Feld `keywords` (Array):
+Prüfe Frontmatter-Feld `schlagworte` (Array):
 - Mindestens 5 Schlüsselwörter für hochrelevante Kapitel
 - Mindestens 3 Schlüsselwörter für mittelrelevante Kapitel
 - Schlüsselwörter sind fachspezifisch, nicht generisch (z.B. "Querkraftverhalten im Auflagerbereich" nicht "wichtiges Thema")
-- Mindestens 2 der Keywords sollten Begriffe sein, die auch in wiki/_vokabular.md definiert sind
+- Mindestens 2 der Schlagworte sollten Begriffe sein, die auch in wiki/_vokabular.md definiert sind
 
 **Resultat:** Vollständig/teilweise/unzureichend.
 
@@ -101,7 +100,7 @@ Prüfe Frontmatter-Feld `keywords` (Array):
 
 ### Part D: Schlüsselwörter
 [Resultat]: [Begründung]
-- Anzahl Keywords: [n]
+- Anzahl Schlagworte: [n]
 - Spezifität: ✓ / ✗ (mit Beispiel)
 - Vocab-Abdeckung: [m/n] Begriffe in wiki/_vokabular.md
 
@@ -115,14 +114,14 @@ Alle Prüfungen bestanden:
 - Part A: Kapitel vollständig erfasst
 - Part B: kapitel-index vollständig und korrekt
 - Part C: Alle high-relevanz Kapitel haben Zusammenfassungen
-- Part D: Keywords sind zahlreich, spezifisch und reichen für Suchfindbarkeit
+- Part D: Schlagworte sind zahlreich, spezifisch und reichen für Suchfindbarkeit
 
 **Aktion:** Weiterleitung zu Gate 2 (quellen-pruefer).
 
 ### PASS MIT HINWEISEN
 Kapitel ist verwendbar, aber mit Empfehlungen:
 - Part C: Medium-relevanz Kapitel hätte von einer Zusammenfassung profitiert
-- Part D: 1–2 Keywords könnten spezifischer sein (Beispiele geben)
+- Part D: 1–2 Schlagworte könnten spezifischer sein (Beispiele geben)
 - Geringfügige Strukturierungsprobleme im kapitel-index (z.B. Formatierung)
 
 **Aktion:** Weiterleitung zu Gate 2 mit Hinweis-Notiz. Autor sollte nacharbeiten.
@@ -132,7 +131,7 @@ Mindestens eines der Kriterien nicht erfüllt:
 - Part A: Ganze Abschnitte oder Kapitel fehlen (>20% des erwarteten Inhalts)
 - Part B: kapitel-index fehlt komplett oder ist strukturell fehlerhaft
 - Part C: High-relevanz Kapitel ohne Zusammenfassung
-- Part D: Weniger als 3 Schlüsselwörter oder überwiegend generische Keywords
+- Part D: Weniger als 3 Schlüsselwörter oder überwiegend generische Schlagworte
 
 **Aktion:** Rückweisung mit detaillierter Reparaturanleitung. Kapitel wird mit `[UNVOLLSTÄNDIG]` markiert, Autor wird zur Nachbearbeitung aufgefordert.
 
@@ -141,14 +140,14 @@ Mindestens eines der Kriterien nicht erfüllt:
 - **Fehlende Kapitel:** ≥1 großer Abschnitt (>500 Wörter erwartete Länge) ist nicht erfasst
 - **Kein kapitel-index:** Struktur-Feld komplett abwesend oder leer
 - **High-relevanz ohne Zusammenfassung:** `relevanz: high` aber `zusammenfassung` fehlt oder <50 Wörter
-- **Unzureichende Keywords:** <3 Keywords insgesamt, oder >50% sind generisch/nichtssagend
+- **Unzureichende Schlagworte:** <3 Schlagworte insgesamt, oder >50% sind generisch/nichtssagend
 
 ## Hinweis-Kriterien (sind verhandelbar)
 
 - **Teilweise erfasst:** 85–100% des Inhalts erfasst, aber einzelne Absätze fehlen
 - **kapitel-index unvollständig:** Struktur vorhanden, aber Seitenbereiche fehlen bei einigen Einträgen, oder Reihenfolge ist nicht präzise
 - **Medium-relevanz ohne Zusammenfassung:** `relevanz: medium` und keine Zusammenfassung (wird als Hinweis ausgegeben, nicht als Fehler)
-- **Schwache Keywords:** 4–5 Keywords vorhanden, aber 1–2 sind zu generisch oder wiederholen sich
+- **Schwache Schlagworte:** 4–5 Schlagworte vorhanden, aber 1–2 sind zu generisch oder wiederholen sich
 
 ## Re-Review-Limit
 

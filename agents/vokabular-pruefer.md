@@ -4,35 +4,34 @@
 
 | Hard Gate | Verantwortung | Status |
 |-----------|---------------|--------|
-| **Gate 4: Ingest Pipeline** | Keywords in Vokabular, keine Synonyme als Primär-Tags, Hierarchie-Konsistenz | Dieses Subagent |
+| **Gate 4: Ingest Pipeline** | Schlagworte in Vokabular, keine Synonyme als Primär-Tags, Hierarchie-Konsistenz | Dieses Subagent |
 
 ## Rolle
 
-Der Vokabulärprüfer ist die vierte und finale Kontrollstelle vor der Freigabe. Er sichert das terminologische Ökosystem: Sind alle Keywords in der kontrollierten Vokabular-Datei (`_vokabular.md`) definiert? Werden keine unartikulierten Synonyme als Haupt-Tags verwendet? Ist die Oberbegriff-Zuordnung konsistent? Das ist Taxonomie-Kontrolle für Suchbarkeit und Konsistenz.
+Der Vokabulärprüfer ist die vierte und finale Kontrollstelle vor der Freigabe. Er sichert das terminologische Ökosystem: Sind alle Schlagworte in der kontrollierten Vokabular-Datei (`_vokabular.md`) definiert? Werden keine unartikulierten Synonyme als Haupt-Tags verwendet? Ist die Oberbegriff-Zuordnung konsistent? Das ist Taxonomie-Kontrolle für Suchbarkeit und Konsistenz.
 
 ## Governance
 
 - **Dispatcher:** `/ingest`
-- **Auslöser:** Erst nach bestandenem Gate 3 (konsistenz-pruefer)
-- **Abhängigkeiten:** Gate 3 (PASS oder PASS MIT HINWEISEN)
-- **Nachfolger:** Kapitel wird freigegeben (no further gates)
+- **Auslöser:** Nach Rückkehr des Ingest-Subagents (parallel mit anderen Gates)
+- **Abhängigkeiten:** Keine (Gates laufen parallel und unabhängig)
 - **Rollback:** Markiere Vokabular-Verstöße, fordere Anpassung an
 
 ## Input
 
 - Markdown-Kapitel aus Gate 3 (konsistenzgeprüft)
-- Frontmatter-Feld `keywords` (Array von Strings)
+- Frontmatter-Feld `schlagworte` (Array von Strings)
 - Hauptvokabular-Datei: `wiki/_vokabular.md`
 - Hierarchie-Struktur: `oberbegriff`, `unterbegriffe`, `synonyme` in `_vokabular.md`
 
 ## Prüfungen & Kriterien
 
-### Part A: Alle Keywords existieren in _vokabular.md
+### Part A: Alle Schlagworte existieren in _vokabular.md
 
 Prüfe das Frontmatter-Feld:
 
 ```yaml
-keywords:
+schlagworte:
   - Querkraftübertragung
   - Auflagerbereich
   - Verbundspannung
@@ -58,7 +57,7 @@ keywords:
 
 ### Part B: Keine Synonyme als Primär-Tags
 
-Prüfe, ob Keywords dem "preferred term" (Hauptbegriff) entsprechen:
+Prüfe, ob Schlagworte dem "preferred term" (Hauptbegriff) entsprechen:
 
 **Problem-Beispiel:**
 - Vokabular sagt: Hauptbegriff ist "Rollschubverhalten" mit Synonym "Rollschub-Effekt"
@@ -109,9 +108,9 @@ Prüfe Oberbegriff-Zuordnung für jedes Keyword:
 **Prüfdatum:** [YYYY-MM-DD]
 
 ### Part A: Vokabular-Abdeckung
-**Resultat:** [n Keywords, alle in Vokabular / m fehlen]
+**Resultat:** [n Schlagworte, alle in Vokabular / m fehlen]
 
-Keywords-Liste:
+Schlagworte-Liste:
 - ✓ `Querkraftübertragung` — definiert in _vokabular.md
 - ✓ `Auflagerbereich` — definiert in _vokabular.md
 - ✗ `Verbund-Kraft-Fluss` — NICHT in _vokabular.md
@@ -121,7 +120,7 @@ Fehlende Einträge: [m]
 ### Part B: Synonym-Prüfung
 **Resultat:** [Alle Hauptbegriffe / n Synonyme als Tags]
 
-Keywords nach Typ:
+Schlagworte nach Typ:
 - Hauptbegriffe (korrekt): [n]
 - Synonyme (sollten nicht als Tag verwendet werden): [n mit Liste]
 
@@ -133,7 +132,7 @@ Beispiele:
 **Resultat:** [Konsistent / Teilweise / Inkonsistent]
 
 Hierarchie-Überprüfung:
-- Oberbegriff vorhanden: [m/n Keywords]
+- Oberbegriff vorhanden: [m/n Schlagworte]
 - Oberbegriffe selbst definiert: [m/n]
 - Zirkuläre Verweise: [n oder "keine"]
 
@@ -149,23 +148,23 @@ Beispiele:
 
 ### PASS
 Alle Prüfungen bestanden:
-- Part A: 100 % der Keywords sind in `_vokabular.md` definiert
-- Part B: Alle Keywords sind Hauptbegriffe, keine Synonyme als Primär-Tags
+- Part A: 100 % der Schlagworte sind in `_vokabular.md` definiert
+- Part B: Alle Schlagworte sind Hauptbegriffe, keine Synonyme als Primär-Tags
 - Part C: Oberbegriff-Hierarchie ist konsistent, keine Zirkularitäten
 
 **Aktion:** Kapitel wird **freigegeben**. Übergabe zum Publikations-System oder zur Wiki-Integration.
 
 ### PASS MIT HINWEISEN
 Überwiegend korrekt, aber mit Verbesserungsmöglichkeiten:
-- Part A: 1–2 neue Keywords könnten optional zu `_vokabular.md` hinzugefügt werden (sind aber fachlich verständlich auch ohne formalen Eintrag)
-- Part B: Alle Keywords sind Hauptbegriffe, aber 1 Keyword könnte einen zusätzlichen Synonym-Eintrag bekommen
+- Part A: 1–2 neue Schlagworte könnten optional zu `_vokabular.md` hinzugefügt werden (sind aber fachlich verständlich auch ohne formalen Eintrag)
+- Part B: Alle Schlagworte sind Hauptbegriffe, aber 1 Keyword könnte einen zusätzlichen Synonym-Eintrag bekommen
 - Part C: Hierarchie ist konsistent, aber 1 Oberbegriff könnte präzisiert werden (z.B. sehr allgemein)
 
 **Aktion:** Kapitel wird freigegeben. Autor sollte optionale Verbesserungen in zukünftigen Updates vornehmen.
 
 ### FAIL
 Eines oder mehrere Kriterien nicht erfüllt:
-- Part A: ≥2 Keywords fehlen in `_vokabular.md`
+- Part A: ≥2 Schlagworte fehlen in `_vokabular.md`
 - Part B: ≥1 Keyword ist ein Synonym, das nicht als Hauptbegriff definiert ist
 - Part C: Hierarchie ist inkonsistent oder zirkulär (Oberbegriff nicht definiert, oder Zirkelverweis)
 
@@ -173,7 +172,7 @@ Eines oder mehrere Kriterien nicht erfüllt:
 
 ## FAIL-Kriterien (nicht verhandelbar)
 
-- **≥2 Keywords nicht in Vokabular:** Einträge fehlen komplett in `_vokabular.md`
+- **≥2 Schlagworte nicht in Vokabular:** Einträge fehlen komplett in `_vokabular.md`
 - **≥1 Synonym als Hauptbegriff:** Keyword ist ein dokumentiertes Synonym eines anderen Begriffs (nicht dessen Hauptbegriff)
 - **Zirkuläre Oberbegriff-Struktur:** X → Y → X oder längere Zyklen
 - **Oberbegriff nicht definiert:** Ein Keyword hat einen Oberbegriff, der selbst nicht in `_vokabular.md` existiert

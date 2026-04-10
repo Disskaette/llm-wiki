@@ -7,7 +7,7 @@ graph LR
     A["📄 PDF-Literatur\n(Normen, Papers,\nForschungsberichte)"] -->|"/ingest\n(Split bei >800K)"| B["📖 Wiki-Seiten\n(Quellen, Konzepte,\nNormen, Baustoffe)"]
     B -->|/vokabular| C["📋 Kontrolliertes\nVokabular\n(_vokabular.md)"]
     B -->|/katalog| D["🗂️ Katalog-Index\n(Quellenliste,\nAbdeckungsanalyse)"]
-    B -->|/wiki-lint| E["✅ Qualitäts-Check\n(16 Output-Checks,\n16 Konsistenz-Checks)"]
+    B -->|/wiki-lint| E["✅ Qualitäts-Check\n(16 Output-Checks,\n19 Konsistenz-Checks)"]
     D -->|/synthese| F["📝 Synthesetext\n(Quellenvergleich,\nWidersprüche)"]
     F -->|/export| G["📊 Export\n(Zusammenfassungen,\nTabellen, Formeln)"]
     E -->|/export| G
@@ -116,7 +116,7 @@ Wird von /ingest am Anfang (Lock-Acquire) und am Ende (Lock-Release) aufgerufen.
 15. **Widerspruch-Marker**: [WIDERSPRUCH]-Marker muessen zwei Quellen nennen
 16. **Review-Status**: Feld `reviewed:` sollte im Frontmatter vorhanden sein
 
-### 16 Plugin-Konsistenz-Checks (check-consistency.sh)
+### 19 Plugin-Konsistenz-Checks (check-consistency.sh)
 
 Prueft die interne Konsistenz des Plugins selbst (nicht der Wiki-Daten):
 
@@ -191,7 +191,7 @@ Prueft die interne Konsistenz des Plugins selbst (nicht der Wiki-Daten):
 - **Agents:** 7 (4 Pruefer + 2 Reviewer + 1 Validator)
 - **Hard Gates:** 10 (definiert in `governance/hard-gates.md`)
 - **Output-Checks:** 16 (check-wiki-output.sh, davon 14 aktiv + 2 deferred)
-- **Konsistenz-Checks:** 16 (check-consistency.sh)
+- **Konsistenz-Checks:** 19 (check-consistency.sh)
 - **Governance-Schichten:** 4 (Hook → Using → Gate → Subagent)
 
 ## Wiki-Verzeichnisstruktur

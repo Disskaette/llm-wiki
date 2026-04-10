@@ -13,9 +13,8 @@ Der Quellenprüfer ist die zweite Kontrollstelle in der Ingest-Pipeline. Er sich
 ## Governance
 
 - **Dispatcher:** `/ingest`
-- **Auslöser:** Erst nach bestandenem Gate 1 (vollstaendigkeits-pruefer)
-- **Abhängigkeiten:** Gate 1 (PASS oder PASS MIT HINWEISEN)
-- **Nachfolger:** konsistenz-pruefer (Gate 3) — nur bei PASS
+- **Auslöser:** Nach Rückkehr des Ingest-Subagents (parallel mit anderen Gates)
+- **Abhängigkeiten:** Keine (Gates laufen parallel und unabhängig)
 - **Rollback:** Markiere fehlende Belege mit `[BELEG-FEHLT: ...]`, gib Reparaturanleitung
 
 ## Input
@@ -38,19 +37,19 @@ Prüfe im gesamten Kapiteltext:
 
 **Format der Quellenangabe (nach Satz oder Absatz):**
 ```markdown
-... Dies zeigt, dass der Verbund unter Querkraft lokal versagt [@quelle_2024, S. 156].
+... Dies zeigt, dass der Verbund unter Querkraft lokal versagt [[quelle_2024.pdf#page=156|Autor 2024, S. 156]].
 ```
 
 oder
 
 ```markdown
-... das Rollschub-Verhalten bei BSP ist ein Kernproblem [@quelle_2024, S. 45–47].
+... das Rollschub-Verhalten bei BSP ist ein Kernproblem [[quelle_2024.pdf#page=45|Autor 2024, S. 45–47]].
 ```
 
 **Anforderungen:**
-- Jede faktische Aussage endet mit `[@quellen_id, S. XX]` oder `[@quellen_id, S. XX–YY]`
+- Jede faktische Aussage endet mit `[[datei.pdf#page=XX|Autor Jahr, S. XX]]`
 - Seitennummern sind präzise (nicht "Kap. 3" oder "Figure 5.2", sondern konkrete Seitenzahl)
-- Mehrere Quellen pro Satz: `[@quelle_A, S. 10] [@quelle_B, S. 23]`
+- Mehrere Quellen pro Satz: `[[quelle_a.pdf#page=10|Autor A, S. 10]] [[quelle_b.pdf#page=23|Autor B, S. 23]]`
 - Paraphrasen sind auch quellenbelegt (nicht nur direkte Zitate)
 
 **Resultat:** Ganz/teilweise/nein mit Prozentsatz erfasster Aussagen.
@@ -65,7 +64,7 @@ Prüfe alle numerischen Werte:
 
 **Format:**
 ```markdown
-Der Elastizitätsmodul von Fichtenbrettschichtholz beträgt etwa 12.600 N/mm² [@DIN1052:2004+A1, S. 12].
+Der Elastizitätsmodul von Fichtenbrettschichtholz beträgt etwa 12.600 N/mm² [[din1052-2004a1.pdf#page=12|DIN 1052:2004+A1, S. 12]].
 ```
 
 **Anforderungen:**
@@ -81,8 +80,8 @@ Prüfe alle Verweise auf Normen, Standards, Richtlinien:
 
 **Format:**
 ```markdown
-Gemäß EC2 Abschnitt 6.2.2 zur Querkraftbemessung [@EC2:2004] gilt für die 
-Verbundverankerung [@EC2:2004, Abschnitt 8.4.3, S. 187]...
+Gemäß EC2 Abschnitt 6.2.2 zur Querkraftbemessung [[ec2-2004.pdf|EC2:2004]] gilt für die 
+Verbundverankerung [[ec2-2004.pdf#page=187|EC2:2004, Abschnitt 8.4.3, S. 187]]...
 ```
 
 **Anforderungen:**
@@ -137,16 +136,34 @@ mit dem Originaltext. Prüfe gezielt auf:
 
 **Resultat:** Semantisch treu / Teilweise ungenau / Materiell verzerrt.
 
+### Part G: Umlaut-Konsistenz (Shell-Check 09)
+
+Prüfe den Body-Text auf verbleibende ASCII-Umlaut-Ersetzungen:
+
+**Typische Artefakte:**
+- "fuer" statt "für", "ueber" statt "über", "Traeger" statt "Träger"
+- Konvertierungs-Artefakte: "Köffizient" (aus Koeffizient), "züinander" (aus zueinander)
+
+**NICHT bemängeln:**
+- Deutsche Wörter mit natürlichem ue/ae/oe: aktuell, manuell, virtuell, neue/neuer, Mauer, Dauer, Frequenz, Versuche, quer*, que*
+- Dateinamen und Pfade (bleiben ASCII)
+- Frontmatter-Werte
+- Code-Blocks
+
+**Bei Fund:** DIREKT korrigieren (nicht nur melden), dann im Prüfbericht dokumentieren.
+
+**Resultat:** Alle Umlaute korrekt / n Artefakte korrigiert.
+
 ### Part F: Cross-Source-Kontaminationsprüfung
 
 Prüfe bei 3-5 zufälligen Zitationen ob der zitierte Inhalt thematisch
 zur Quelle PASST. Nutze den kapitel-index der Quellenseite:
 
-- Zitation: "[@Mueller2020, S. 45]" bei Aussage über Rollschub
+- Zitation: `[[mueller2020.pdf#page=45|Mueller 2020, S. 45]]` bei Aussage über Rollschub
 - Quellenseite Mueller2020: kapitel-index zeigt Kap. 3 (S. 40-60) = "Verbundverhalten"
 - Passt "Rollschub" thematisch zu "Verbundverhalten"? → JA, plausibel
 
-- Zitation: "[@Mueller2020, S. 45]" bei Aussage über Brandschutz
+- Zitation: `[[mueller2020.pdf#page=45|Mueller 2020, S. 45]]` bei Aussage über Brandschutz
 - Quellenseite Mueller2020: Kein Kapitel zu Brandschutz
 - → VERDACHT: Cross-Source-Kontamination. Nutzer konsultieren.
 
@@ -175,7 +192,7 @@ Beispiel fehlender Beleg:
 - Fehlende Quellenangaben: [Liste]
 
 Beispiel:
-- ✓ "E-Modul = 12.600 N/mm²" [@quelle_2024, S. 34]
+- ✓ "E-Modul = 12.600 N/mm²" [[quelle_2024.pdf#page=34|Autor 2024, S. 34]]
 - ✗ "Verbundspannung max. 8,5 MPa" [BELEG-FEHLT]
 
 ### Part C: Normreferenzen
@@ -184,7 +201,7 @@ Beispiel:
 - Unvollständige Normzüge: [Liste]
 
 Beispiel:
-- ✓ "EC2 Abschnitt 6.2.2" [@EC2:2004, S. 187]
+- ✓ "EC2 Abschnitt 6.2.2" [[ec2-2004.pdf#page=187|EC2:2004, S. 187]]
 - ✗ "DIN 1052" [nur Name, kein Abschnitt]
 
 ### Part D: Spot-Check Seitennummern
@@ -203,8 +220,8 @@ Beispiel:
 ### Part F: Cross-Source-Kontamination
 **Resultat:** [Alle konsistent / n Verdachtsfälle]
 - Geprüfte Zitationen: [3-5]
-  - ✓ [@Mueller2020, S. 45] zu "Verbundverhalten" — passt zu kapitel-index
-  - ✗ [@Mueller2020, S. 45] zu "Brandschutz" — Quelle behandelt kein Brandschutz
+  - ✓ [[mueller2020.pdf#page=45|Mueller 2020, S. 45]] zu "Verbundverhalten" — passt zu kapitel-index
+  - ✗ [[mueller2020.pdf#page=45|Mueller 2020, S. 45]] zu "Brandschutz" — Quelle behandelt kein Brandschutz
 
 **Gesamtergebnis:** [PASS / PASS MIT HINWEISEN / FAIL]
 ```

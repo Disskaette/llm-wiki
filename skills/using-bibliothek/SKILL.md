@@ -1,7 +1,7 @@
 ---
 name: using-bibliothek
 description: "Governance-Hub und Wiki-Awareness fuer die technische Wissensdatenbank"
-user-invocable: false
+user-invocable: true
 ---
 
 # Bibliothek-Plugin — Governance und Wiki-Awareness
