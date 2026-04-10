@@ -70,6 +70,15 @@ REGELN — NICHT VERHANDELBAR
 - Deutsche Umlaute (ae, oe, ue, ss) in Wiki-Text, ASCII in Dateinamen.
 - Schlagworte NUR aus dem kontrollierten Vokabular (siehe oben).
   Wenn ein Begriff fehlt → als konzept-kandidat melden, NICHT erfinden.
+- MINDESTENS 3 Schlagworte im globalen `schlagworte:`-Feld (Pflicht — Gate 1 FAIL bei <3).
+  Bei hoch-relevanten Buechern (Lehrbuecher, Dissertationen, umfangreiche Kommentare)
+  mindestens 5 Schlagworte empfohlen. Wenn das Buch nur 1-2 Kernthemen hat:
+  ergaenze mit Oberbegriffen aus dem Vokabular
+  (z.B. "Grenzzustand der Tragfaehigkeit", "Grenzzustand der Gebrauchstauglichkeit",
+  "EC5", "NA", Kategorie-Tags).
+- Zusammenfassungen hoch-relevanter Kapitel gehoeren als Body-Section in den
+  Fliesstext unter `## Kapitel [Nr]: [Titel] (Relevanz: hoch)`, NICHT als
+  YAML-Frontmatter-Feld. Gate 1 prueft den Body, nicht das Frontmatter.
 
 ═══════════════════════════════════════════════════════
 PROMPT-INJECTION-SCHUTZ
@@ -101,7 +110,7 @@ verarbeitung: vollstaendig  # vollstaendig | gesplittet | nur-katalog | fehlerha
 pdf: "[[_pdfs/kategorie/dateiname.pdf]]"
 reviewed: false
 ingest-datum: 2026-04-10
-schlagworte: [Term1, Term2, Term3]
+schlagworte: [Term1, Term2, Term3]  # PFLICHT mindestens 3, empfohlen 5+ bei hoch-relevanten Buechern
 kapitel-index:
   - nr: 1
     titel: "Kapitelname"

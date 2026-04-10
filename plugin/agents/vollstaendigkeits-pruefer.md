@@ -54,25 +54,35 @@ Anforderungen:
 
 ### Part C: Hochrelevante Kapitel haben Zusammenfassungen?
 
-Prüfe Frontmatter-Feld `relevanz`:
-- Wenn `relevanz: high` → muss Feld `zusammenfassung` existieren (mindestens 100 Wörter, max. 300)
-- Wenn `relevanz: medium` → `zusammenfassung` ist optional, aber empfohlen
-- Wenn `relevanz: low` → keine Anforderung
+**Wichtig — Schema-Hinweis:** Das Ingest-Template verlangt Zusammenfassungen als **Body-Section** im Fließtext, NICHT als YAML-Frontmatter-Feld. Prüfe im Body, nicht im Frontmatter.
+
+Prüfe im `kapitel-index:`-Array des Frontmatters jedes Kapitel-Objekt auf `relevanz: hoch|mittel|niedrig` (deutsche Werte, nicht englische high/medium/low).
+
+Für jedes Kapitel mit `relevanz: hoch`:
+- Im Body der Quellenseite muss eine Section existieren: `## Kapitel [Nr]: [Titel] (Relevanz: hoch)` oder `## Kapitel [Nr]: [Titel] (Relevanz: hoch/mittel)`
+- Der Fließtext unter dieser Section ist die Zusammenfassung (100–300 Wörter empfohlen, mindestens 50 Wörter Pflicht)
+
+Für `relevanz: mittel`: Body-Section empfohlen, aber optional (PASS MIT HINWEISEN wenn fehlt).
+Für `relevanz: niedrig`: keine Anforderung.
 
 Zusammenfassung muss:
 - Die zentralen Aussagen des Kapitels zusammenfassen
 - Spezifisch sein (nicht generisch "dieses Kapitel behandelt...")
 - Ein-bis-zwei Sätze pro wichtigen Punkt
+- Seitenangaben enthalten (Gate 2 prüft das im Detail)
 
 **Resultat:** Vollständig/teilweise/nein.
 
 ### Part D: Schlüsselwörter decken Kernthemen ab?
 
-Prüfe Frontmatter-Feld `schlagworte` (Array):
-- Mindestens 5 Schlüsselwörter für hochrelevante Kapitel
-- Mindestens 3 Schlüsselwörter für mittelrelevante Kapitel
-- Schlüsselwörter sind fachspezifisch, nicht generisch (z.B. "Querkraftverhalten im Auflagerbereich" nicht "wichtiges Thema")
+Prüfe das **globale** `schlagworte:`-Feld im Frontmatter der Quellenseite (Array — gilt für das gesamte Buch, nicht pro Kapitel):
+- **Mindestens 3 Schlagworte insgesamt (PFLICHT — FAIL-Kriterium wenn <3)**
+- Mindestens 5 Schlagworte empfohlen bei hoch-relevanten Büchern (umfangreiche Lehrbücher, Dissertationen)
+- Schlagworte sind fachspezifisch, nicht generisch (z.B. "Querkraftverhalten im Auflagerbereich" nicht "wichtiges Thema")
 - Mindestens 2 der Schlagworte sollten Begriffe sein, die auch in wiki/_vokabular.md definiert sind
+- Fallback-Strategie bei zu wenig spezifischen Tags: Oberbegriffe aus dem Vokabular ergänzen (z.B. "Grenzzustand der Tragfähigkeit", "Grenzzustand der Gebrauchstauglichkeit", Kategorie-Tags wie "EC5" oder "NA")
+
+Zusätzlich (optional): pro Kapitel im `kapitel-index:`-Array kann ein eigenes `schlagworte:`-Feld existieren. Das ist empfehlenswert aber nicht Pflicht und wird nur als Hinweis gewertet.
 
 **Resultat:** Vollständig/teilweise/unzureichend.
 
@@ -139,8 +149,8 @@ Mindestens eines der Kriterien nicht erfüllt:
 
 - **Fehlende Kapitel:** ≥1 großer Abschnitt (>500 Wörter erwartete Länge) ist nicht erfasst
 - **Kein kapitel-index:** Struktur-Feld komplett abwesend oder leer
-- **High-relevanz ohne Zusammenfassung:** `relevanz: high` aber `zusammenfassung` fehlt oder <50 Wörter
-- **Unzureichende Schlagworte:** <3 Schlagworte insgesamt, oder >50% sind generisch/nichtssagend
+- **Hoch-relevanz ohne Body-Zusammenfassung:** Kapitel mit `relevanz: hoch` im kapitel-index hat keine zugehörige `## Kapitel [Nr]: [Titel]`-Section im Body, oder die Section existiert aber hat <50 Wörter Zusammenfassung
+- **Unzureichende Schlagworte:** <3 Einträge im globalen `schlagworte:`-Frontmatter-Feld, oder >50% sind generisch/nichtssagend
 
 ## Hinweis-Kriterien (sind verhandelbar)
 
