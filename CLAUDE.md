@@ -81,10 +81,15 @@ bash plugin/hooks/check-consistency.sh plugin/    # 19/19 PASS?
 diff <(sed -n '/<!-- BEGIN HARD-GATES -->/,/<!-- END HARD-GATES -->/p' plugin/skills/using-bibliothek/SKILL.md | sed '1d;$d') plugin/governance/hard-gates.md   # Sync?
 bash tests/test-guard-wiki-writes.sh               # 5/5 PASS?
 bash tests/test-inject-lock-warning.sh             # 7/7 PASS?
-bash tests/test-gates-pending-hook.sh              # 12/12 PASS?
 ```
 
 Session-Neustart noetig nach Hook-Aenderungen (Claude Code cached im RAM).
+
+**Orphaned Tests (nicht Teil der Pflicht-Checkliste):**
+`tests/test-gates-pending-hook.sh` testet `plugin/hooks/check-gates-pending.sh`,
+der in `hooks.json` nicht registriert ist. Beide werden als Referenz fuer SPEC-002
+behalten (atomarer Switch, wenn SPEC-002 Hook B + Hook C committed sind). Bei
+Interesse: `bash tests/test-gates-pending-hook.sh` liefert 12/12 PASS.
 
 ## Bekannte Patterns
 

@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 # tests/test-gates-pending-hook.sh
+#
+# STATUS (Stand 2026-04-11): Testet plugin/hooks/check-gates-pending.sh, das
+# ORPHANED ist (siehe Header-Kommentar dort). Die 12 Cases bleiben gruen als
+# isolierte Funktionsverifikation bis SPEC-002 Hook B + Hook C implementiert
+# sind. Danach wird dieser Test mit check-gates-pending.sh zusammen geloescht
+# (atomischer Switch in der SPEC-002-Commit-Sequenz).
+#
+# NICHT in die "Nach jeder Aenderung" Pflicht-Checkliste aufnehmen — der
+# getestete Code wird nicht produktiv aufgerufen, die Tests belegen nur dass
+# die Logik zur Referenz fuer SPEC-002 noch funktional ist.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

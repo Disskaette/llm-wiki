@@ -1,10 +1,35 @@
 #!/usr/bin/env bash
-# check-gates-pending.sh — PreToolUse Hook auf Agent-Tool
+#
+# =============================================================================
+# STATUS (Stand 2026-04-11): ORPHANED PREVIEW — NICHT REGISTRIERT
+#
+# Diese Datei ist KEIN aktiver Hook mehr. Sie ist weder in plugin/hooks/hooks.json
+# registriert noch laeuft sie bei Tool-Calls. Sie wird aus zwei Gruenden behalten:
+#
+# 1. Referenz-Implementierung fuer SPEC-002. Die Pipeline-Lock-Logik hier wird
+#    in SPEC-002 durch zwei neue Hooks ersetzt:
+#      - plugin/hooks/guard-pipeline-lock.sh  (Block-Gate, exit-code-basiert)
+#      - plugin/hooks/advance-pipeline-lock.sh (SubagentStop State-Machine)
+#    Beide folgen dem Website_v2-Pattern mit jq und exit 2, nicht dem hier
+#    verwendeten veralteten JSON-Response-Schema.
+#
+# 2. Funktional erprobt bis SPEC-002 Done. Die 12 Tests in
+#    tests/test-gates-pending-hook.sh laufen weiterhin gruen als isolierte
+#    Funktionsverifikation. Atomischer Switch: alte Datei + alte Tests weg,
+#    sobald SPEC-002 Hook B + Hook C committed und verifiziert sind.
+#
+# KEINESFALLS DIESE DATEI WIEDER IN hooks.json REGISTRIEREN — das alte
+# JSON-Response-Schema '{"decision":"block"}' wird von der Claude Code Hooks
+# API 2026 nicht mehr akzeptiert und produziert "JSON validation failed" bei
+# jedem Call (siehe Commits 12e8a3c + 19e23c7 fuer die Historie).
+# =============================================================================
+#
+# check-gates-pending.sh — PreToolUse Hook auf Agent-Tool (ORPHANED)
 # Blockiert neue Ingest/Synthese-Agents wenn Gates oder Nebeneffekte ausstehen.
 # Gate-Agents (pruefer/reviewer/validator) werden IMMER durchgelassen.
 #
 # Input: JSON auf stdin mit subagent_type und prompt
-# Output: JSON mit "decision": "block"/"allow" + "reason"
+# Output: JSON mit "decision": "block"/"allow" + "reason"  (VERALTETES SCHEMA)
 # Env: WIKI_DIR (optional, fuer Tests; sonst aus Projekt-Root abgeleitet)
 
 # KEIN set -uo pipefail — Hook muss IMMER gueltige JSON-Antwort liefern.
