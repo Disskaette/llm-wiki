@@ -65,6 +65,69 @@ assert_allow "Bash ohne wiki-Pfad" \
     '{"tool": "Bash", "tool_input": {"command": "ls -la /tmp/"}}'
 
 echo ""
+echo "--- _pending.json Tests ---"
+
+# Setup: Temp-Wiki-Verzeichnis
+PJ_TMPDIR=$(mktemp -d)
+trap "rm -rf $PJ_TMPDIR" EXIT
+mkdir -p "$PJ_TMPDIR/wiki/quellen"
+
+# Erstelle eine minimale Quellenseite die check-wiki-output.sh besteht
+cat > "$PJ_TMPDIR/wiki/quellen/test-buch-2024.md" << 'WIKIEOF'
+---
+type: quelle
+title: "Test Buch"
+autor: [Test, Autor]
+jahr: 2024
+verarbeitung: vollstaendig
+reviewed: false
+schlagworte: []
+kapitel-index:
+  - nr: 1
+    titel: "Einleitung"
+    seiten: "1-10"
+    relevanz: hoch
+---
+
+# Test Buch
+
+Testinhalt.
+WIKIEOF
+
+# Test: Quellenseite-Write erstellt _pending.json
+rm -f "$PJ_TMPDIR/wiki/_pending.json"
+echo "{\"tool\": \"Write\", \"tool_input\": {\"file_path\": \"$PJ_TMPDIR/wiki/quellen/test-buch-2024.md\"}}" | \
+    bash "$HOOK" > /dev/null 2>&1 || true
+
+if [ -f "$PJ_TMPDIR/wiki/_pending.json" ]; then
+    echo "  ✅ _pending.json erstellt nach Quellenseiten-Write"; PASS=$((PASS + 1))
+else
+    echo "  ❌ FAIL: _pending.json nicht erstellt nach Quellenseiten-Write"; FAIL=$((FAIL + 1))
+fi
+
+# Test: _pending.json hat stufe "gates"
+if [ -f "$PJ_TMPDIR/wiki/_pending.json" ] && grep -q '"gates"' "$PJ_TMPDIR/wiki/_pending.json"; then
+    echo "  ✅ _pending.json stufe ist gates"; PASS=$((PASS + 1))
+else
+    echo "  ❌ FAIL: _pending.json stufe ist nicht gates"; FAIL=$((FAIL + 1))
+fi
+
+# Test: Zweiter Write erstellt kein neues _pending.json (idempotent)
+FIRST_TS=""
+if [ -f "$PJ_TMPDIR/wiki/_pending.json" ]; then
+    FIRST_TS=$(cat "$PJ_TMPDIR/wiki/_pending.json")
+fi
+sleep 1
+echo "{\"tool\": \"Write\", \"tool_input\": {\"file_path\": \"$PJ_TMPDIR/wiki/quellen/test-buch-2024.md\"}}" | \
+    bash "$HOOK" > /dev/null 2>&1 || true
+SECOND_TS=$(cat "$PJ_TMPDIR/wiki/_pending.json" 2>/dev/null || true)
+if [ "$FIRST_TS" = "$SECOND_TS" ]; then
+    echo "  ✅ _pending.json nicht ueberschrieben bei zweitem Write"; PASS=$((PASS + 1))
+else
+    echo "  ❌ FAIL: _pending.json wurde ueberschrieben"; FAIL=$((FAIL + 1))
+fi
+
+echo ""
 echo "=== Ergebnis: $PASS PASS, $FAIL FAIL ==="
 [ "$FAIL" -gt 0 ] && exit 1
 exit 0

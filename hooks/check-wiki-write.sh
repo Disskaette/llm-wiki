@@ -53,8 +53,32 @@ esac
 # Sonderdateien die KEINE Wiki-Seiten sind (kein Frontmatter noetig)
 BASENAME=$(basename "$FILE_PATH")
 case "$BASENAME" in
-    CLAUDE.md|_log.md|_vokabular.md|*.json)
+    CLAUDE.md|_vokabular.md|*.json)
         echo '{"decision": "allow", "reason": "Sonderdatei — kein Wiki-Seiten-Check"}'
+        exit 0
+        ;;
+    _log.md)
+        # --- _pending.json Stufen-Transition ---
+        if [ -f "$PENDING" ]; then
+            P_STUFE=$(sed -n 's/.*"stufe"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$PENDING" | head -1)
+            P_QUELLE=$(sed -n 's/.*"quelle"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$PENDING" | head -1)
+
+            if [ "$P_STUFE" = "gates" ]; then
+                # Check if gate results are in the log
+                if grep -q "Gates:.*PASS" "$FILE_PATH" 2>/dev/null && grep -q "$P_QUELLE" "$FILE_PATH" 2>/dev/null; then
+                    sed -i '' 's/"stufe"[[:space:]]*:[[:space:]]*"gates"/"stufe":"sideeffects"/' "$PENDING"
+                fi
+            elif [ "$P_STUFE" = "sideeffects" ]; then
+                # Check if complete log entry exists (has Gates + Verarbeitung lines)
+                LAST_ENTRY=$(tail -20 "$FILE_PATH")
+                HAS_GATES=$(echo "$LAST_ENTRY" | grep -c "Gates:" 2>/dev/null || true)
+                HAS_VERARBEITUNG=$(echo "$LAST_ENTRY" | grep -c "Verarbeitung:" 2>/dev/null || true)
+                if [ "$HAS_GATES" -gt 0 ] && [ "$HAS_VERARBEITUNG" -gt 0 ]; then
+                    rm -f "$PENDING"
+                fi
+            fi
+        fi
+        echo '{"decision": "allow", "reason": "Log-Update erlaubt"}'
         exit 0
         ;;
 esac
@@ -76,6 +100,7 @@ fi
 # Bestimme Wiki-Root und Vokabular-Pfad
 WIKI_DIR=$(echo "$FILE_PATH" | sed 's|/wiki/.*|/wiki/|')
 VOKAB="${WIKI_DIR}_vokabular.md"
+PENDING="${WIKI_DIR}_pending.json"
 
 # Fuehre check-wiki-output.sh aus — Exit-Code VOR || true erfassen!
 set +e
@@ -85,6 +110,16 @@ set -e
 
 if [ "$CHECK_RC" -eq 0 ]; then
     echo "{\"decision\": \"allow\", \"reason\": \"Wiki-Check bestanden\"}"
+    # --- _pending.json Erstellung bei neuen Quellenseiten ---
+    case "$FILE_PATH" in
+        */wiki/quellen/*.md)
+            if [ ! -f "$PENDING" ]; then
+                QUELLE_BASENAME=$(basename "$FILE_PATH" .md)
+                printf '{"typ":"ingest","stufe":"gates","quelle":"%s","timestamp":"%s"}' \
+                    "$QUELLE_BASENAME" "$(date -u +%FT%T)" > "$PENDING"
+            fi
+            ;;
+    esac
 else
     # Extrahiere FAIL-Zeilen fuer die Fehlermeldung
     FAILS=$(echo "$CHECK_OUTPUT" | grep "FAIL" | head -5 | tr '\n' ' ' | sed 's/"/\\"/g')
