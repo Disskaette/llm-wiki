@@ -8,10 +8,11 @@
 | **-reviewer** | Breite Bewertung, mehrere Aspekte | Report mit Befunden | struktur-reviewer, norm-reviewer |
 | **-validator** | Formatpruefung, technische Korrektheit | Syntax-Check | duplikat-validator |
 
-## Bestehende Agents (7)
+## Bestehende Agents (8)
 
 | Agent | Typ | Dispatcht von |
 |-------|-----|---------------|
+| ingest-worker | Worker | /ingest (Phase 0.6 Dispatch) |
 | vollstaendigkeits-pruefer | Pruefer | /ingest (Gate 1) |
 | quellen-pruefer | Pruefer | /ingest (Gate 2) |
 | konsistenz-pruefer | Pruefer | /ingest (Gate 3) |

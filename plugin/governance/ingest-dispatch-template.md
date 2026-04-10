@@ -4,6 +4,9 @@ Standardisierter Prompt fuer Ingest-Subagents.
 Der Hauptagent liest dieses Template, ersetzt die Platzhalter und uebergibt
 das Ergebnis als Agent-Prompt. Der Subagent liest diese Datei nie direkt.
 
+> **Dispatch-Hinweis:** Subagent-Type ist `bibliothek:ingest-worker`. Der
+> PreToolUse-Hook `guard-pipeline-lock.sh` nutzt diesen String als Matcher.
+
 ---
 
 ## Modellwahl

@@ -1,9 +1,9 @@
 # SPEC-001: Passive Hook-Infrastruktur
 
-**Status:** Planned
+**Status:** Done
 **Version:** 1.0
 **Erstellt:** 2026-04-10
-**Aktualisiert:** 2026-04-10
+**Aktualisiert:** 2026-04-11
 
 > **Fuer agentische Worker:** REQUIRED SUB-SKILL — `superpowers:subagent-driven-development` (empfohlen) oder `superpowers:executing-plans`. Task-Steps verwenden `- [ ]` Checkbox-Syntax.
 
@@ -79,7 +79,8 @@ TRANSCRIPT_PATH = jq .transcript_path
 IF TRANSCRIPT_PATH existiert nicht:
     exit 2 mit Warnung "Transcript nicht lesbar"
 
-IF grep -q "ingest|synthese|normenupdate|vokabular" im TRANSCRIPT_PATH:
+IF Zeilen mit "name":"Skill" im TRANSCRIPT_PATH existieren
+   UND eine davon "skill":"(bibliothek:)?(ingest|synthese|normenupdate|vokabular)" enthaelt:
     exit 0 (allow)
 
 ELSE:
@@ -87,7 +88,7 @@ ELSE:
     exit 2
 ```
 
-**Warum Transcript-Grep funktioniert:** Claude Code speichert jede Skill-Invocation als Event im Transcript. Der String `bibliothek:ingest` (oder welcher Namespace-Praefix immer das Plugin benutzt) erscheint im Transcript sobald ein Skill geladen wird. Website_v2 nutzt denselben Mechanismus.
+**Warum zwei-stufiger Transcript-Grep:** Claude Code speichert Skill-Invocations als `tool_use`-Events mit `"name":"Skill"` im Transcript. Ein einfacher Grep nach "ingest" genuegt NICHT — das Wort taucht auch in File-Reads und Gespraechen auf (False-Positive in E2E-Test entdeckt, 2026-04-11). Der zwei-stufige Grep filtert erst auf Skill-Tool-Calls, dann auf den Skill-Namen.
 
 **Warum das auch fuer Subagents funktioniert:** Laut Claude Code Hooks Reference zeigt `transcript_path` auch bei Subagent-Calls auf das **Main-Transcript**. Ein `/ingest` das den Ingest-Worker dispatcht hinterlaesst den Marker im Main-Transcript, bevor der Subagent Write aufruft.
 
@@ -363,8 +364,9 @@ if [[ -z "$TRANSCRIPT_PATH" ]] || [[ ! -f "$TRANSCRIPT_PATH" ]]; then
   exit 2
 fi
 
-# Wurde ein Bibliothek-Skill in dieser Session geladen?
-if grep -q -E "(bibliothek:)?(ingest|synthese|normenupdate|vokabular)" "$TRANSCRIPT_PATH" 2>/dev/null; then
+# Wurde ein Bibliothek-Skill in dieser Session via Skill-Tool geladen?
+# Zwei-stufig: erst Zeilen mit Skill-Tool-Calls filtern, dann Skill-Name pruefen.
+if grep '"name":"Skill"' "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE '"skill":"(bibliothek:)?(ingest|synthese|normenupdate|vokabular)"'; then
   exit 0
 fi
 

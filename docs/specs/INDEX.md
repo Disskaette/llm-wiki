@@ -7,8 +7,8 @@ Bestehende Specs werden bei neuen Anforderungen aktualisiert, nicht dupliziert.
 
 | Nr | Titel | Status | Version | Letzte Aktualisierung |
 |----|-------|--------|---------|----------------------|
-| [SPEC-001](SPEC-001-passive-hooks.md) | Passive Hook-Infrastruktur (Schreibschutz + Lock-Warnung) | Planned | 1.0 | 2026-04-10 |
-| [SPEC-002](SPEC-002-pipeline-lock-enforcement.md) | Aktive Pipeline-Lock-Hooks + Subagent-Type-Refactor | Planned | 1.0 | 2026-04-10 |
+| [SPEC-001](SPEC-001-passive-hooks.md) | Passive Hook-Infrastruktur (Schreibschutz + Lock-Warnung) | Done | 1.0 | 2026-04-11 |
+| [SPEC-002](SPEC-002-pipeline-lock-enforcement.md) | Aktive Pipeline-Lock-Hooks + Subagent-Type-Refactor | Done | 1.0 | 2026-04-11 |
 
 ## Aussenstehende Arbeiten (nicht spec-wuerdig)
 

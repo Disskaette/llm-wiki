@@ -22,6 +22,28 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/guard-pipeline-lock.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "bibliothek:(vollstaendigkeits|quellen|konsistenz|vokabular)-pruefer",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/advance-pipeline-lock.sh\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [

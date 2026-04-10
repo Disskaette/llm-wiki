@@ -1,9 +1,9 @@
 # SPEC-002: Aktive Pipeline-Lock-Enforcement + Subagent-Type-Refactor
 
-**Status:** Planned
+**Status:** Done
 **Version:** 1.0
 **Erstellt:** 2026-04-10
-**Aktualisiert:** 2026-04-10
+**Aktualisiert:** 2026-04-11
 
 > **Fuer agentische Worker:** REQUIRED SUB-SKILL — `superpowers:subagent-driven-development` (empfohlen) oder `superpowers:executing-plans`. Task-Steps verwenden `- [ ]` Checkbox-Syntax.
 

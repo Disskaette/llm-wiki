@@ -14,7 +14,7 @@ llm-wiki/
 │   ├── .claude-plugin/  ← Plugin-Manifest
 │   ├── hooks/           ← Shell-Hooks (Pre/PostToolUse, SessionStart)
 │   ├── skills/          ← 8 Skill-Definitionen (SKILL.md)
-│   ├── agents/          ← 7 Subagent-Definitionen
+│   ├── agents/          ← 8 Subagent-Definitionen
 │   ├── governance/      ← Hard Gates, Templates, Konventionen
 │   └── commands/        ← Slash-Commands
 ├── docs/                ← Specs, Plans (Dev-only)
@@ -48,11 +48,12 @@ vor dem `plugin/`-Subdirectory-Refactor (Commit 4766b13).
 
 1. **Prompt-Law** — Skill-Anweisungen, Hard Gates, Dispatch-Templates
 2. **Subagent-Review** — 4 Pruefer (Ingest) + 2 Reviewer (Synthese) + 1 Validator (parallel, unabhaengig)
-3. **Machine-Law (teilweise — nach SPEC-001):**
-   - `guard-wiki-writes.sh` (PreToolUse Edit|Write) — blockiert Wiki-Writes ausserhalb von `/ingest`, `/synthese`, `/normenupdate`, `/vokabular` via Transcript-Check
+3. **Machine-Law:**
+   - `guard-wiki-writes.sh` (PreToolUse Edit|Write) — blockiert Wiki-Writes ausserhalb von `/ingest`, `/synthese`, `/normenupdate`, `/vokabular` via zwei-stufigem Transcript-Check (Skill-Tool-Call, nicht blankes Wort)
+   - `guard-pipeline-lock.sh` (PreToolUse Agent) — blockiert neue `bibliothek:ingest-worker`-Dispatches solange `wiki/_pending.json` offen ist
+   - `advance-pipeline-lock.sh` (SubagentStop auf 4 Gate-Agents) — inkrementiert `gates_passed`-Counter, wechselt Stufe auf `sideeffects` nach 4/4 Gates
    - `inject-lock-warning.sh` (UserPromptSubmit) — injiziert passive Lock-Warnung als `additionalContext` wenn `wiki/_pending.json` offen ist
    - `check-wiki-output.sh` — wird von den Gate-Agents selbst aufgerufen (seit Commit `f7b08d7`)
-   - **Noch ausstehend (SPEC-002):** mechanische Pipeline-Lock-Enforcement via `guard-pipeline-lock.sh` und `advance-pipeline-lock.sh`
 
 Heuristische Checks (04 Zahlenwerte, 05 Normbezuege, 06 Seitenangaben, 09 Umlaute)
 sind WARN im Shell-Script. Die echte Pruefung macht der quellen-pruefer Agent (Gate 2).
@@ -68,10 +69,19 @@ sind WARN im Shell-Script. Die echte Pruefung macht der quellen-pruefer Agent (G
 
 ## Pipeline-Lock
 
-`wiki/_pending.json` blockiert den naechsten Ingest bis Gates + Nebeneffekte fertig:
-- `stufe: "gates"` → Gate-Agents muessen laufen
-- `stufe: "sideeffects"` → Nebeneffekte muessen abgeschlossen werden
+`wiki/_pending.json` blockiert den naechsten Ingest **mechanisch** (via `guard-pipeline-lock.sh`):
+- `stufe: "gates"` → Gate-Agents muessen laufen, `advance-pipeline-lock.sh` zaehlt mit
+- `stufe: "sideeffects"` → Nebeneffekte muessen abgeschlossen werden (manuell durch Phase 4)
 - (Datei geloescht) → naechster Ingest frei
+
+Format:
+```json
+{"typ":"ingest","stufe":"gates","quelle":"<kurzname>","timestamp":"<ISO>","gates_passed":0,"gates_total":4}
+```
+
+`_pending.json` wird in Phase 3 (nach Ingest-Worker-Rueckkehr, vor Gate-Dispatch) angelegt
+und in Phase 4 (nach allen Nebeneffekten) geloescht. NICHT in Phase 0.4 — sonst blockiert
+der Hook den eigenen ersten Ingest-Dispatch.
 
 ## Entwicklung
 
@@ -79,17 +89,43 @@ Nach jeder Aenderung IMMER:
 ```bash
 bash plugin/hooks/check-consistency.sh plugin/    # 19/19 PASS?
 diff <(sed -n '/<!-- BEGIN HARD-GATES -->/,/<!-- END HARD-GATES -->/p' plugin/skills/using-bibliothek/SKILL.md | sed '1d;$d') plugin/governance/hard-gates.md   # Sync?
-bash tests/test-guard-wiki-writes.sh               # 5/5 PASS?
+bash tests/test-guard-wiki-writes.sh               # 6/6 PASS?
 bash tests/test-inject-lock-warning.sh             # 7/7 PASS?
+bash tests/test-guard-pipeline-lock.sh             # 6/6 PASS?
+bash tests/test-advance-pipeline-lock.sh           # 10/10 PASS?
 ```
 
 Session-Neustart noetig nach Hook-Aenderungen (Claude Code cached im RAM).
 
 **Orphaned Tests (nicht Teil der Pflicht-Checkliste):**
 `tests/test-gates-pending-hook.sh` testet `plugin/hooks/check-gates-pending.sh`,
-der in `hooks.json` nicht registriert ist. Beide werden als Referenz fuer SPEC-002
-behalten (atomarer Switch, wenn SPEC-002 Hook B + Hook C committed sind). Bei
-Interesse: `bash tests/test-gates-pending-hook.sh` liefert 12/12 PASS.
+der in `hooks.json` nicht registriert ist. Beide Dateien sind Relikte aus der
+SPEC-002-Vorarbeit — `guard-pipeline-lock.sh` und `advance-pipeline-lock.sh`
+haben diese Funktionalitaet uebernommen.
+
+## Troubleshooting
+
+### "PIPELINE-LOCK: Neuer Ingest blockiert" aber vorheriger wurde abgebrochen
+
+```bash
+rm wiki/_pending.json
+```
+
+Nur wenn der vorige Ingest nachweislich nicht fortgefuehrt wird.
+Ueberpruefe `_log.md` auf offene `[INGEST UNVOLLSTAENDIG]` Marker.
+
+### SubagentStop feuert nicht, Counter bleibt auf 0
+
+Pruefe:
+1. Claude Code Version (SubagentStop wurde spaet 2025 eingefuehrt)
+2. Matcher in hooks.json — mit `bash tests/test-advance-pipeline-lock.sh` verifizieren
+3. Hook-Script ist ausfuehrbar: `ls -la plugin/hooks/advance-pipeline-lock.sh`
+
+### Manueller Gate-Dispatch waehrend aktivem Ingest
+
+NICHT empfohlen — `advance-pipeline-lock.sh` zaehlt jeden SubagentStop auf einen
+Gate-Agent, unabhaengig ob er zum aktuellen Ingest gehoert. Der Counter laeuft
+ueber, was zwar harmlos aber verwirrend ist.
 
 ## Bekannte Patterns
 

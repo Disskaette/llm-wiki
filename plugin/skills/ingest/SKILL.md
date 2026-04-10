@@ -133,7 +133,13 @@ Subagent-Prompts werden NICHT frei formuliert. IMMER Template verwenden.
 3. Modellwahl nach Seitenzahl (aus Phase 0.1):
    - **>200 Seiten** → `model: "opus"` (1M Context, komplexe Buecher)
    - **≤200 Seiten** → `model: "sonnet"` (fokussierte Extraktion, guenstiger)
-4. Dispatche Agent mit ausgefuelltem Template als Prompt + gewaehltem Modell
+4. Dispatche Agent mit:
+   - `subagent_type: "bibliothek:ingest-worker"` (PFLICHT — PreToolUse-Hook
+     guard-pipeline-lock.sh matcht auf diesen String, um parallele Ingests zu
+     blockieren solange _pending.json offen ist)
+   - `prompt`: ausgefuelltes Template aus Schritt 2
+   - `model`: "opus" oder "sonnet" nach Seitenzahl (Schritt 3)
+   - `description`: "Ingest: <Quellen-Kurzname>"
 5. Warte auf Ergebnis, dann weiter mit Phase 3 (Gate-Review)
 
 ---
@@ -253,14 +259,20 @@ NACH Rueckkehr des Ingest-Subagents MUESSEN die folgenden Gates dispatcht werden
 Ueberspringen ist VERBOTEN. _pending.json blockiert den naechsten Ingest mechanisch.
 
 Checkliste:
-1. check-wiki-output.sh automatisch gelaufen (PostToolUse-Hook) → Bei FAIL: Korrektur
-2. Lade `governance/gate-dispatch-template.md`
-3. Fuelle Platzhalter pro Gate-Agent (Quellenseite, PDF-Pfad, Konzeptseiten, etc.)
-4. Gate 1-4 parallel dispatchen — IMMER mit Template-Prompt, NIE frei formuliert
-5. Gate 2 (quellen-pruefer) uebernimmt die kontextuellen Checks 04, 05, 06, 09
+1. **Pipeline-Lock anlegen** — Schreibe `wiki/_pending.json`:
+   ```json
+   {"typ":"ingest","stufe":"gates","quelle":"<kurzname>","timestamp":"<ISO-8601>","gates_passed":0,"gates_total":4}
+   ```
+   ERST hier, NICHT in Phase 0.4 — sonst blockiert guard-pipeline-lock.sh den eigenen
+   ersten Ingest-Dispatch.
+2. check-wiki-output.sh automatisch gelaufen (PostToolUse-Hook) → Bei FAIL: Korrektur
+3. Lade `governance/gate-dispatch-template.md`
+4. Fuelle Platzhalter pro Gate-Agent (Quellenseite, PDF-Pfad, Konzeptseiten, etc.)
+5. Gate 1-4 parallel dispatchen — IMMER mit Template-Prompt, NIE frei formuliert
+6. Gate 2 (quellen-pruefer) uebernimmt die kontextuellen Checks 04, 05, 06, 09
    die das Shell-Script nur als WARN meldet — der Agent bewertet und korrigiert
-6. Alle 4 PASS → weiter zu Phase 4 (Nebeneffekte)
-7. Bei FAIL: Korrektur → Re-Gate (max 3x) → Eskalation an Nutzer
+7. Alle 4 PASS → weiter zu Phase 4 (Nebeneffekte)
+8. Bei FAIL: Korrektur → Re-Gate (max 3x) → Eskalation an Nutzer
 </NICHT-VERHANDELBAR>
 
 Alle generierten/aktualisierten Wiki-Seiten durchlaufen 4 Gates.
@@ -323,6 +335,9 @@ Pflicht-Nebeneffekte:
 - [ ] **_vokabular.md aktualisieren** — Neue Terme hinzufuegen (via /vokabular wenn noetig)
 - [ ] **check-wiki-output.sh ausfuehren** — Auf jede neue/aktualisierte Datei
 - [ ] **[INGEST UNVOLLSTAENDIG] Marker entfernen** — Aus _log.md (Phase 0.4 Marker)
+- [ ] **Pipeline-Lock freigeben** — `rm -f wiki/_pending.json` als ALLERLETZTEN Schritt,
+      erst NACHDEM alle anderen Nebeneffekte nachweislich durchgelaufen sind.
+      Solange die Datei existiert blockt guard-pipeline-lock.sh jeden neuen Ingest.
 
 Log-Format:
 ```markdown
