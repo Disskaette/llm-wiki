@@ -1,9 +1,9 @@
 # SPEC-002: Aktive Pipeline-Lock-Enforcement + Subagent-Type-Refactor
 
-**Status:** Done
-**Version:** 1.0
+**Status:** In Progress
+**Version:** 2.0
 **Erstellt:** 2026-04-10
-**Aktualisiert:** 2026-04-11
+**Aktualisiert:** 2026-04-13
 
 > **Fuer agentische Worker:** REQUIRED SUB-SKILL — `superpowers:subagent-driven-development` (empfohlen) oder `superpowers:executing-plans`. Task-Steps verwenden `- [ ]` Checkbox-Syntax.
 
@@ -33,6 +33,17 @@ Dieser Spec baut den mechanischen Lock wirklich:
 5. Wenn der Nebeneffekt-Abschluss erkannt wird (naechster `/ingest`-Start oder expliziter Ingest-Phase-4-Abschluss), wird die Datei geloescht
 
 Hook D aus SPEC-001 (passive UserPromptSubmit-Warnung) bleibt unveraendert — sie liest denselben `_pending.json` und zeigt dem User den aktuellen Stand an.
+
+### v2.0: Auto-Pipeline-Lock (2026-04-13)
+
+In Session 2026-04-13 hat der Orchestrator nach einem Ingest-Worker-Return Phase 3
+(Gate-Dispatch) uebersprungen und direkt zum naechsten Ingest gewollt. Die Machine-Law
+hat nicht gegriffen weil `_pending.json` nie angelegt wurde — die gesamte Enforcement-Kette
+haengt an einer Datei die der LLM-Orchestrator erstellen soll.
+
+**Fix:** Neuer Hook `create-pipeline-lock.sh` auf SubagentStop fuer Worker-Agents.
+Erzeugt `_pending.json` mechanisch nach Worker-Ende. Damit blockiert `guard-pipeline-lock.sh`
+den naechsten Dispatch auch wenn der Orchestrator Phase 3 ueberspringt.
 
 ## Anforderungen
 
@@ -266,6 +277,12 @@ Bestehende Eintraege haben moeglicherweise nur `{typ, stufe, quelle, timestamp}`
 - [ ] Nach Gate-Abschluss: `_pending.json` hat `gates_passed: 4, stufe: sideeffects`
 - [ ] Nach Phase 4 des Ingest-Skills: `_pending.json` ist geloescht, neuer Ingest geht
 - [ ] CLAUDE.md reflektiert die vollstaendige 3-Schichten-Enforcement
+- [ ] `plugin/hooks/create-pipeline-lock.sh` existiert, `jq`-basiert, `set -euo pipefail`
+- [ ] hooks.json: SubagentStop-Matcher fuer `bibliothek:(ingest|synthese)-worker` registriert
+- [ ] `ingest-dispatch-template.md` enthaelt `[INGEST-ID:...]` im Prompt
+- [ ] `tests/test-create-pipeline-lock.sh`: alle Cases gruen
+- [ ] Integration-Test: Worker-Stop → `_pending.json` entsteht automatisch → zweiter Dispatch blockiert
+- [ ] SKILL.md Phase 3 Step 1: "verify" statt "create"
 
 ## Edge Cases
 
