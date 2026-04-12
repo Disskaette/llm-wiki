@@ -46,6 +46,8 @@ PDF-Datei:          {{PDF_PFAD}}
 Wiki-Verzeichnis:   {{WIKI_ROOT}}
 Quellenseite:       {{QUELLENSEITE_DATEI}}
 
+[INGEST-ID:{{QUELLENSEITE_DATEI}}]
+
 Bestehende Konzeptseiten:
 {{BESTEHENDE_KONZEPTE}}
 
@@ -209,4 +211,11 @@ RECHTSCHREIBUNG — ZWEI WELTEN
 | Schlagworte    | Deutsche Rechtschreibung, Nomen gross |
 | Wiki-Text      | Normale deutsche Sprache mit Umlauten |
 | Wikilinks      | Anzeigename deutsch, Datei lowercase  |
+
+═══════════════════════════════════════════════════════
+PIPELINE-ID (PFLICHT — fuer Hook-Matching)
+═══════════════════════════════════════════════════════
+
+Gib am Ende deines Ergebnis-Berichts diese Zeile zurueck:
+[INGEST-ID:{{QUELLENSEITE_DATEI}}]
 ```

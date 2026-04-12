@@ -39,6 +39,8 @@ Konzept:            {{KONZEPT_NAME}}
 Konzeptseite:       {{KONZEPT_DATEI}}
 Wiki-Verzeichnis:   {{WIKI_ROOT}}
 
+[SYNTHESE-ID:{{KONZEPT_NAME}}]
+
 Kontrolliertes Vokabular (erlaubte Terme):
 {{VOKABULAR_TERME}}
 
@@ -121,6 +123,8 @@ type: konzept
 title: "Konzeptname"
 synonyme: [Synonym1, Synonym2]
 schlagworte: [Term1, Term2]
+materialgruppe: Holz
+versagensart: [Rollschub, Knickung]
 mocs: [moc-holzbau, moc-verbundbau]
 quellen-anzahl: 5
 created: 2026-04-10
@@ -129,47 +133,52 @@ synth-datum: 2026-04-10
 reviewed: false
 ---
 
-Body-Struktur:
+Body-Struktur (Randbedingungen VOR Formeln — Ingenieur will erst
+wissen WANN es gilt, dann WIE man rechnet):
 
 # [Konzeptname]
 
 ## Zusammenfassung
 1-3 Saetze: Definition + Anwendungsbereich.
 
+## Einsatzgrenzen + Randbedingungen
+
+- **Materialgruppe:** [Holz / Stahlbeton / Stahl / Verbund]
+- **Versagensart:** [Rollschub / Durchstanzen / Knickung / ...]
+- **Umweltklasse:** [Feuchteklasse 1-3 / Expositionsklasse XC / ...]
+- **Gueltig fuer:** [Geometrie, Temperatur, Feuchte]
+- **Gueltig bis:** [Grenzen]
+
 ## Formeln
 
 ### [Formelname / Anwendungsfall]
 [Formel]
-- **Quelle:** [[datei.pdf#page=N|Autor Jahr, S. N]]
+- **Quelle:** [[quellenseite|Autor Jahr]], S. N
 - **Annahmen:** [Liste]
+- **Parameter:** [[parameter-konzept|Symbol]] = Beschreibung
 - **Gueltig fuer:** [Randbedingungen]
 
-[Wiederholen fuer alle Formeln aus allen Quellen]
+[Wiederholen fuer alle Formeln — Parameter verlinken wenn eigene Konzeptseite]
 
 ## Zahlenwerte + Parameter
 
 | Parameter | Wert | Einheit | Quelle | Bereich |
 |-----------|------|---------|--------|---------|
-| ... | ... | ... | [[datei.pdf#page=N|Autor, S. N]] | ... |
+| ... | ... | ... | [[quellenseite|Autor]], S. N | ... |
 
 ## Norm-Referenzen
 
 - **[[ec2-9-2-5|EC2, §9.2.5]]:** [Inhalt] → [Interpretationsvergleich ueber Quellen]
 - **[[ec5-6-1-5|EC5, §6.1.5]]:** [Inhalt]
 
-## Randbedingungen
-
-- Materialgruppe: ...
-- Geometrie: ...
-- Feuchte/Temperatur: ...
-- Gueltig bis: ...
-
 ## Widersprueche
 
-[WIDERSPRUCH] [[quelle-a.pdf#page=N|Quelle A, S. N]] und [[quelle-b.pdf#page=M|Quelle B, S. M]] widersprechen sich:
-- **A sagt:** [Aussage]
-- **B sagt:** [Aussage]
-- **Erklaerung:** [Moegliche Ursachen]
+> [!CAUTION] Widerspruch: [[quelle-a|Quelle A]] vs. [[quelle-b|Quelle B]]
+> - **A sagt:** [Aussage] ([[quelle-a|Autor A]], S. N)
+> - **B sagt:** [Aussage] ([[quelle-b|Autor B]], S. M)
+> - **Erklaerung:** [Moegliche Ursachen]
+
+[Obsidian Callout-Syntax: farbkodiert, foldable in der UI]
 
 ## Verwandte Konzepte
 
@@ -263,4 +272,11 @@ Ergebnis am Ende melden:
 - Zahlenwerte: [Anzahl]
 - Widersprueche: [Anzahl]
 - PDF-Spot-Checks: [Anzahl]
+
+═══════════════════════════════════════════════════════
+PIPELINE-ID (PFLICHT — fuer Hook-Matching)
+═══════════════════════════════════════════════════════
+
+Gib am Ende deines Ergebnis-Berichts diese Zeile zurueck:
+[SYNTHESE-ID:{{KONZEPT_NAME}}]
 ```
