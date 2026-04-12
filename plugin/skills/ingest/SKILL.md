@@ -20,7 +20,7 @@ description: "Dokument vollstaendig lesen und ins Wiki einpflegen — Kern-Skill
 | KEIN-UPDATE-OHNE-DIFF | ✅ Aktiv | Phase 2 dokumentiert Diffs bei Updates |
 | KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | 🔄 Delegiert | Gate 3 (konsistenz-pruefer) |
 | KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ✅ Aktiv | Phase 1 liest PDF komplett |
-| KORREKTE-UMLAUTE | ✅ Aktiv | check-wiki-output.sh Check 9 |
+| KORREKTE-UMLAUTE | 🔄 Delegiert | Gate 2 (quellen-pruefer), Part C |
 
 ---
 
@@ -259,18 +259,22 @@ NACH Rueckkehr des Ingest-Subagents MUESSEN die folgenden Gates dispatcht werden
 Ueberspringen ist VERBOTEN. _pending.json blockiert den naechsten Ingest mechanisch.
 
 Checkliste:
-1. **Pipeline-Lock anlegen** — Schreibe `wiki/_pending.json`:
-   ```json
-   {"typ":"ingest","stufe":"gates","quelle":"<kurzname>","timestamp":"<ISO-8601>","gates_passed":0,"gates_total":4}
-   ```
-   ERST hier, NICHT in Phase 0.4 — sonst blockiert guard-pipeline-lock.sh den eigenen
-   ersten Ingest-Dispatch.
-2. check-wiki-output.sh automatisch gelaufen (PostToolUse-Hook) → Bei FAIL: Korrektur
-3. Lade `governance/gate-dispatch-template.md`
-4. Fuelle Platzhalter pro Gate-Agent (Quellenseite, PDF-Pfad, Konzeptseiten, etc.)
+1. **Pipeline-Lock verifizieren** — `wiki/_pending.json` wurde automatisch durch
+   `create-pipeline-lock.sh` (SubagentStop-Hook) angelegt. Verifiziere:
+   - Datei existiert
+   - `quelle` stimmt mit der Quellenseite ueberein
+   - Falls die Datei NICHT existiert (Hook-Fehler): manuell anlegen wie bisher:
+     ```json
+     {"typ":"ingest","stufe":"gates","quelle":"<kurzname>","timestamp":"<ISO-8601>","gates_passed":0,"gates_total":4}
+     ```
+2. Lade `governance/gate-dispatch-template.md`
+3. Fuelle Platzhalter pro Gate-Agent (Quellenseite, PDF-Pfad, Konzeptseiten, etc.)
+4. Lese `_pending.json` → verwende `.quelle` als `{{PIPELINE_ID_MARKER}}`:
+   `[INGEST-ID:<_pending.json.quelle>]`
+   (advance-pipeline-lock.sh verifiziert den Marker gegen _pending.json.quelle)
 5. Gate 1-4 parallel dispatchen — IMMER mit Template-Prompt, NIE frei formuliert
-6. Gate 2 (quellen-pruefer) uebernimmt die kontextuellen Checks 04, 05, 06, 09
-   die das Shell-Script nur als WARN meldet — der Agent bewertet und korrigiert
+6. Gate 2 (quellen-pruefer) fuehrt die kontextuellen Checks (Zahlenwerte, Normbezuege,
+   Seitenangaben, Umlaute) durch — diese brauchen Kontext den Shell nicht liefern kann
 7. Alle 4 PASS → weiter zu Phase 4 (Nebeneffekte)
 8. Bei FAIL: Korrektur → Re-Gate (max 3x) → Eskalation an Nutzer
 </NICHT-VERHANDELBAR>
