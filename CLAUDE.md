@@ -50,13 +50,15 @@ vor dem `plugin/`-Subdirectory-Refactor (Commit 4766b13).
 2. **Subagent-Review** — 4 Pruefer (Ingest) + 2 Reviewer (Synthese) + 1 Validator (parallel, unabhaengig)
 3. **Machine-Law:**
    - `guard-wiki-writes.sh` (PreToolUse Edit|Write) — blockiert Wiki-Writes ausserhalb von `/ingest`, `/synthese`, `/normenupdate`, `/vokabular` via zwei-stufigem Transcript-Check (Skill-Tool-Call, nicht blankes Wort)
-   - `guard-pipeline-lock.sh` (PreToolUse Agent) — blockiert neue `bibliothek:ingest-worker`-Dispatches solange `wiki/_pending.json` offen ist
-   - `advance-pipeline-lock.sh` (SubagentStop auf 4 Gate-Agents) — inkrementiert `gates_passed`-Counter, wechselt Stufe auf `sideeffects` nach 4/4 Gates
-   - `inject-lock-warning.sh` (UserPromptSubmit) — injiziert passive Lock-Warnung als `additionalContext` wenn `wiki/_pending.json` offen ist
+   - `guard-pipeline-lock.sh` (PreToolUse Agent) — blockiert neue `bibliothek:ingest-worker`- und `bibliothek:synthese-worker`-Dispatches solange `wiki/_pending.json` offen ist (gegenseitige Blockade)
+   - `advance-pipeline-lock.sh` (SubagentStop auf Gate-Agents) — inkrementiert `gates_passed`-Counter, wechselt Stufe auf `sideeffects` nach gates_total Gates. Verifiziert INGEST-ID/SYNTHESE-ID gegen `_pending.json.quelle` (bei Mismatch: Counter nicht inkrementieren)
+   - `create-pipeline-lock.sh` (SubagentStop auf Worker-Agents) — erzeugt `wiki/_pending.json` automatisch nach Ingest-/Synthese-Worker-Ende. Extrahiert quelle aus `[INGEST-ID:xxx]` / `[SYNTHESE-ID:xxx]` im Worker-Output. Ueberschreibt bestehende Locks nicht.
+   - `inject-lock-warning.sh` (UserPromptSubmit) — injiziert passive Lock-Warnung mit Typ, Quelle, Stufe und Gates-Zaehler als `additionalContext`
    - `check-wiki-output.sh` — wird von den Gate-Agents selbst aufgerufen (seit Commit `f7b08d7`)
 
-Heuristische Checks (04 Zahlenwerte, 05 Normbezuege, 06 Seitenangaben, 09 Umlaute)
-sind WARN im Shell-Script. Die echte Pruefung macht der quellen-pruefer Agent (Gate 2).
+Heuristische Checks (Zahlenwerte, Normbezuege, Seitenangaben, Umlaute) wurden
+aus `check-wiki-output.sh` entfernt — sie brauchen Kontext den Shell nicht liefern
+kann. Die Gate-Agents (quellen-pruefer, konsistenz-pruefer) pruefen kontextuell.
 
 ## Dispatch-Templates
 
@@ -69,19 +71,24 @@ sind WARN im Shell-Script. Die echte Pruefung macht der quellen-pruefer Agent (G
 
 ## Pipeline-Lock
 
-`wiki/_pending.json` blockiert den naechsten Ingest **mechanisch** (via `guard-pipeline-lock.sh`):
+`wiki/_pending.json` blockiert den naechsten Ingest/Synthese **mechanisch** (via `guard-pipeline-lock.sh`):
 - `stufe: "gates"` → Gate-Agents muessen laufen, `advance-pipeline-lock.sh` zaehlt mit
-- `stufe: "sideeffects"` → Nebeneffekte muessen abgeschlossen werden (manuell durch Phase 4)
-- (Datei geloescht) → naechster Ingest frei
+- `stufe: "sideeffects"` → Nebeneffekte muessen abgeschlossen werden
+- (Datei geloescht) → naechste Pipeline frei
+
+Ingest und Synthese blockieren sich gegenseitig (nur ein `_pending.json`).
 
 Format:
 ```json
-{"typ":"ingest","stufe":"gates","quelle":"<kurzname>","timestamp":"<ISO>","gates_passed":0,"gates_total":4}
+{"typ":"ingest|synthese","stufe":"gates","quelle":"<kurzname>","timestamp":"<ISO>","gates_passed":0,"gates_total":4|3}
 ```
 
-`_pending.json` wird in Phase 3 (nach Ingest-Worker-Rueckkehr, vor Gate-Dispatch) angelegt
-und in Phase 4 (nach allen Nebeneffekten) geloescht. NICHT in Phase 0.4 — sonst blockiert
-der Hook den eigenen ersten Ingest-Dispatch.
+Ingest: `gates_total: 4` (vollstaendigkeits-, quellen-, konsistenz-, vokabular-pruefer).
+Synthese: `gates_total: 3` (quellen-, konsistenz-, vokabular-pruefer).
+
+`_pending.json` wird automatisch durch `create-pipeline-lock.sh` (SubagentStop-Hook)
+nach Worker-Rueckkehr angelegt. Phase 3 verifiziert die Datei und dispatcht die Gates.
+In der Nebeneffekte-Phase (nach allen Seiteneffekten) wird die Datei geloescht.
 
 ## Entwicklung
 
@@ -91,8 +98,10 @@ bash plugin/hooks/check-consistency.sh plugin/    # 19/19 PASS?
 diff <(sed -n '/<!-- BEGIN HARD-GATES -->/,/<!-- END HARD-GATES -->/p' plugin/skills/using-bibliothek/SKILL.md | sed '1d;$d') plugin/governance/hard-gates.md   # Sync?
 bash tests/test-guard-wiki-writes.sh               # 6/6 PASS?
 bash tests/test-inject-lock-warning.sh             # 7/7 PASS?
-bash tests/test-guard-pipeline-lock.sh             # 6/6 PASS?
-bash tests/test-advance-pipeline-lock.sh           # 10/10 PASS?
+bash tests/test-guard-pipeline-lock.sh             # 10/10 PASS?
+bash tests/test-advance-pipeline-lock.sh           # 16/16 PASS?
+bash tests/test-create-pipeline-lock.sh            # 30/30 PASS?
+bash tests/test-integration-pipeline.sh            # 137/137 PASS?
 ```
 
 Session-Neustart noetig nach Hook-Aenderungen (Claude Code cached im RAM).
@@ -121,11 +130,19 @@ Pruefe:
 2. Matcher in hooks.json — mit `bash tests/test-advance-pipeline-lock.sh` verifizieren
 3. Hook-Script ist ausfuehrbar: `ls -la plugin/hooks/advance-pipeline-lock.sh`
 
-### Manueller Gate-Dispatch waehrend aktivem Ingest
+### Worker-Stop erzeugt _pending.json nicht (Hook-Fehler)
 
-NICHT empfohlen — `advance-pipeline-lock.sh` zaehlt jeden SubagentStop auf einen
-Gate-Agent, unabhaengig ob er zum aktuellen Ingest gehoert. Der Counter laeuft
-ueber, was zwar harmlos aber verwirrend ist.
+Pruefe:
+1. hooks.json hat SubagentStop-Matcher fuer `bibliothek:(ingest|synthese)-worker`
+2. `create-pipeline-lock.sh` ist ausfuehrbar: `ls -la plugin/hooks/create-pipeline-lock.sh`
+3. `wiki/` Verzeichnis existiert (Bootstrap gelaufen?)
+4. Manuell anlegen: `echo '{"typ":"ingest","stufe":"gates","quelle":"...","timestamp":"...","gates_passed":0,"gates_total":4}' > wiki/_pending.json`
+
+### Manueller Gate-Dispatch waehrend aktivem Ingest/Synthese
+
+NICHT empfohlen — obwohl `advance-pipeline-lock.sh` seit SPEC-003 INGEST-ID/SYNTHESE-ID
+aus `last_assistant_message` verifiziert (Mismatch → Counter nicht inkrementiert),
+ist manueller Gate-Dispatch ein Sonderfall der nicht getestet ist.
 
 ## Bekannte Patterns
 
