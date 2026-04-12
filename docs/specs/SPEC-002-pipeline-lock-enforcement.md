@@ -1,6 +1,6 @@
 # SPEC-002: Aktive Pipeline-Lock-Enforcement + Subagent-Type-Refactor
 
-**Status:** In Progress
+**Status:** Done
 **Version:** 2.0
 **Erstellt:** 2026-04-10
 **Aktualisiert:** 2026-04-13

@@ -8,7 +8,7 @@ Bestehende Specs werden bei neuen Anforderungen aktualisiert, nicht dupliziert.
 | Nr | Titel | Status | Version | Letzte Aktualisierung |
 |----|-------|--------|---------|----------------------|
 | [SPEC-001](SPEC-001-passive-hooks.md) | Passive Hook-Infrastruktur (Schreibschutz + Lock-Warnung) | Done | 1.0 | 2026-04-11 |
-| [SPEC-002](SPEC-002-pipeline-lock-enforcement.md) | Aktive Pipeline-Lock-Enforcement + Auto-Lock nach Worker-Stop | In Progress | 2.0 | 2026-04-13 |
+| [SPEC-002](SPEC-002-pipeline-lock-enforcement.md) | Aktive Pipeline-Lock-Enforcement + Auto-Lock nach Worker-Stop | Done | 2.0 | 2026-04-13 |
 | [SPEC-003](SPEC-003-synthese-enforcement.md) | Synthese-Enforcement + Heuristik-Bereinigung | Done | 1.0 | 2026-04-11 |
 | [SPEC-004](SPEC-004-wiki-review-skill.md) | Wiki-Review-Skill (semantische Analyse + Verbesserungsplaene) | Done | 1.0 | 2026-04-11 |
 
