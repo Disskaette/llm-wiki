@@ -7,7 +7,7 @@ graph LR
     A["📄 PDF-Literatur\n(Normen, Papers,\nForschungsberichte)"] -->|"/ingest\n(Split bei >800K)"| B["📖 Wiki-Seiten\n(Quellen, Konzepte,\nNormen, Baustoffe)"]
     B -->|/vokabular| C["📋 Kontrolliertes\nVokabular\n(_vokabular.md)"]
     B -->|/katalog| D["🗂️ Katalog-Index\n(Quellenliste,\nAbdeckungsanalyse)"]
-    B -->|/wiki-lint| E["✅ Qualitäts-Check\n(16 Output-Checks,\n19 Konsistenz-Checks)"]
+    B -->|/wiki-lint| E["✅ Qualitäts-Check\n(12 Output-Checks,\n19 Konsistenz-Checks)"]
     D -->|/synthese| F["📝 Synthesetext\n(Quellenvergleich,\nWidersprüche)"]
     F -->|/export| G["📊 Export\n(Zusammenfassungen,\nTabellen, Formeln)"]
     E -->|/export| G
@@ -34,7 +34,7 @@ graph LR
 
 ## Agent-Taxonomie
 
-Es gibt 7 Subagents, aufgeteilt in 3 Rollen (siehe `governance/naming-konvention.md`):
+Es gibt 9 Subagents, aufgeteilt in 4 Rollen (siehe `governance/naming-konvention.md`):
 
 ### Pruefer (PASS/FAIL — blockierend)
 
@@ -51,6 +51,13 @@ Es gibt 7 Subagents, aufgeteilt in 3 Rollen (siehe `governance/naming-konvention
 |-------|---------------|--------|
 | `struktur-reviewer` | /wiki-lint | Waisen-Seiten, Hub-Seiten, Coverage-Luecken, MOC-Vollstaendigkeit |
 | `norm-reviewer` | /normenupdate | Abschnitts-Mapping alt→neu, Zahlenwerte-Propagierung, Norm-Markierung |
+
+### Worker (Ausfuehrung)
+
+| Agent | Dispatcht von | Auftrag |
+|-------|---------------|---------|
+| `ingest-worker` | /ingest (Phase 0.6) | PDF vollstaendig lesen, Quellenseite erstellen |
+| `synthese-worker` | /synthese (Phase 0.6) | Konzeptseite aus Wiki-Quellenseiten vertiefen |
 
 ### Validator (Format-Check)
 
@@ -91,38 +98,38 @@ Es gibt 7 Subagents, aufgeteilt in 3 Rollen (siehe `governance/naming-konvention
 
 ## Shell-Checks und Hooks
 
-### Aktive Hooks (Stand SPEC-001, 2026-04-11)
+### Aktive Hooks (Stand SPEC-003, 2026-04-11)
 
 | Hook | Event | Matcher | Zweck |
 |------|-------|---------|-------|
 | `session-start` | SessionStart | startup\|resume\|clear\|compact | Governance-Context injizieren via using-bibliothek |
 | `guard-wiki-writes.sh` | PreToolUse | Edit\|Write | Blockiert `wiki/**/*.md`-Writes ausserhalb der 4 Schreib-Skills (Transcript-Check) |
-| `inject-lock-warning.sh` | UserPromptSubmit | — | Passive Warnung wenn `wiki/_pending.json` offen ist (additionalContext-Injection) |
+| `guard-pipeline-lock.sh` | PreToolUse | Agent | Blockiert ingest-worker/synthese-worker bei offenem _pending.json (gegenseitige Blockade) |
+| `advance-pipeline-lock.sh` | SubagentStop | Gate-Agents | Zaehlt gates_passed, wechselt Stufe, verifiziert INGEST-ID/SYNTHESE-ID |
+| `inject-lock-warning.sh` | UserPromptSubmit | — | Passive Warnung mit Typ, Quelle, Stufe, Gates-Zaehler |
 
-**Noch ausstehend (SPEC-002):**
-- `guard-pipeline-lock.sh` (PreToolUse Agent) — blockiert parallele Ingest-Dispatches solange _pending.json offen
-- `advance-pipeline-lock.sh` (SubagentStop auf Gate-Agents) — zaehlt Gates, wechselt Lock-Stufe
+**Selbst-Check im Subagent:** Gate-Agents rufen `check-wiki-output.sh` nach jeder Datei selbst auf. Kontextuelle Checks (Zahlenwerte, Normbezuege, Seitenangaben, Umlaute) werden von den Gate-Agents direkt durchgefuehrt — das Shell-Script prueft nur deterministische Aspekte.
 
-**Selbst-Check im Subagent:** Gate-Agents rufen `check-wiki-output.sh` nach jeder Datei selbst auf (seit Commit f7b08d7). Das ist die einzige automatische Output-Validierung, weil PostToolUse-Hooks nach Claude Code Hooks API 2026 nicht mehr blockieren koennen.
-
-### 16 Output-Checks (check-wiki-output.sh)
+### 12 Output-Checks (check-wiki-output.sh)
 
 1. **Frontmatter-Type**: Feld `type:` muss im YAML-Frontmatter vorhanden sein
-2. **Seitentyp-Validierung**: `type:` muss einer der 6 definierten Typen sein
+2. **Seitentyp-Validierung**: `type:` muss einer der definierten Typen sein (config/valid-types.txt)
 3. **Schlagworte-Vokabular**: Alle `schlagworte:`-Eintraege muessen in `_vokabular.md` existieren
-4. **Zahlenwert-Quelle**: Absaetze mit Zahlenwerten+Einheiten brauchen Quellenangabe
-5. **Normbezug-Abschnitt**: Normverweise in normativem Kontext brauchen Abschnittsnummer
-6. **Seitenangabe**: Quellenverweise brauchen S./Kap./Tab./Abb./Gl.-Angabe (MOC ausgenommen)
 7. **Querverweise**: Konzept-/Verfahrens-/Baustoffseiten brauchen mindestens einen Wikilink [[...]]
-8. **Offene Marker**: Keine [TODO], [UNSICHER], [PRUEFEN], [QUELLE BENOETIGT] in fertigen Seiten
-9. **Korrekte Umlaute**: Erkennung von ASCII-Ersetzungen (ae/oe/ue statt ä/ö/ü)
+8. **Offene Marker**: Keine [TODO], [UNSICHER], [PRUEFEN], [QUELLE BENOETIGT], [INGEST/SYNTHESE UNVOLLSTAENDIG]
 10. **Kapitelindex**: Quellenseiten muessen `kapitel-index:` im Frontmatter haben
-11. **Duplikat-Quellen**: Keine zwei Quellenseiten mit identischem Titel
+11. **Duplikat-Quellen**: Keine zwei Quellenseiten mit identischem Titel (exakter Match)
 12. **Index-Eintrag**: (Deferred — wird bei /wiki-lint geprueft)
 13. **Log-Eintrag**: (Deferred — wird bei /wiki-lint geprueft)
 14. **Wikilinks-Aufloesbar**: Alle [[...]]-Links auf existierende Wiki-Dateien (mit Umlaut-Mapping)
 15. **Widerspruch-Marker**: [WIDERSPRUCH]-Marker muessen zwei Quellen nennen
 16. **Review-Status**: Feld `reviewed:` sollte im Frontmatter vorhanden sein
+
+Entfernte heuristische Checks (brauchen Kontext, den Gate-Agents liefern):
+- ~~04 Zahlenwert-Quelle~~ → Gate 2 (quellen-pruefer), Part A
+- ~~05 Normbezug-Abschnitt~~ → Gate 2, Part A
+- ~~06 Seitenangabe~~ → Gate 2, Part A
+- ~~09 Korrekte Umlaute~~ → Gate 2, Part C
 
 ### 19 Plugin-Konsistenz-Checks (check-consistency.sh)
 
@@ -183,7 +190,7 @@ Prueft die interne Konsistenz des Plugins selbst (nicht der Wiki-Daten):
 | Kontrolliertes Vokabular | Markdown | `wiki/_vokabular.md` | /vokabular | /ingest (Check), /wiki-lint |
 | Aenderungsprotokoll | Markdown | `wiki/_log.md` | Alle schreibenden Skills | /wiki-lint (Audit-Trail) |
 | BibTeX-Katalog | BibTeX | `Masterarbeit/literatur.bib` | /katalog (Export-Proposal, NICHT direkt schreiben!) | Pandoc (Kapitel-Build) |
-| Pipeline-Lock | JSON | `wiki/_pending.json` | /ingest (Lock-Datei waehrend Verarbeitung) | `inject-lock-warning.sh` (SPEC-001, passiv) + `guard-pipeline-lock.sh` / `advance-pipeline-lock.sh` (SPEC-002, aktiv, geplant) |
+| Pipeline-Lock | JSON | `wiki/_pending.json` | /ingest, /synthese (Lock-Datei waehrend Verarbeitung, gegenseitige Blockade) | `guard-pipeline-lock.sh` (blockiert), `advance-pipeline-lock.sh` (zaehlt Gates), `inject-lock-warning.sh` (warnt) |
 
 > **Scope-Regel:** Das Bibliothek-Plugin arbeitet ausschliesslich in `wiki/`.
 > Dateien ausserhalb von `wiki/` (z.B. literatur.bib) werden NICHT geschrieben.
@@ -196,11 +203,11 @@ Prueft die interne Konsistenz des Plugins selbst (nicht der Wiki-Daten):
 
 - **Befehle:** 7 (ingest, katalog, wiki-lint, vokabular, synthese, normenupdate, export)
 - **Skills:** 8 (7 Befehls-Skills + using-bibliothek Governance-Skill)
-- **Agents:** 7 (4 Pruefer + 2 Reviewer + 1 Validator)
+- **Agents:** 9 (4 Pruefer + 2 Reviewer + 1 Validator + 2 Worker)
 - **Hard Gates:** 10 (definiert in `governance/hard-gates.md`)
-- **Output-Checks:** 16 (check-wiki-output.sh, davon 14 aktiv + 2 deferred)
+- **Output-Checks:** 12 (check-wiki-output.sh, davon 10 aktiv + 2 deferred; kontextuelle via Gate-Agents)
 - **Konsistenz-Checks:** 19 (check-consistency.sh)
-- **Aktive Hooks:** 3 (SessionStart + PreToolUse Edit|Write + UserPromptSubmit; SPEC-002 bringt 2 weitere)
+- **Aktive Hooks:** 5 (SessionStart + PreToolUse Edit|Write + PreToolUse Agent + SubagentStop + UserPromptSubmit)
 - **Governance-Schichten:** 4 (Hook → Using → Gate → Subagent)
 
 ## Wiki-Verzeichnisstruktur

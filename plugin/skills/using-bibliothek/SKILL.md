@@ -37,6 +37,14 @@ Aenderungsprotokoll: `wiki/_log.md`
 
 Falls `wiki/` nicht existiert:
 → Sage das offen und fuehre `/ingest` auf das erste Buch aus — Bootstrap ist in Phase 0 integriert.
+
+Falls `wiki/` existiert:
+→ Pruefe ob ein Wiki-Review faellig ist:
+  1. Gibt es `wiki/_reviews/`? Falls nein: "Noch kein Wiki-Review gelaufen. `/wiki-review` empfohlen?"
+  2. Falls ja: Wann war der letzte Review? (juengste Datei in `wiki/_reviews/`)
+  3. Zaehle Ingests seit letztem Review (Eintraege in `_log.md` nach Review-Datum)
+  4. Wenn >3 Ingests seit letztem Review ODER >14 Tage: "Wiki-Review empfohlen (N Ingests seit letztem Check). `/wiki-review`?"
+  5. Sonst: Schweigen (kein Hinweis noetig)
 </EXTREMELY_IMPORTANT>
 
 ---
@@ -48,6 +56,7 @@ Falls `wiki/` nicht existiert:
 | Buch/PDF einlesen | /ingest | "Lies dieses Buch ein", "Ingest", PDF-Pfad, "neue Quelle", "neue Quelle im Ordner" |
 | Bestand navigieren | /katalog | "Was haben wir zu...", "Zeig alle Buecher ueber..." |
 | Wiki-Gesundheitscheck | /wiki-lint | "Pruefe das Wiki", "Lint", "Inkonsistenzen?" |
+| Wiki-Review (Qualitaet + Drift) | /wiki-review | "Review", "Audit", "Stimmt die Wiki noch?", "Ist alles aktuell?" |
 | Schlagworte pflegen | /vokabular | "Neuer Term", "Synonym hinzufuegen" |
 | Konzeptseite vertiefen | /synthese | "Erklaer mir ... genauer", "Vertiefe die Seite..." |
 | Normstand aktualisieren | /normenupdate | "Neue Norm-Ausgabe", "EC2 aktualisiert" |

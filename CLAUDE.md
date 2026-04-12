@@ -51,7 +51,7 @@ vor dem `plugin/`-Subdirectory-Refactor (Commit 4766b13).
 3. **Machine-Law:**
    - `guard-wiki-writes.sh` (PreToolUse Edit|Write) — blockiert Wiki-Writes ausserhalb von `/ingest`, `/synthese`, `/normenupdate`, `/vokabular` via zwei-stufigem Transcript-Check (Skill-Tool-Call, nicht blankes Wort)
    - `guard-pipeline-lock.sh` (PreToolUse Agent) — blockiert neue `bibliothek:ingest-worker`- und `bibliothek:synthese-worker`-Dispatches solange `wiki/_pending.json` offen ist (gegenseitige Blockade)
-   - `advance-pipeline-lock.sh` (SubagentStop auf Gate-Agents) — inkrementiert `gates_passed`-Counter, wechselt Stufe auf `sideeffects` nach gates_total Gates. Verifiziert INGEST-ID/SYNTHESE-ID gegen `_pending.json.quelle` (bei Mismatch: Counter nicht inkrementieren)
+   - `advance-pipeline-lock.sh` (SubagentStop auf Gate-Agents) — inkrementiert `gates_passed`-Counter, wechselt Stufe auf `sideeffects` nach gates_total Gates. Verifiziert INGEST-ID/SYNTHESE-ID gegen `_pending.json.quelle` (bei Mismatch: Counter nicht inkrementieren). Bei Gate-FAIL (`Ergebnis:.*FAIL` im Output): Counter wird NICHT inkrementiert — erzwingt Re-Gate-Dispatch nach Korrektur maschinell.
    - `create-pipeline-lock.sh` (SubagentStop auf Worker-Agents) — erzeugt `wiki/_pending.json` automatisch nach Ingest-/Synthese-Worker-Ende. Extrahiert quelle aus `[INGEST-ID:xxx]` / `[SYNTHESE-ID:xxx]` im Worker-Output. Ueberschreibt bestehende Locks nicht.
    - `inject-lock-warning.sh` (UserPromptSubmit) — injiziert passive Lock-Warnung mit Typ, Quelle, Stufe und Gates-Zaehler als `additionalContext`
    - `check-wiki-output.sh` — wird von den Gate-Agents selbst aufgerufen (seit Commit `f7b08d7`)
@@ -99,7 +99,7 @@ diff <(sed -n '/<!-- BEGIN HARD-GATES -->/,/<!-- END HARD-GATES -->/p' plugin/sk
 bash tests/test-guard-wiki-writes.sh               # 6/6 PASS?
 bash tests/test-inject-lock-warning.sh             # 7/7 PASS?
 bash tests/test-guard-pipeline-lock.sh             # 10/10 PASS?
-bash tests/test-advance-pipeline-lock.sh           # 16/16 PASS?
+bash tests/test-advance-pipeline-lock.sh           # 20/20 PASS?
 bash tests/test-create-pipeline-lock.sh            # 30/30 PASS?
 bash tests/test-integration-pipeline.sh            # 137/137 PASS?
 ```

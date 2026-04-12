@@ -6,8 +6,22 @@ dieses Template verwenden.
 
 ## Wann dispatchen
 
-NACH Rueckkehr des Ingest-Subagents. Der Hauptagent dispatcht die Gates,
-nicht ein Hook. Kein Ingest darf ohne abgeschlossene Gates weitergehen.
+NACH Rueckkehr des Pipeline-Workers. Der Hauptagent dispatcht die Gates,
+nicht ein Hook. Keine Pipeline darf ohne abgeschlossene Gates weitergehen.
+
+- **Ingest:** 4 Gates (Gate 1-4: vollstaendigkeits-, quellen-, konsistenz-, vokabular-pruefer)
+- **Synthese:** 3 Gates (Gate 2-4: quellen-, konsistenz-, vokabular-pruefer — kein vollstaendigkeits-pruefer)
+
+## Pipeline-ID-Marker
+
+JEDER Gate-Prompt MUSS den Platzhalter `{{PIPELINE_ID_MARKER}}` enthalten.
+Der dispatchende Skill setzt:
+- Ingest: `[INGEST-ID:kurzname]` (z.B. `[INGEST-ID:fingerloos-ec2-2016]`)
+- Synthese: `[SYNTHESE-ID:konzeptname]` (z.B. `[SYNTHESE-ID:querkraft-transfer]`)
+
+Gate-Agents geben den Marker im Output-Bericht zurueck. `advance-pipeline-lock.sh`
+extrahiert ihn aus `last_assistant_message` und verifiziert gegen `_pending.json.quelle`.
+Bei Mismatch wird der Counter NICHT inkrementiert.
 
 ## Dispatch-Reihenfolge
 
@@ -25,8 +39,7 @@ als externer Hook.
 bash "${CLAUDE_PLUGIN_ROOT}/hooks/check-wiki-output.sh" "{{QUELLENSEITE_PFAD}}" "{{WIKI_ROOT}}/_vokabular.md" "{{WIKI_ROOT}}/"
 ```
 
-Bei FAIL: Der Agent bewertet ob es ein echter Mangel oder ein False Positive ist
-(heuristische Checks 04/05/06/09 sind WARN, nicht FAIL — der Agent entscheidet).
+Bei FAIL: Der Agent bewertet ob es ein echter Mangel oder ein False Positive ist.
 
 ---
 
@@ -43,6 +56,8 @@ Bei FAIL: Der Agent bewertet ob es ein echter Mangel oder ein False Positive ist
 
 ```
 Du bist der Vollständigkeitsprüfer (Gate 1) des Bibliothek-Plugins.
+
+{{PIPELINE_ID_MARKER}}
 
 ## Dein Auftrag
 
@@ -108,6 +123,8 @@ Die vollständige Prüflogik mit Parts A-G ist in `agents/quellen-pruefer.md` de
 ```
 Du bist der Quellenprüfer (Gate 2) des Bibliothek-Plugins.
 
+{{PIPELINE_ID_MARKER}}
+
 ## Dein Auftrag
 
 Prüfe ob JEDE Aussage, JEDER Zahlenwert und JEDER Normbezug korrekt
@@ -128,7 +145,7 @@ Fuehre zuerst check-wiki-output.sh auf die Quellenseite aus:
 ```bash
 bash check-wiki-output.sh "{{QUELLENSEITE_PFAD}}" "{{WIKI_ROOT}}/_vokabular.md" "{{WIKI_ROOT}}/"
 ```
-Melde alle PASS/FAIL/WARN im Pruefbericht. WARN-Checks (04/05/06/09) bewertest DU kontextuell in den folgenden Parts.
+Melde alle PASS/FAIL/WARN im Pruefbericht. Die kontextuellen Pruefungen (Zahlenwerte, Normbezuege, Seitenangaben, Umlaute) bewertest DU in den folgenden Parts — das Shell-Script prueft sie nicht.
 
 ### A: Kontextuelle Quellenprüfung (ersetzt Shell-Checks 04, 05, 06)
 
@@ -218,6 +235,8 @@ Lies den Body-Text und prüfe auf verbleibende ASCII-Umlaut-Ersetzungen:
 ```
 Du bist der Konsistenzprüfer (Gate 3) des Bibliothek-Plugins.
 
+{{PIPELINE_ID_MARKER}}
+
 ## Dein Auftrag
 
 Prüfe ob der neue Inhalt mit dem bestehenden Wiki konsistent ist.
@@ -277,6 +296,8 @@ Wiki-Root: {{WIKI_ROOT}}
 
 ```
 Du bist der Vokabulärprüfer (Gate 4) des Bibliothek-Plugins.
+
+{{PIPELINE_ID_MARKER}}
 
 ## Dein Auftrag
 

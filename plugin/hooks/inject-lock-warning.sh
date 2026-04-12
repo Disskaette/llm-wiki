@@ -16,6 +16,9 @@ fi
 # Lock lesen — defensiv, bei kaputtem JSON exit 0 ohne Output
 QUELLE=$(jq -r '.quelle // "unbekannt"' "$PENDING" 2>/dev/null || echo "")
 STUFE=$(jq -r '.stufe // "unbekannt"' "$PENDING" 2>/dev/null || echo "")
+TYP=$(jq -r '.typ // "unbekannt"' "$PENDING" 2>/dev/null || echo "")
+PASSED=$(jq -r '.gates_passed // "?"' "$PENDING" 2>/dev/null || echo "?")
+TOTAL=$(jq -r '.gates_total // "?"' "$PENDING" 2>/dev/null || echo "?")
 
 if [ -z "$QUELLE" ] || [ -z "$STUFE" ]; then
   # Kaputtes JSON — nicht crashen, einfach schweigen
@@ -23,11 +26,11 @@ if [ -z "$QUELLE" ] || [ -z "$STUFE" ]; then
 fi
 
 # additionalContext zurueckgeben
-jq -n --arg q "$QUELLE" --arg s "$STUFE" '
+jq -n --arg q "$QUELLE" --arg s "$STUFE" --arg t "$TYP" --arg p "$PASSED" --arg tot "$TOTAL" '
 {
   hookSpecificOutput: {
     hookEventName: "UserPromptSubmit",
-    additionalContext: ("⚠️ Pipeline-Lock offen: Quelle=" + $q + ", Stufe=" + $s + ". Bevor du einen neuen Ingest startest, schliesse die offenen Gates bzw. Nebeneffekte fuer diese Quelle ab.")
+    additionalContext: ("⚠️ Pipeline-Lock offen: Typ=" + $t + ", Quelle=" + $q + ", Stufe=" + $s + ", Gates=" + $p + "/" + $tot + ". Bevor du einen neuen Ingest/Synthese startest, schliesse die offenen Gates bzw. Nebeneffekte ab.")
   }
 }'
 

@@ -33,7 +33,7 @@ fi
 # Wurde ein Bibliothek-Skill in dieser Session via Skill-Tool geladen?
 # Zwei-stufig: erst Zeilen mit Skill-Tool-Calls filtern, dann Skill-Name pruefen.
 # Verhindert False-Positives wenn "ingest" in Gespraechen/File-Reads vorkommt.
-if grep '"name":"Skill"' "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE '"skill":"(bibliothek:)?(ingest|synthese|normenupdate|vokabular)"'; then
+if grep '"name":"Skill"' "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE '"skill":"(bibliothek:)?(ingest|synthese|normenupdate|vokabular|wiki-review)"'; then
   exit 0
 fi
 

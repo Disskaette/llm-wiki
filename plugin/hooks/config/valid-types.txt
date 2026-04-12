@@ -1,0 +1,8 @@
+# Gueltige Wiki-Seitentypen (type:-Feld im Frontmatter).
+# Ein Typ pro Zeile. Wird von check-wiki-output.sh Check 02 geladen.
+quelle
+konzept
+norm
+baustoff
+verfahren
+moc

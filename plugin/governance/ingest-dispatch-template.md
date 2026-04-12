@@ -9,15 +9,17 @@ das Ergebnis als Agent-Prompt. Der Subagent liest diese Datei nie direkt.
 
 ---
 
-## Modellwahl
+## Modellwahl und Split-Entscheidung
 
 | Dokumentgroesse | Modell | Begruendung |
 |-----------------|--------|-------------|
 | >200 Seiten (Lehrbuecher, Dissertationen, Kommentare) | **Opus** | Braucht 1M Context, komplexe Zusammenhaenge |
 | ≤200 Seiten (Papers, Berichte, Normen, Leitfaeden) | **Sonnet** | Reicht fuer fokussierte Extraktion, guenstiger |
+| **>10 MB Dateigroesse** | **Split-Ingest** | API-Request-Size-Limit (~25 MB) mit base64-Overhead (+33%) → ab 10 MB unsicher. Split-Ingest-Protokoll in SKILL.md aktivieren. |
 
-Der Hauptagent bestimmt die Seitenzahl beim PDF-Lokalisieren (Phase 0.1)
-und waehlt das Modell entsprechend beim Agent-Dispatch (`model: "opus"` oder `model: "sonnet"`).
+Der Hauptagent bestimmt Seitenzahl UND Dateigroesse beim PDF-Lokalisieren (Phase 0.1).
+Dateigroesse >10 MB erzwingt Split-Ingest unabhaengig von der Seitenzahl.
+Modellwahl (Opus/Sonnet) richtet sich weiterhin nach der Seitenzahl pro Split-Block.
 
 ## Platzhalter
 

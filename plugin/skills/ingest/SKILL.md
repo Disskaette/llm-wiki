@@ -75,14 +75,17 @@ description: "Dokument vollstaendig lesen und ins Wiki einpflegen — Kern-Skill
    - Existiert die Datei?
    - Text extrahierbar? (Read-Tool auf erste 5 Seiten testen)
    - Wenn kein Text: PDF nach `wiki/_pdfs/unlesbar/` verschieben, Fallback `verarbeitung: nur-katalog`
-   - Seitenzahl und geschaetzte Tokens ermitteln
+   - Seitenzahl und Dateigroesse ermitteln
 
 2. **Duplikat-Check:**
    - Existiert bereits eine Quellenseite im Wiki fuer dieses Buch?
    - Wenn ja: UPDATE-MODUS (nicht Neuanlage)
    - Dispatch: `duplikat-validator` wenn unsicher
 
-3. **Split-Plan (wenn >800K Tokens):**
+3. **Split-Plan (wenn >10 MB Dateigroesse ODER >800K Tokens):**
+   - **Trigger:** PDF-Dateigroesse >10 MB erzwingt Split-Ingest unabhaengig von
+     der Token-Schaetzung (API-Request-Size-Limit ~25 MB, base64-Encoding +33%
+     Overhead → ab ~10 MB unsicher). Dateigroesse mit `ls -la` oder `stat` pruefen.
    - Inhaltsverzeichnis lesen (erste 5-10 Seiten)
    - Kapitel in Bloecke aufteilen die einzeln in den Context passen
    - Split-Plan dokumentieren: welche Kapitel pro Durchgang
@@ -133,6 +136,7 @@ Subagent-Prompts werden NICHT frei formuliert. IMMER Template verwenden.
 3. Modellwahl nach Seitenzahl (aus Phase 0.1):
    - **>200 Seiten** → `model: "opus"` (1M Context, komplexe Buecher)
    - **≤200 Seiten** → `model: "sonnet"` (fokussierte Extraktion, guenstiger)
+   - **>10 MB Dateigroesse** → Split-Ingest-Protokoll aktivieren (siehe Phase 0 Schritt 3)
 4. Dispatche Agent mit:
    - `subagent_type: "bibliothek:ingest-worker"` (PFLICHT — PreToolUse-Hook
      guard-pipeline-lock.sh matcht auf diesen String, um parallele Ingests zu
@@ -276,7 +280,12 @@ Checkliste:
 6. Gate 2 (quellen-pruefer) fuehrt die kontextuellen Checks (Zahlenwerte, Normbezuege,
    Seitenangaben, Umlaute) durch — diese brauchen Kontext den Shell nicht liefern kann
 7. Alle 4 PASS → weiter zu Phase 4 (Nebeneffekte)
-8. Bei FAIL: Korrektur → Re-Gate (max 3x) → Eskalation an Nutzer
+8. Bei FAIL: Korrektur durchfuehren → dann das FAIL-Gate ERNEUT dispatchen
+   (gleicher Agent-Typ, gleiches Template, frischer Prompt).
+   Erst wenn Re-Gate PASS meldet zaehlt es. Max 3 Re-Gate-Zyklen pro Gate,
+   dann Eskalation an den Nutzer.
+   WICHTIG: Korrektur OHNE Re-Gate ist NICHT ausreichend — der Gate-Agent
+   muss die Korrektur validieren.
 </NICHT-VERHANDELBAR>
 
 Alle generierten/aktualisierten Wiki-Seiten durchlaufen 4 Gates.
@@ -313,7 +322,9 @@ Prueft:
 - Keine Synonyme statt bevorzugter Terme?
 - Oberbegriff-Zuordnung konsistent?
 
-**Bei FAIL:** Korrigieren → erneut dispatchen. Max 3 Iterationen, dann Eskalation.
+**Bei FAIL:** Korrigieren → betroffenes Gate ERNEUT dispatchen (frischer Agent,
+gleiches Template). Korrektur ohne Re-Gate zaehlt NICHT als bestanden.
+Max 3 Zyklen pro Gate, dann Eskalation an den Nutzer.
 **Bei PASS MIT HINWEISEN:** Hinweise pruefen, sinnvolle einarbeiten. Kein Re-Review.
 
 ---
@@ -367,7 +378,12 @@ fordert es explizit und akzeptiert das Risiko reduzierter Gate-Kontrolle.
 
 ---
 
-## Split-Ingest-Protokoll (bei >800K Tokens)
+## Split-Ingest-Protokoll (bei >10 MB Dateigroesse oder >800K Tokens)
+
+Trigger: PDF-Dateigroesse >10 MB (API-Request-Size-Limit, base64-Overhead)
+ODER geschaetzte Tokens >800K (Context-Window-Limit).
+Die MB-Schwelle greift frueher und zuverlaessiger — Dateigroesse ist exakt messbar,
+Token-Schaetzung nur heuristisch.
 
 1. Phase 0 liest Inhaltsverzeichnis → erstellt Split-Plan
 2. Durchgang 1: Lese Kapitel 1-N, erstelle Zwischen-Wiki-Seiten

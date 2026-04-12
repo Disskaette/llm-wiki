@@ -10,10 +10,11 @@ INPUT=$(cat)
 
 SUBAGENT_TYPE=$(echo "$INPUT" | jq -r '.tool_input.subagent_type // empty')
 
-# Nur Ingest-Worker-Dispatches betrachten
-if [ "$SUBAGENT_TYPE" != "bibliothek:ingest-worker" ]; then
-  exit 0
-fi
+# Nur Pipeline-Worker-Dispatches betrachten (Ingest + Synthese)
+case "$SUBAGENT_TYPE" in
+  bibliothek:ingest-worker|bibliothek:synthese-worker) ;;
+  *) exit 0 ;;
+esac
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$PWD}"
 PENDING="${PROJECT_DIR}/wiki/_pending.json"
@@ -26,6 +27,7 @@ fi
 # Defensiv parsen — bei kaputtem JSON: durchlassen (lieber laufen als tot sein)
 QUELLE=$(jq -r '.quelle // empty' "$PENDING" 2>/dev/null || echo "")
 STUFE=$(jq -r '.stufe // empty' "$PENDING" 2>/dev/null || echo "")
+TYP=$(jq -r '.typ // "unbekannt"' "$PENDING" 2>/dev/null || echo "unbekannt")
 PASSED=$(jq -r '.gates_passed // 0' "$PENDING" 2>/dev/null || echo "0")
 TOTAL=$(jq -r '.gates_total // 4' "$PENDING" 2>/dev/null || echo "4")
 
@@ -34,17 +36,18 @@ if [ -z "$QUELLE" ] || [ -z "$STUFE" ]; then
 fi
 
 cat >&2 << BLOCK_MSG
-PIPELINE-LOCK: Neuer Ingest blockiert.
+PIPELINE-LOCK: Neuer Dispatch blockiert.
 
+Typ:            ${TYP}
 Offene Quelle: ${QUELLE}
 Stufe:          ${STUFE}
 Gates:          ${PASSED}/${TOTAL}
 
 Handlungsoptionen:
   1. Wenn stufe=gates: laufende Gate-Agents abwarten / fehlende nachdispatchen
-  2. Wenn stufe=sideeffects: Phase 4 des /ingest Skills abschliessen
-     (PDF sortieren, _index aktualisieren, _log Eintrag, _pending.json loeschen)
-  3. Im Notfall: haendisch 'rm wiki/_pending.json' — nur wenn der vorherige
-     Ingest abgebrochen wurde und nicht fortgefuehrt wird.
+  2. Wenn stufe=sideeffects: Nebeneffekte-Phase des /ingest bzw. /synthese Skills abschliessen
+     (_index aktualisieren, _log Eintrag, _pending.json loeschen)
+  3. Im Notfall: haendisch 'rm wiki/_pending.json' — nur wenn die vorherige
+     Pipeline abgebrochen wurde und nicht fortgefuehrt wird.
 BLOCK_MSG
 exit 2
