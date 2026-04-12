@@ -44,6 +44,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "bibliothek:(ingest|synthese)-worker",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/create-pipeline-lock.sh\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
