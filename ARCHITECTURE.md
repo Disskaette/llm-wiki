@@ -96,6 +96,29 @@ Es gibt 9 Subagents, aufgeteilt in 4 Rollen (siehe `governance/naming-konvention
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## 3-Schichten-Architektur (seit SPEC-005)
+
+```
+CORE (immer, nicht konfigurierbar)
+├── Typen: quelle, konzept
+├── Verzeichnisse: quellen/, konzepte/, _index/
+├── Gates: 9 universelle (VOLLSTAENDIGE-LESUNG, SEITENANGABE, ...)
+├── Pipeline: Lock, Counter, FAIL-Check, ID-Matching
+└── Infrastruktur: _vokabular.md, _log.md, pdfs/
+
+DOMAIN (konfiguriert, entsteht aus Inhalt)
+├── Typen: norm, baustoff, verfahren, moc, ... (erweiterbar via seitentypen.md)
+├── Verzeichnisse: on-demand angelegt
+├── Gates: bedingt (z.B. NORMBEZUG nur wenn Typ "norm" aktiv)
+├── Kategorien: Level-1-Terme in _vokabular.md
+└── Quellen-Unterordner: pdfs/<kategorie>/ on-demand
+
+INSTANZ (das konkrete Wiki)
+├── Quellen, Konzeptseiten, Domain-Seiten
+├── Spezifisches Vokabular + Kategorien
+└── Spezifische Domain-Typ-Konfiguration
+```
+
 ## Shell-Checks und Hooks
 
 ### Aktive Hooks (Stand SPEC-003, 2026-04-11)
@@ -237,7 +260,7 @@ wiki/
 ├── moc/               ← Maps of Content (Navigationsseiten)
 │   ├── querkraft.md
 │   └── ...
-├── _pdfs/             ← Original-PDFs (Obsidian oeffnet per Klick)
+├── pdfs/             ← Original-PDFs (Obsidian oeffnet per Klick)
 │   ├── neu/           ← Eingangsordner (hier PDFs reinwerfen)
 │   ├── holzbau/       ← Nach Ingest sortiert nach Kategorie
 │   ├── stahlbeton/
@@ -262,4 +285,4 @@ was davon wohin uebernommen wird.
 
 ---
 
-**Version:** 1.2.0 | **Stand:** 2026-04-11
+**Version:** 2.0.0 | **Stand:** 2026-04-13

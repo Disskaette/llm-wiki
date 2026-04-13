@@ -56,6 +56,10 @@ vor dem `plugin/`-Subdirectory-Refactor (Commit 4766b13).
    - `inject-lock-warning.sh` (UserPromptSubmit) — injiziert passive Lock-Warnung mit Typ, Quelle, Stufe und Gates-Zaehler als `additionalContext`
    - `check-wiki-output.sh` — wird von den Gate-Agents selbst aufgerufen (seit Commit `f7b08d7`)
 
+Bedingte Gates: `KEIN-NORMBEZUG-OHNE-ABSCHNITT` ist nur aktiv wenn Domain-Typ
+"norm" in seitentypen.md existiert. Universelle Gates gelten immer.
+Siehe hard-gates.md fuer die vollstaendige Liste mit Bedingungen.
+
 Heuristische Checks (Zahlenwerte, Normbezuege, Seitenangaben, Umlaute) wurden
 aus `check-wiki-output.sh` entfernt — sie brauchen Kontext den Shell nicht liefern
 kann. Die Gate-Agents (quellen-pruefer, konsistenz-pruefer) pruefen kontextuell.

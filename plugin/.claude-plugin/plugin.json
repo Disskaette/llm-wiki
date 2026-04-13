@@ -1,7 +1,7 @@
 {
   "name": "bibliothek",
-  "description": "Technische Wissensdatenbank — LLM-gepflegtes Wiki über Fachbücher des Konstruktiven Ingenieurbaus",
-  "version": "1.2.0",
+  "description": "Universelle LLM-gepflegte Wissensdatenbank",
+  "version": "2.0.0",
   "author": {
     "name": "User"
   }
