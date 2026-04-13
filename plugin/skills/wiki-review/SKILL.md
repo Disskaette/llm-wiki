@@ -69,12 +69,19 @@ Wenn sich Templates aendern, aendert sich automatisch was der Review als
   - Dateinamen-Regeln (lowercase ASCII, Bindestriche, keine Umlaute)
   - Eindeutigkeitsregel ueber alle Verzeichnisse
 
-**Schritt 0.7 — Wiki-Inventar erstellen:**
+**Schritt 0.7 — Obsidian-Setup-Standard laden:**
+- Read `governance/obsidian-setup.md`
+- Extrahiere:
+  - `app.json`-Block → **SOLL_APP_JSON** (Key-Value-Paare)
+  - Graph-View-Filter → **SOLL_GRAPH_FILTER**
+  - Graph-View-Gruppen-Logik (Typ→Verzeichnis, siehe 0.9) → dynamisch in Phase 1.6 abgeleitet
+
+**Schritt 0.8 — Wiki-Inventar erstellen:**
 - Alle `.md`-Dateien unter `wiki/` zaehlen und kategorisieren
 - Sonderdateien: `_log.md`, `_vokabular.md`, `_pending.json`
 - Ergebnis → **INVENTAR** mit Counts pro Verzeichnis
 
-**Schritt 0.8 — Typ→Verzeichnis-Mapping extrahieren (dynamisch):**
+**Schritt 0.9 — Typ→Verzeichnis-Mapping extrahieren (dynamisch):**
 - Read `governance/seitentypen.md`
 - seitentypen.md enthaelt ZWEI Tabellen:
   - **Core-Typen** (Spalten: Typ, Beantwortet, Beispiel, Verzeichnis) — immer vorhanden
@@ -84,6 +91,11 @@ Wenn sich Templates aendern, aendert sich automatisch was der Review als
   `_index/`, `pdfs/`
 - NICHT hardcoden — wenn ein neuer Seitentyp in seitentypen.md aufgenommen wird,
   erkennt der Review ihn automatisch
+
+**Schritt 0.10 — Discovery-Dateien laden (v1.1):**
+- Read `wiki/_konzept-reife.md` (falls vorhanden) → YAML parsen → **KONZEPT_REIFE**
+- Read `wiki/_schlagwort-vorschlaege.md` (falls vorhanden) → YAML parsen → **SCHLAGWORT_VORSCHLAEGE**
+- Falls eine oder beide Dateien fehlen: in Phase 3b als DATEIEN-CHECK melden
 
 ---
 
@@ -145,6 +157,42 @@ Ein einziger Fund reicht fuer Full-Audit-Empfehlung.
   - `quellen-anzahl:` → Zahl, nicht String `"5"`
 - **Output:** Tabelle `| Seite | Feld | Ist-Typ | Soll-Typ |`
 
+**1.6 Obsidian-Vault-Konfiguration:**
+
+<NICHT-VERHANDELBAR>
+Der Soll-Zustand wird aus `governance/obsidian-setup.md` gelesen, NIE hardcoded.
+Wenn sich die Setup-Doku aendert, aendert sich was der Review als "korrekt" betrachtet.
+</NICHT-VERHANDELBAR>
+
+**Schritt 1.6.1 — .obsidian/ Existenz:**
+- Existiert `wiki/.obsidian/`? Falls nein → ERROR: "Vault-Konfiguration fehlt.
+  Obsidian erkennt wiki/ ohne `.obsidian/` nicht als Vault."
+- Falls nein: restliche 1.6-Checks ueberspringen (kein Soll/Ist-Vergleich moeglich)
+
+**Schritt 1.6.2 — app.json Pflicht-Keys:**
+- Read `wiki/.obsidian/app.json`
+- Read `governance/obsidian-setup.md`, extrahiere den `app.json`-Block
+- Pflicht-Keys aus der Setup-Doku (dynamisch, nicht hardcoded):
+  `useMarkdownLinks`, `newLinkFormat`, `strictLineBreaks`, `showFrontmatter`
+- Fuer jeden Pflicht-Key:
+  - Key fehlt → WARN: "Einstellung `[key]` nicht gesetzt"
+  - Key vorhanden, Wert weicht ab → WARN: "Einstellung `[key]`: ist `[ist]`, soll `[soll]`"
+- `defaultOpenFile: "home"` nur pruefen wenn `wiki/home.md` existiert
+- **Output:** Tabelle `| Key | Soll | Ist | Status |`
+
+**Schritt 1.6.3 — Graph-View-Gruppen:**
+- Read `wiki/.obsidian/graph.json` (falls vorhanden)
+- Nutze **TYP_VERZEICHNIS_MAP** aus Phase 0.9
+- Fuer jedes existierende Wiki-Verzeichnis aus der Map (nicht fuer leere/fehlende):
+  - Gibt es eine Graph-Gruppe mit `path:verzeichnisname/`-Query? → OK
+  - Fehlt die Gruppe → WARN: "Graph-Gruppe fuer `[verzeichnis]/` nicht konfiguriert —
+    Seiten dieses Typs haben keine eigene Farbe im Graph View"
+- Graph-Filter pruefen: Enthaelt der Filter `-path:quellen/` und `-path:_index/`?
+  Falls nein → INFO: "Empfohlener Graph-Filter fehlt (Quellen/Index ausblenden)"
+- `graph.json` fehlt komplett → WARN: "Keine Graph-View-Konfiguration.
+  Alle Seitentypen erscheinen in gleicher Farbe."
+- **Output:** Tabelle `| Seitentyp | Verzeichnis | Graph-Gruppe | Status |`
+
 ---
 
 ### Phase 2: Content-Layer (STICHPROBE — 15 Seiten gemischt)
@@ -185,6 +233,20 @@ Falls das Wiki <15 inhaltliche Seiten hat: alle pruefen.
 - Kein Widerspruchs-Marker aber Quellen divergieren → INFO (kein Fehler, aber Hinweis)
 - **Output:** `| Seite | Format | Status |`
 
+**2.6 PDF-Link-Drift (nur Quellenseiten mit pdf:-Feld):**
+- Suche nach Plaintext-Seitenangaben: Regex `\(S\.\s*\d+` (matcht `(S. 32)`, `(S. 42-48)`)
+- Suche nach klickbaren PDF-Links: Regex `\[\[[^\]]+\.pdf#page=\d+`
+- Bewertung pro Seite:
+  - Plaintext-Referenzen vorhanden + PDF-Links vorhanden → TEILWEISE MIGRIERT
+  - Nur Plaintext, keine PDF-Links → NICHT MIGRIERT
+  - Nur PDF-Links, kein Plaintext → OK (aktuelles Format)
+- Zaehle: Wieviele Plaintext-Referenzen vs. PDF-Links pro Seite?
+- Fuer Migration noetige Daten auf der Seite selbst vorhanden:
+  - `pdf:` im Frontmatter → PDF-Dateiname
+  - `autor:` + `jahr:` → Link-Alias
+  - Seitenzahl aus dem Plaintext `(S. N)` → `#page=N`
+- **Output:** `| Seite | Plaintext-Refs | PDF-Links | Status | Migrierbar |`
+
 **2.5 Review-Freshness:**
 - `reviewed:` Wert lesen
   - `false` → seit wann? (`synth-datum:` oder `ingest-datum:` als Referenz)
@@ -218,7 +280,7 @@ Falls das Wiki <15 inhaltliche Seiten hat: alle pruefen.
 
 **3.5 Bootstrap-Vollstaendigkeit (content-driven):**
 
-Nutze **TYP_VERZEICHNIS_MAP** aus Phase 0.8 und **INVENTAR** aus Phase 0.7.
+Nutze **TYP_VERZEICHNIS_MAP** aus Phase 0.9 und **INVENTAR** aus Phase 0.8.
 Kein Verzeichnis wird pauschal als fehlend gemeldet — die Bewertung haengt
 davon ab ob das Wiki Inhalte hat die das Verzeichnis brauchen.
 
@@ -244,7 +306,7 @@ Sonderregeln:
 
 **3.6 config/valid-types.txt — Sync mit seitentypen.md:**
 - Lade `hooks/config/valid-types.txt` (aus Phase 0.4)
-- Lade **TYP_VERZEICHNIS_MAP** (aus Phase 0.8)
+- Lade **TYP_VERZEICHNIS_MAP** (aus Phase 0.9)
 - Vergleiche: Jeder Typ in valid-types.txt muss in seitentypen.md existieren und umgekehrt
   - Typ in valid-types.txt aber NICHT in seitentypen.md → ERROR: "Typ in Hook-Config aber nicht in Governance"
   - Typ in seitentypen.md aber NICHT in valid-types.txt → ERROR: "Typ in Governance aber nicht in Hook-Config"
@@ -259,15 +321,66 @@ Sonderregeln:
   - Term nicht in `_vokabular.md` definiert? → melden als "undefiniert"
 - **Output:** `| Term | Definiert | Verwendet (Anzahl Seiten) | Status |`
 
+### Phase 3b: Discovery-Gesundheit (SPEC-003 v2.0)
+
+Prueft ob die persistente Discovery-Logik funktioniert oder stillschweigend
+uebersprungen wird.
+
+**3b.1 DATEIEN-CHECK:**
+- Existiert `_konzept-reife.md`?
+- Existiert `_schlagwort-vorschlaege.md`?
+- Falls eine fehlt UND `_log.md` enthaelt mindestens einen `synthese`-Eintrag:
+  → ERROR: "Discovery-Dateien nicht angelegt obwohl Synthese gelaufen ist."
+- Falls eine fehlt UND keine Synthese im Log:
+  → INFO: "Discovery-Dateien noch nicht angelegt. Wird beim ersten /synthese erstellt."
+- **Output:** `| Datei | Status |`
+
+**3b.2 STALE-CHECK:**
+- Letztes `aktualisiert:`-Datum in `_konzept-reife.md` YAML extrahieren
+- Synthese-Laeufe seit diesem Datum aus `_log.md` zaehlen (Eintraege mit `synthese |`)
+- Falls >=2 Synthese-Laeufe seit letztem Update:
+  → WARN: "N Synthese-Laeufe seit letztem Discovery-Update. Discovery wird moeglicherweise uebersprungen."
+- **Output:** `| Letztes Update | Synthese-Laeufe seitdem | Status |`
+
+**3b.3 REIFE-CHECK:**
+- Alle Eintraege mit `status: reif` aus `_konzept-reife.md` lesen
+- Fuer jeden: Existiert `wiki/konzepte/<term>.md`?
+  - JA → `status` sollte `erstellt` sein, nicht `reif` → WARN: "Status-Drift"
+  - NEIN → Wie lange schon reif? (Synthese-Laeufe seit `aktualisiert`-Datum zaehlen)
+    - >2 Synthese-Laeufe → WARN: "[Term] ist seit [Datum] reif (N Quellen), aber noch keine Konzeptseite. /synthese empfohlen."
+- **Output:** `| Kandidat | Quellen | Reif seit | Synthese-Laeufe | Status |`
+
+**3b.4 RUECKSTAU-CHECK:**
+- Alle Eintraege mit `status: offen` aus `_schlagwort-vorschlaege.md` zaehlen
+- Aeltesten offenen Eintrag identifizieren
+- Synthese-Laeufe seit aeltestem offenen Eintrag zaehlen
+- Falls >=3 Synthese-Laeufe:
+  → WARN: "N offene Schlagwort-Vorschlaege, aeltester seit [Datum]. /vokabular empfohlen."
+- **Output:** `| Typ | Offen | Aeltester | Status |`
+
+**3b.5 KONSISTENZ-CHECK:**
+- Alle `konzept-kandidaten:`-Eintraege aus `wiki/quellen/*.md` sammeln
+- Gegen `_konzept-reife.md` abgleichen
+- Terme die in Quellenseiten stehen aber NICHT in der Reife-Datei:
+  → WARN: "N Kandidaten aus Quellenseiten fehlen in _konzept-reife.md. Phase 0.0 Sync nicht gelaufen."
+- **Output:** `| Term | In Quellenseiten | In _konzept-reife.md | Status |`
+
+**3b.6 GHOST-CHECK:**
+- Alle Eintraege mit `status: erstellt` aus `_konzept-reife.md` lesen
+- Fuer jeden: Existiert die Konzeptseite tatsaechlich?
+  - NEIN → ERROR: "[Term] als 'erstellt' markiert, aber Konzeptseite existiert nicht."
+- **Output:** `| Term | Status | Konzeptseite existiert | Ergebnis |`
+
 ---
 
 ### Phase 4: Abdeckungs-Check
 
 **4.1 Konzept-Kandidaten ohne eigene Seite:**
-- Alle `konzept-kandidaten:`-Eintraege aus allen Quellenseiten (`wiki/quellen/*.md`) sammeln
-- Gruppieren nach `term:`
-- Terme mit >=2 verschiedenen Quellen UND ohne eigene Konzeptseite → melden
-- **Output:** `| Kandidat | Quellen (Anzahl) | Quellenseiten |`
+- Primaer: Lies `_konzept-reife.md` → alle Eintraege mit `status: reif` ohne Konzeptseite
+- Fallback (falls `_konzept-reife.md` nicht existiert):
+  Alle `konzept-kandidaten:`-Eintraege aus allen Quellenseiten sammeln,
+  gruppieren nach `term:`, Terme mit >=2 Quellen und ohne Konzeptseite → melden
+- **Output:** `| Kandidat | Quellen (Anzahl) | Quellenseiten | Quelle (Reife-Datei/Frontmatter) |`
 
 **4.2 Verwaiste Quellenseiten:**
 - Quellenseiten die von KEINER Konzeptseite im `## Quellen`-Abschnitt verlinkt werden
@@ -289,11 +402,13 @@ Quick-Scan Report (Chat-Output, kein File):
 - Dateinamen: X/N konform, Y Verstoesse
 - Graph: X Waisen, Y Sackgassen, Z MOC-lose Konzepte
 - Dataview: X/N kompatibel, Y Typfehler
+- Vault-Konfiguration: .obsidian/ [vorhanden|fehlt], app.json [X/Y Keys korrekt], Graph-Gruppen [X/Y Typen konfiguriert]
 
 ### Content-Qualitaet (Stichprobe, M Seiten)
 - Struktur (Konzeptseiten): X/M aktuelle H2-Reihenfolge
 - check-wiki-output: X/M PASS
 - Quellenqualitaet: Durchschnitt N Quellen pro Konzeptseite
+- PDF-Link-Drift: X/M Quellenseiten mit Plaintext-Refs statt PDF-Links
 - Widerspruchs-Format: X aktuell (Callout), Y veraltet (Plaintext)
 - Reviews: X ueberfaellig (>30 Tage)
 
@@ -303,6 +418,14 @@ Quick-Scan Report (Chat-Output, kein File):
 - _pending.json: [frei | verwaist seit HH:MM | nicht vorhanden]
 - _vokabular.md: X unbenutzte Terme, Y undefinierte Schlagworte
 - Bootstrap: X ERROR, Y WARN, Z INFO [Details pro Verzeichnis]
+
+### Discovery-Gesundheit
+- Discovery-Dateien: [vorhanden | fehlen (Synthese gelaufen: ja/nein)]
+- Stale: [aktuell | N Synthese-Laeufe seit letztem Update]
+- Reife Kandidaten ohne Seite: X (aeltester seit [Datum])
+- Schlagwort-Rueckstau: X offene Vorschlaege (aeltester seit [Datum])
+- Konsistenz: X Kandidaten nicht in Reife-Datei
+- Ghosts: X "erstellt"-Eintraege ohne Konzeptseite
 
 ### Abdeckung
 - Konzept-Kandidaten mit >=2 Quellen ohne Seite: X
@@ -320,6 +443,10 @@ ODER
 **Schwellwerte fuer Full-Audit-Empfehlung:**
 - Obsidian-Layer: JEDER Fund → Full-Audit empfehlen fuer die betroffene Kategorie
   (ein gebrochener Link ist einer zu viel)
+- Vault-Konfiguration: Fehlende `.obsidian/` → sofortige Empfehlung (kein Full-Audit noetig,
+  sondern direkte Behebung: Konfiguration anlegen). Falsche Keys/fehlende Graph-Gruppen
+  → als Obsidian-Fix in den Migrationsplan aufnehmen (kein Full-Audit-Trigger,
+  da die Loesung immer dieselbe ist: Setup korrigieren)
 - Content-Layer: >=2 Seiten mit dem GLEICHEN Drift-Muster in der 15er Stichprobe
   → Full-Audit empfehlen (ein Einzelfund ist Ausreisser, zwei sind Muster)
 - Abdeckung: Rein informativ, kein Full-Audit-Trigger
@@ -351,17 +478,19 @@ Grund: Token-Budget. 50 Seiten x 500 Zeilen = 25K Zeilen → Split noetig.
 
 1. **Frontmatter-Drift:** Fehlende Pflicht-Felder (aus aktuellem Template, Phase 0)
 2. **Link-Drift:** Falsche Syntax, gebrochene Links, fehlende Aliases
-3. **Struktur-Drift:** H2-Reihenfolge gegen **SOLL_REIHENFOLGE** (nur Konzeptseiten)
-4. **Konventions-Drift:** Dateinamen, Umlaut-Handling
-5. **Inhalts-Qualitaet:** `quellen-anzahl`, Wikilink-Dichte, offene Marker
-6. **check-wiki-output.sh:** Alle 12 deterministischen Checks ausfuehren
-7. **Review-Alter:** `reviewed: false` seit wann?
+3. **PDF-Link-Drift:** Plaintext `(S. N)` statt `[[pdf#page=N|Autor Jahr, S. N]]`
+4. **Struktur-Drift:** H2-Reihenfolge gegen **SOLL_REIHENFOLGE** (nur Konzeptseiten)
+5. **Konventions-Drift:** Dateinamen, Umlaut-Handling
+6. **Inhalts-Qualitaet:** `quellen-anzahl`, Wikilink-Dichte, offene Marker
+7. **check-wiki-output.sh:** Alle 12 deterministischen Checks ausfuehren
+8. **Review-Alter:** `reviewed: false` seit wann?
 
 **Befunde kategorisieren:**
 
 | Kategorie | Behebbar | Beispiel |
 |---|---|---|
 | **Obsidian-Fix** | Automatisch (Frontmatter, Links) | `materialgruppe:` fehlt, Link-Alias korrigieren |
+| **PDF-Link-Migration** | Automatisch (mechanisch) | `(S. 32)` → `[[pdf#page=32\|Autor Jahr, S. 32]]` |
 | **Restrukturierung** | Semi-automatisch (/synthese) | Randbedingungen nach statt vor Formeln |
 | **Inhaltsluecke** | Manuell (/ingest, /synthese) | Konzept hat nur 1 Quelle |
 | **Veraltet** | Review noetig | `reviewed: false` seit >30 Tagen |
@@ -378,7 +507,7 @@ Grund: Token-Budget. 50 Seiten x 500 Zeilen = 25K Zeilen → Split noetig.
 - Z Inhaltsluecken (Ingest/Synthese noetig)
 - W Reviews ueberfaellig
 
-### Migration-Batch (automatisch — vorgeschlagene Aktion)
+### Migration-Batch: Frontmatter (automatisch)
 Die folgenden X Seiten brauchen nur Frontmatter-Ergaenzungen.
 Soll ich das als Batch durchfuehren? (Schreibt via /synthese oder direkt)
 
@@ -386,6 +515,25 @@ Soll ich das als Batch durchfuehren? (Schreibt via /synthese oder direkt)
 |---|---|---|
 | [pfad] | [felder] | Ergaenze: `[feld]: [wert]` |
 | ... | ... | ... |
+
+### Migration-Batch: PDF-Links (automatisch)
+Die folgenden X Seiten haben Plaintext-Seitenangaben `(S. N)` die
+mechanisch in klickbare PDF-Links umgewandelt werden koennen.
+Alle noetigten Daten stehen auf der Seite selbst:
+- `pdf:` Frontmatter-Feld → PDF-Dateiname
+- `autor:` + `jahr:` → Link-Alias
+- Seitenzahl aus `(S. N)` → `#page=N`
+
+Transformation: `(S. N)` → `([[pdf-datei.pdf#page=N|Autor Jahr, S. N]])`
+
+Soll ich das als Batch durchfuehren?
+
+| Seite | Plaintext-Refs | PDF-Datei | Migrierbar |
+|---|---|---|---|
+| [pfad] | [anzahl] | [pdf-feld] | ja/nein (pdf:-Feld vorhanden?) |
+| ... | ... | ... | ... |
+
+Nicht migrierbar (kein `pdf:`-Feld, z.B. Markdown/URL-Quellen): separat listen.
 
 ### Restrukturierungen (manuell — Nutzer entscheidet)
 | Seite | Problem | Vorschlag |
@@ -419,7 +567,7 @@ Soll ich das als Batch durchfuehren? (Schreibt via /synthese oder direkt)
   ```
   ## [DATUM] — Wiki-Review (Full-Audit)
   - Seiten geprueft: N
-  - Befunde: X Obsidian-Fix, Y Restrukturierung, Z Inhaltsluecke, W Veraltet
+  - Befunde: X Obsidian-Fix, P PDF-Link-Migration, Y Restrukturierung, Z Inhaltsluecke, W Veraltet
   - Report: [[_reviews/review-[DATUM]]]
   ```
 
