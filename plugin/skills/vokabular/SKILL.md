@@ -9,18 +9,18 @@ description: "Kontrolliertes Vokabular pflegen — neue Terme, Synonyme, Hierarc
 > Gate 6 (KEIN-SCHLAGWORT-OHNE-VOKABULAR) delegiert ALLE neuen Terme an diesen Skill.
 > Vokabular ist Gatekeeper und Quelle der Wahrheit fuer alle Schlagworte im Wiki.
 
-| Gate | Durchsetzung | Wie |
-|------|-------------|-----|
-| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Vokabular arbeitet mit bestehenden Termen |
-| KEIN-INHALT-OHNE-SEITENANGABE | ⚪ N/A | Vokabular-Aufbau basiert nicht auf neuer Lesung |
-| KEIN-ZAHLENWERT-OHNE-QUELLE | ⚪ N/A | Vokabular-Definitionen sind konzeptionell |
-| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ⚪ N/A | Vokabular bezieht sich nicht auf Normen |
-| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Vokabular traegt keine Querverweise bei |
-| KEIN-SCHLAGWORT-OHNE-VOKABULAR | ✅ Aktiv | Dieser Skill IST die Durchsetzung |
-| KEIN-UPDATE-OHNE-DIFF | ⚪ N/A | Vokabular-Aenderungen sind selbsterklaerend |
-| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ⚪ N/A | Vokabular traegt keine Widersprueche bei |
-| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ⚪ N/A | Vokabular ist Metadaten |
-| KORREKTE-UMLAUTE | ✅ Aktiv | Alle neuen Terme auf Umlaute geprueft |
+| Gate | Durchsetzung | Wie | Bedingung |
+|------|-------------|-----|-----------|
+| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Vokabular arbeitet mit bestehenden Termen | — |
+| KEIN-INHALT-OHNE-SEITENANGABE | ⚪ N/A | Vokabular-Aufbau basiert nicht auf neuer Lesung | — |
+| KEIN-ZAHLENWERT-OHNE-QUELLE | ⚪ N/A | Vokabular-Definitionen sind konzeptionell | — |
+| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ⚪ N/A | Vokabular bezieht sich nicht auf Normen | — |
+| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Vokabular traegt keine Querverweise bei | — |
+| KEIN-SCHLAGWORT-OHNE-VOKABULAR | ✅ Aktiv | Dieser Skill IST die Durchsetzung | — |
+| KEIN-UPDATE-OHNE-DIFF | ⚪ N/A | Vokabular-Aenderungen sind selbsterklaerend | — |
+| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ⚪ N/A | Vokabular traegt keine Widersprueche bei | — |
+| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ⚪ N/A | Vokabular ist Metadaten | — |
+| KORREKTE-UMLAUTE | ✅ Aktiv | Alle neuen Terme auf Umlaute geprueft | — |
 
 ---
 

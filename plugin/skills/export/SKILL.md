@@ -9,18 +9,18 @@ description: "Wiki-Inhalte exportieren — Uebersichten, Vergleichstabellen, Zus
 > Er modifiziert das Wiki niemals, verursacht daher keine Diffs oder Nebeneffekte.
 > Nur KORREKTE-UMLAUTE ist aktiv; alle anderen Gates sind nicht anwendbar.
 
-| Gate | Durchsetzung | Wie |
-|------|-------------|-----|
-| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Export liest bestehende Wiki-Seiten |
-| KEIN-INHALT-OHNE-SEITENANGABE | ⚪ N/A | Nur Leseoperationen |
-| KEIN-ZAHLENWERT-OHNE-QUELLE | ⚪ N/A | Nur Leseoperationen |
-| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ⚪ N/A | Nur Leseoperationen |
-| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Nur Leseoperationen |
-| KEIN-SCHLAGWORT-OHNE-VOKABULAR | ⚪ N/A | Nur Leseoperationen |
-| KEIN-UPDATE-OHNE-DIFF | ⚪ N/A | Keine Aenderungen |
-| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ⚪ N/A | Nur Leseoperationen |
-| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ⚪ N/A | Keine Aenderungen |
-| KORREKTE-UMLAUTE | ✅ Aktiv | Export-Output wird auf korrekte Umlaute geprueft |
+| Gate | Durchsetzung | Wie | Bedingung |
+|------|-------------|-----|-----------|
+| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Export liest bestehende Wiki-Seiten | — |
+| KEIN-INHALT-OHNE-SEITENANGABE | ⚪ N/A | Nur Leseoperationen | — |
+| KEIN-ZAHLENWERT-OHNE-QUELLE | ⚪ N/A | Nur Leseoperationen | — |
+| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ⚪ N/A | Nur Leseoperationen | — |
+| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Nur Leseoperationen | — |
+| KEIN-SCHLAGWORT-OHNE-VOKABULAR | ⚪ N/A | Nur Leseoperationen | — |
+| KEIN-UPDATE-OHNE-DIFF | ⚪ N/A | Keine Aenderungen | — |
+| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ⚪ N/A | Nur Leseoperationen | — |
+| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ⚪ N/A | Keine Aenderungen | — |
+| KORREKTE-UMLAUTE | ✅ Aktiv | Export-Output wird auf korrekte Umlaute geprueft | — |
 
 ---
 
@@ -84,8 +84,8 @@ Output: Markdown-Tabelle oder CSV/TSV
 ```markdown
 | Konzept | Definition | Quellen | Formeln | Review |
 |---------|-----------|---------|---------|--------|
-| Querkraft | ... | 5 | Ja | aktuell |
-| Durchstanzen | ... | 3 | Nein | alt |
+| Konzept A | ... | 5 | Ja | aktuell |
+| Konzept B | ... | 3 | Nein | alt |
 ```
 
 **1c: Thema-Uebersicht**
@@ -98,19 +98,19 @@ Lade alle Seiten mit Schlagwort X:
 Output: Nested List oder Tabelle
 
 ```markdown
-# Thema: Querkraft-Transfer
+# Thema: [Themaname]
 
-## Konzepte (3)
-- [[Querkraft-Transfer]]
-- [[Aufhaengebewehrung]]
-- [[Rueckstau]]
+## Konzepte (N)
+- [[Konzept-A]]
+- [[Konzept-B]]
+- [[Konzept-C]]
 
-## Normen (2)
-- [[EC5 3.2.3]]
-- [[EC2 6.2]]
+## Normen (M)
+- [[Norm-Abschnitt-1]]
+- [[Norm-Abschnitt-2]]
 
-## Quellen (7)
-- Fingerloos EC2 (Kapitel 6)
+## Quellen (K)
+- Autor-A Titel (Kapitel X)
 - ...
 ```
 
@@ -123,15 +123,15 @@ Lade Quellenseiten zu einem Thema:
 Output: Nummerierte Liste mit Begruendungen
 
 ```markdown
-# Lektuerempfehlung: Querkraft-Transfer
+# Lektuerempfehlung: [Themaname]
 
 ## Stufe 1 — Grundlagen
-1. **Schrift A** — Kap. 2, S. 30-50
-   - Einfache Intro, gute Diagramme
+1. **Quelle A** — Kap. X, S. N-M
+   - Einfache Einfuehrung, gute Abbildungen
    - ~2h Lesedauer
 
 ## Stufe 2 — Vertiefung
-2. **Schrift B** — Kap. 5-6, S. 120-180
+2. **Quelle B** — Kap. Y-Z, S. N-M
    - Formeln, rechnerische Beispiele
    - Benoetigt: Verstaendnis von Stufe 1
    - ~4h Lesedauer
@@ -146,21 +146,20 @@ Lade alle Konzeptseiten zu Thema X:
 Output: Markdown mit Formel-Liste + Quellenverweise
 
 ```markdown
-# Formeln: Querkraft-Transfer
+# Formeln: [Themaname]
 
-## Formel 1: Querkraft-Kapazitaet (EC5)
+## Formel 1: [Bezeichnung] ([Norm/Quelle])
 
-$V = k_1 \cdot f_v \cdot A$
+$[Formel]$
 
-**Quelle:** EC5 3.2.3, [Buch], Seite N
+**Quelle:** [Norm-Abschnitt], [Quelle], Seite N
 **Variablen:**
-- $V$: Querkraft-Kapazitaet [kN]
-- $k_1$: Form-Faktor [-]
-- $f_v$: Schubfestigkeit [N/mm²]
-- $A$: Scherflasche [mm²]
+- $V_1$: [Beschreibung] [Einheit]
+- $k_1$: [Beschreibung] [-]
+- $f_1$: [Beschreibung] [Einheit]
 
-**Gueltig fuer:** Nadelholz, Nutzungsklasse 1+2
-**Quellen:** [Fingerloos], [CEN/TS], ...
+**Gueltig fuer:** [Randbedingungen]
+**Quellen:** [Quelle-A], [Quelle-B], ...
 ```
 
 **1f: Zahlenwert-Tabelle**
@@ -173,12 +172,12 @@ Lade Konzeptseiten + ihre "Zahlenwerte"-Sektionen:
 Output: Markdown-Tabelle oder CSV
 
 ```markdown
-# Parameter + Werte: HBV-Baustoffe
+# Parameter + Werte: [Themaname]
 
 | Parameter | Material | Wert | Einheit | Quelle | Bereich |
 |-----------|----------|------|--------|--------|---------|
-| Reibungskoeff. | BSH | 0.5 | - | [A], S. N | 0.4-0.6 |
-| Rollschub | BSP | 0.8 | N/mm² | [B], S. M | 0.6-1.0 |
+| Parameter-1 | Material-A | 0.5 | - | [Quelle-A], S. N | 0.4-0.6 |
+| Parameter-2 | Material-B | 0.8 | N/mm² | [Quelle-B], S. M | 0.6-1.0 |
 ```
 
 ---
@@ -235,15 +234,15 @@ Nutzer kann Format waehlen: "Gib mir die Tabelle als CSV"
 ## Beispiele
 
 **Anfrage 1:**
-"Gib mir eine Zusammenfassung von Querkraft-Transfer"
+"Gib mir eine Zusammenfassung von [Konzeptname]"
 
-→ Lade konzepte/querkraft-transfer.md
+→ Lade konzepte/[konzeptname].md
 → Output: Definition + Verwandte Themen + Tabelle "Wo nachschlagen"
 
 ---
 
 **Anfrage 2:**
-"Vergleiche Querkraft und Durchstanzen — Tabelle"
+"Vergleiche [Konzept A] und [Konzept B] — Tabelle"
 
 → Lade beide Konzeptseiten
 → Output: Vergleichstabelle (Definition | Formeln | Quellen | Review-Status)
@@ -251,17 +250,17 @@ Nutzer kann Format waehlen: "Gib mir die Tabelle als CSV"
 ---
 
 **Anfrage 3:**
-"Welche Buecher sollte ich lesen zum Thema indirekte Lagerung? Gib eine Reihenfolge."
+"Welche Buecher sollte ich lesen zum Thema [X]? Gib eine Reihenfolge."
 
-→ Lade katalog → Such Quellen zu "indirekt"
+→ Lade katalog → Such Quellen zu [X]
 → Output: Nummerierte Lektuerempfehlung mit Stufen + Lesedauer
 
 ---
 
 **Anfrage 4:**
-"Sammle alle Formeln zum Querkraft-Transfer in eine Tabelle (CSV)"
+"Sammle alle Formeln zu [Konzeptname] in eine Tabelle (CSV)"
 
-→ Durchsuche konzepte/querkraft-transfer.md + verwandte Seiten
+→ Durchsuche konzepte/[konzeptname].md + verwandte Seiten
 → Extrahiere Formel-Sektionen
 → Output: CSV mit Spalten: Formel | Name | Quelle | Seite | Gueltigkeitsbereich
 

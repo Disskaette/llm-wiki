@@ -5,23 +5,27 @@ description: "Normstaende pruefen und aktualisieren — neue Ausgaben einarbeite
 
 ## Governance-Vertrag
 
+> **Bedingung:** Dieser Skill ist nur relevant wenn Domain-Typ "norm"
+> in seitentypen.md aktiv ist. Pruefe beim Skill-Start ob der Typ existiert.
+> Falls nicht: "Kein norm-Typ in diesem Wiki aktiv. /normenupdate nicht verfuegbar."
+
 > Normenupdate verwaltet Norm-Editions-Wechsel (z.B. EC2 2011 → EC2 2020).
 > Wenn eine Norm eine neue Ausgabe bekommt, werden ALLE Wiki-Seiten die
 > diese Norm referenzieren aktualisiert + Unterschiede dokumentiert.
 > Mehrere Gates sind aktiv; Vergleich alter vs. neuer Ausgabe erfordert Gate 9.
 
-| Gate | Durchsetzung | Wie |
-|------|-------------|-----|
-| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Normenupdate liest Norm-Auszuege, keine Buecher |
-| KEIN-INHALT-OHNE-SEITENANGABE | ⚪ N/A | Seitenangaben werden erhalten |
-| KEIN-ZAHLENWERT-OHNE-QUELLE | ⚪ N/A | Zahlenwerte in Normen bleiben gekennzeichnet |
-| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ✅ Aktiv | Phase 1 + 2 aktualisieren Abschnitts-Nummern |
-| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Querverweise bleiben erhalten |
-| KEIN-SCHLAGWORT-OHNE-VOKABULAR | ⚪ N/A | Keine neuen Schlagworte durch Normenupdate |
-| KEIN-UPDATE-OHNE-DIFF | ✅ Aktiv | Phase 1 dokumentiert Diffs (alt vs. neu) |
-| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ✅ Aktiv | Phase 2 markiert Aenderungen mit [NORM-CHANGED] |
-| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ✅ Aktiv | Phase 0.5 liest beide Norm-Versionen (PDF) |
-| KORREKTE-UMLAUTE | ✅ Aktiv | Normenupdate-Output auf Umlaute geprueft |
+| Gate | Durchsetzung | Wie | Bedingung |
+|------|-------------|-----|-----------|
+| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Normenupdate liest Norm-Auszuege, keine Buecher | — |
+| KEIN-INHALT-OHNE-SEITENANGABE | ⚪ N/A | Seitenangaben werden erhalten | — |
+| KEIN-ZAHLENWERT-OHNE-QUELLE | ⚪ N/A | Zahlenwerte in Normen bleiben gekennzeichnet | — |
+| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ✅ Aktiv | Phase 1 + 2 aktualisieren Abschnitts-Nummern | norm-Typ aktiv |
+| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Querverweise bleiben erhalten | — |
+| KEIN-SCHLAGWORT-OHNE-VOKABULAR | ⚪ N/A | Keine neuen Schlagworte durch Normenupdate | — |
+| KEIN-UPDATE-OHNE-DIFF | ✅ Aktiv | Phase 1 dokumentiert Diffs (alt vs. neu) | — |
+| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ✅ Aktiv | Phase 2 markiert Aenderungen mit [NORM-CHANGED] | — |
+| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ✅ Aktiv | Phase 0.5 liest beide Norm-Versionen (PDF) | — |
+| KORREKTE-UMLAUTE | ✅ Aktiv | Normenupdate-Output auf Umlaute geprueft | — |
 
 **EXTERNER-INHALT-Marker:** Normenupdate liest Norm-PDFs → Wrapper erforderlich.
 

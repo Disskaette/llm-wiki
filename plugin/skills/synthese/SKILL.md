@@ -9,18 +9,18 @@ description: "Konzeptseiten vertiefen — Quellen vergleichen, Formeln ausarbeit
 > Ausarbeitung von Formeln, Markierung von Widerspruechen und Validierung.
 > Mehrere Core-Gates sind aktiv; Phase 0.5 liest Original-PDFs (Gate 9 ist BLOCKIEREND).
 
-| Gate | Durchsetzung | Wie |
-|------|-------------|-----|
-| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Synthese liest Kapitel, nicht ganze Buecher |
-| KEIN-INHALT-OHNE-SEITENANGABE | ✅ Aktiv | Phase 1 + 2 setzen Seitenangaben bei jeden Aussage |
-| KEIN-ZAHLENWERT-OHNE-QUELLE | ✅ Aktiv | Phase 1 recherchiert + vergleicht Zahlenwerte |
-| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ✅ Aktiv | Phase 1 identifiziert Norm-Paragraphen exakt |
-| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Synthese traegt zu Querverweisen bei, setzt sie nicht |
-| KEIN-SCHLAGWORT-OHNE-VOKABULAR | 🔄 Delegiert | Dispatch: vokabular-pruefer |
-| KEIN-UPDATE-OHNE-DIFF | ✅ Aktiv | Phase 2 dokumentiert Diffs zwischen Alt + Neu |
-| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ✅ Aktiv | Phase 2 markiert ALLE Widersprueche mit [WIDERSPRUCH] |
-| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ✅ Aktiv | Wiki-Quellenseiten als Primaerquelle (4-Gate-geprueft), PDF-Spot-Check bei Widerspruechen/Unklarheiten |
-| KORREKTE-UMLAUTE | 🔄 Delegiert | Gate 1 (quellen-pruefer), Part C |
+| Gate | Durchsetzung | Wie | Bedingung |
+|------|-------------|-----|-----------|
+| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Synthese liest Kapitel, nicht ganze Buecher | — |
+| KEIN-INHALT-OHNE-SEITENANGABE | ✅ Aktiv | Phase 1 + 2 setzen Seitenangaben bei jeden Aussage | — |
+| KEIN-ZAHLENWERT-OHNE-QUELLE | ✅ Aktiv | Phase 1 recherchiert + vergleicht Zahlenwerte | — |
+| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ✅ Aktiv | Phase 1 identifiziert Norm-Paragraphen exakt | norm-Typ aktiv |
+| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Synthese traegt zu Querverweisen bei, setzt sie nicht | — |
+| KEIN-SCHLAGWORT-OHNE-VOKABULAR | 🔄 Delegiert | Dispatch: vokabular-pruefer | — |
+| KEIN-UPDATE-OHNE-DIFF | ✅ Aktiv | Phase 2 dokumentiert Diffs zwischen Alt + Neu | — |
+| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ✅ Aktiv | Phase 2 markiert ALLE Widersprueche mit [WIDERSPRUCH] | — |
+| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ✅ Aktiv | Wiki-Quellenseiten als Primaerquelle (4-Gate-geprueft), PDF-Spot-Check bei Widerspruechen/Unklarheiten | — |
+| KORREKTE-UMLAUTE | 🔄 Delegiert | Gate 1 (quellen-pruefer), Part C | — |
 
 **EXTERNER-INHALT-Marker:** Synthese liest PDFs → Wrapper erforderlich.
 

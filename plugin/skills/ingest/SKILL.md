@@ -9,18 +9,18 @@ description: "Dokument vollstaendig lesen und ins Wiki einpflegen — Kern-Skill
 > Dieser Skill ist das Herzstueck der Bibliothek und traegt Primaerverantwortung
 > fuer die meisten Gates.
 
-| Gate | Durchsetzung | Wie |
-|------|-------------|-----|
-| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ✅ Aktiv | Phase 1 liest komplett, Phase 0 erstellt Split-Plan bei Bedarf |
-| KEIN-INHALT-OHNE-SEITENANGABE | ✅ Aktiv | Phase 2 setzt Seitenangaben, Gate 2 prueft |
-| KEIN-ZAHLENWERT-OHNE-QUELLE | ✅ Aktiv | Phase 2 setzt Quellen, Gate 2 prueft |
-| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ✅ Aktiv | Phase 2 setzt Abschnitte, Gate 2 prueft |
-| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ✅ Aktiv | Phase 2 setzt Wikilinks, Gate 1 prueft |
-| KEIN-SCHLAGWORT-OHNE-VOKABULAR | 🔄 Delegiert | Gate 4 (vokabular-pruefer) |
-| KEIN-UPDATE-OHNE-DIFF | ✅ Aktiv | Phase 2 dokumentiert Diffs bei Updates |
-| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | 🔄 Delegiert | Gate 3 (konsistenz-pruefer) |
-| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ✅ Aktiv | Phase 1 liest PDF komplett |
-| KORREKTE-UMLAUTE | 🔄 Delegiert | Gate 2 (quellen-pruefer), Part C |
+| Gate | Durchsetzung | Wie | Bedingung |
+|------|-------------|-----|-----------|
+| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ✅ Aktiv | Phase 1 liest komplett, Phase 0 erstellt Split-Plan bei Bedarf | — |
+| KEIN-INHALT-OHNE-SEITENANGABE | ✅ Aktiv | Phase 2 setzt Seitenangaben, Gate 2 prueft | — |
+| KEIN-ZAHLENWERT-OHNE-QUELLE | ✅ Aktiv | Phase 2 setzt Quellen, Gate 2 prueft | — |
+| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ✅ Aktiv | Phase 2 setzt Abschnitte, Gate 2 prueft | norm-Typ aktiv |
+| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ✅ Aktiv | Phase 2 setzt Wikilinks, Gate 1 prueft | — |
+| KEIN-SCHLAGWORT-OHNE-VOKABULAR | 🔄 Delegiert | Gate 4 (vokabular-pruefer) | — |
+| KEIN-UPDATE-OHNE-DIFF | ✅ Aktiv | Phase 2 dokumentiert Diffs bei Updates | — |
+| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | 🔄 Delegiert | Gate 3 (konsistenz-pruefer) | — |
+| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ✅ Aktiv | Phase 1 liest PDF komplett | — |
+| KORREKTE-UMLAUTE | 🔄 Delegiert | Gate 2 (quellen-pruefer), Part C | — |
 
 ---
 

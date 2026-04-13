@@ -9,18 +9,18 @@ description: "Wiki-Gesundheitscheck — Widersprueche, Verwaiste, Veraltete find
 > Er identifiziert Probleme, korrigiert sie aber nicht selbst.
 > Mehrere Gates sind aktiv; bei Spot-Checks (Phase 2) tritt Gate 9 in Kraft.
 
-| Gate | Durchsetzung | Wie |
-|------|-------------|-----|
-| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Lint liest keine neuen Buecher |
-| KEIN-INHALT-OHNE-SEITENANGABE | ⚪ N/A | Lint prueft, modifiziert aber nicht |
-| KEIN-ZAHLENWERT-OHNE-QUELLE | ⚪ N/A | Lint prueft, modifiziert aber nicht |
-| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ⚪ N/A | Lint prueft, modifiziert aber nicht |
-| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Lint prueft, meldet Luecken |
-| KEIN-SCHLAGWORT-OHNE-VOKABULAR | ⚪ N/A | Lint prueft, meldet Probleme |
-| KEIN-UPDATE-OHNE-DIFF | ⚪ N/A | Keine Aenderungen durch Lint |
-| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ✅ Aktiv | Phase 1 sucht nach unmarkierten Widerspruechen |
-| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ✅ Aktiv | Phase 2 Spot-Checks lesen PDF-Originale |
-| KORREKTE-UMLAUTE | ✅ Aktiv | Lint-Report auf Umlaute geprueft |
+| Gate | Durchsetzung | Wie | Bedingung |
+|------|-------------|-----|-----------|
+| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Lint liest keine neuen Buecher | — |
+| KEIN-INHALT-OHNE-SEITENANGABE | ⚪ N/A | Lint prueft, modifiziert aber nicht | — |
+| KEIN-ZAHLENWERT-OHNE-QUELLE | ⚪ N/A | Lint prueft, modifiziert aber nicht | — |
+| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ⚪ N/A | Lint prueft, modifiziert aber nicht | — |
+| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Lint prueft, meldet Luecken | — |
+| KEIN-SCHLAGWORT-OHNE-VOKABULAR | ⚪ N/A | Lint prueft, meldet Probleme | — |
+| KEIN-UPDATE-OHNE-DIFF | ⚪ N/A | Keine Aenderungen durch Lint | — |
+| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ✅ Aktiv | Phase 1 sucht nach unmarkierten Widerspruechen | — |
+| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ✅ Aktiv | Phase 2 Spot-Checks lesen PDF-Originale | — |
+| KORREKTE-UMLAUTE | ✅ Aktiv | Lint-Report auf Umlaute geprueft | — |
 
 ---
 

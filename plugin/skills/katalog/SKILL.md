@@ -9,18 +9,18 @@ description: "Bestandsuebersicht — Wiki navigieren, Abdeckung pruefen, Statist
 > Er modifiziert niemals Wiki-Inhalte, verursacht daher keine Nebeneffekte.
 > Nur KORREKTE-UMLAUTE ist aktiv; alle anderen Gates sind nicht anwendbar.
 
-| Gate | Durchsetzung | Wie |
-|------|-------------|-----|
-| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Katalog liest nicht; zeigt bestehende Metadaten |
-| KEIN-INHALT-OHNE-SEITENANGABE | ⚪ N/A | Nur Leseoperationen |
-| KEIN-ZAHLENWERT-OHNE-QUELLE | ⚪ N/A | Nur Leseoperationen |
-| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ⚪ N/A | Nur Leseoperationen |
-| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Nur Leseoperationen |
-| KEIN-SCHLAGWORT-OHNE-VOKABULAR | ⚪ N/A | Nur Leseoperationen |
-| KEIN-UPDATE-OHNE-DIFF | ⚪ N/A | Keine Aenderungen |
-| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ⚪ N/A | Nur Leseoperationen |
-| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ⚪ N/A | Keine Aenderungen |
-| KORREKTE-UMLAUTE | ✅ Aktiv | Katalog-Output wird auf korrekte Umlaute geprueft |
+| Gate | Durchsetzung | Wie | Bedingung |
+|------|-------------|-----|-----------|
+| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Katalog liest nicht; zeigt bestehende Metadaten | — |
+| KEIN-INHALT-OHNE-SEITENANGABE | ⚪ N/A | Nur Leseoperationen | — |
+| KEIN-ZAHLENWERT-OHNE-QUELLE | ⚪ N/A | Nur Leseoperationen | — |
+| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ⚪ N/A | Nur Leseoperationen | — |
+| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Nur Leseoperationen | — |
+| KEIN-SCHLAGWORT-OHNE-VOKABULAR | ⚪ N/A | Nur Leseoperationen | — |
+| KEIN-UPDATE-OHNE-DIFF | ⚪ N/A | Keine Aenderungen | — |
+| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ⚪ N/A | Nur Leseoperationen | — |
+| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ⚪ N/A | Keine Aenderungen | — |
+| KORREKTE-UMLAUTE | ✅ Aktiv | Katalog-Output wird auf korrekte Umlaute geprueft | — |
 
 ---
 
@@ -30,7 +30,7 @@ description: "Bestandsuebersicht — Wiki navigieren, Abdeckung pruefen, Statist
 
 1. **Verzeichnisstruktur auslesen:**
    - `wiki/_index/` komplett durchsuchen
-   - Verfuegbare Kategorien identifizieren: quellen, konzepte, normen, baustoffe, verfahren, mocs
+   - Kategorien werden aus den Verzeichnissen unter wiki/ und den Typen in seitentypen.md dynamisch abgeleitet
    - _vokabular.md laden
 
 2. **Metadaten sammeln:**
@@ -104,12 +104,12 @@ Katalog ist meist Ausgangspunkt fuer andere Skills:
 ## Beispiele
 
 **Anfrage:**
-"Welche Buecher decken den Querkrafttransfer bei indirekter Lagerung ab?"
+"Welche Buecher decken Thema X ab?"
 
 **Katalog antwortet:**
 - Listet Quellenseite + Kapitel/Seiten auf
-- Zeigt, dass z.B. "Fingerloos-EC2" Querkraft in Kap. 6 behandelt, aber nicht spezifisch "indirekt"
-- Schlaegt vor zu-synthese zu gehen um Konzeptseite zu vertiefen
+- Zeigt, welche Quellen das Thema direkt oder indirekt behandeln
+- Schlaegt vor zu /synthese zu gehen um Konzeptseite zu vertiefen
 
 ---
 

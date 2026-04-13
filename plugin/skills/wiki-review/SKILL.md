@@ -9,18 +9,18 @@ description: "Wiki-Review — Obsidian-Integritaet, Content-Drift, Abdeckungsana
 > Er identifiziert Qualitaetsprobleme, Content-Drift und Abdeckungsluecken.
 > Kein Gate ist aktiv — der Skill ist read-only (ausser Report-Write in `wiki/_reviews/`).
 
-| Gate | Durchsetzung | Wie |
-|------|-------------|-----|
-| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Review liest keine neuen Buecher |
-| KEIN-INHALT-OHNE-SEITENANGABE | ⚪ N/A | Review prueft, modifiziert aber nicht |
-| KEIN-ZAHLENWERT-OHNE-QUELLE | ⚪ N/A | Review prueft, modifiziert aber nicht |
-| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ⚪ N/A | Review prueft, modifiziert aber nicht |
-| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Review prueft, meldet Luecken |
-| KEIN-SCHLAGWORT-OHNE-VOKABULAR | ⚪ N/A | Review prueft, meldet Probleme |
-| KEIN-UPDATE-OHNE-DIFF | ⚪ N/A | Keine Aenderungen durch Review |
-| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ⚪ N/A | Review prueft Format, korrigiert nicht |
-| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ⚪ N/A | Review aendert keine Wiki-Seiten |
-| KORREKTE-UMLAUTE | ⚪ N/A | Review-Report ist Chat-Output (Stufe 1) bzw. Markdown (Stufe 2) |
+| Gate | Durchsetzung | Wie | Bedingung |
+|------|-------------|-----|-----------|
+| KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG | ⚪ N/A | Review liest keine neuen Buecher | — |
+| KEIN-INHALT-OHNE-SEITENANGABE | ⚪ N/A | Review prueft, modifiziert aber nicht | — |
+| KEIN-ZAHLENWERT-OHNE-QUELLE | ⚪ N/A | Review prueft, modifiziert aber nicht | — |
+| KEIN-NORMBEZUG-OHNE-ABSCHNITT | ⚪ N/A | Review prueft, modifiziert aber nicht | — |
+| KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Review prueft, meldet Luecken | — |
+| KEIN-SCHLAGWORT-OHNE-VOKABULAR | ⚪ N/A | Review prueft, meldet Probleme | — |
+| KEIN-UPDATE-OHNE-DIFF | ⚪ N/A | Keine Aenderungen durch Review | — |
+| KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ⚪ N/A | Review prueft Format, korrigiert nicht | — |
+| KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ⚪ N/A | Review aendert keine Wiki-Seiten | — |
+| KORREKTE-UMLAUTE | ⚪ N/A | Review-Report ist Chat-Output (Stufe 1) bzw. Markdown (Stufe 2) | — |
 
 ---
 
@@ -76,8 +76,10 @@ Wenn sich Templates aendern, aendert sich automatisch was der Review als
 
 **Schritt 0.8 — Typ→Verzeichnis-Mapping extrahieren (dynamisch):**
 - Read `governance/seitentypen.md`
-- Extrahiere aus der Uebersichtstabelle (Spalten: Typ, Beantwortet, Beispiel, Verzeichnis)
-  alle `Typ → Verzeichnis`-Paare → **TYP_VERZEICHNIS_MAP**
+- seitentypen.md enthaelt ZWEI Tabellen:
+  - **Core-Typen** (Spalten: Typ, Beantwortet, Beispiel, Verzeichnis) — immer vorhanden
+  - **Domain-Typen** (Spalten: Typ, Beantwortet, Beispiel, Verzeichnis, Bedingter Gate) — erweiterbar
+- Extrahiere aus BEIDEN Tabellen alle `Typ → Verzeichnis`-Paare → **TYP_VERZEICHNIS_MAP**
 - Ergaenze Infrastruktur-Verzeichnisse (nicht typengebunden, aber immer erwartet):
   `_index/`, `pdfs/`
 - NICHT hardcoden — wenn ein neuer Seitentyp in seitentypen.md aufgenommen wird,
@@ -239,6 +241,15 @@ Sonderregeln:
   (ohne Index keine Katalog-Uebersicht, ohne pdfs/ keine PDF-Verlinkung)
 
 - **Output:** `| Verzeichnis | Soll-Typ | Status | Seiten | Empfehlung |`
+
+**3.6 config/valid-types.txt — Sync mit seitentypen.md:**
+- Lade `hooks/config/valid-types.txt` (aus Phase 0.4)
+- Lade **TYP_VERZEICHNIS_MAP** (aus Phase 0.8)
+- Vergleiche: Jeder Typ in valid-types.txt muss in seitentypen.md existieren und umgekehrt
+  - Typ in valid-types.txt aber NICHT in seitentypen.md → ERROR: "Typ in Hook-Config aber nicht in Governance"
+  - Typ in seitentypen.md aber NICHT in valid-types.txt → ERROR: "Typ in Governance aber nicht in Hook-Config"
+  - Alle synchron → OK
+- **Output:** `| Typ | valid-types.txt | seitentypen.md | Status |`
 
 **3.4 _vokabular.md — Aggregierte Nutzungsanalyse:**
 - Alle definierten Terme in `wiki/_vokabular.md` laden
