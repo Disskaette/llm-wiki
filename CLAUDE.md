@@ -98,7 +98,7 @@ In der Nebeneffekte-Phase (nach allen Seiteneffekten) wird die Datei geloescht.
 
 Nach jeder Aenderung IMMER:
 ```bash
-bash plugin/hooks/check-consistency.sh plugin/    # 21/21 PASS?
+bash plugin/hooks/check-consistency.sh plugin/    # 22/22 PASS?
 diff <(sed -n '/<!-- BEGIN HARD-GATES -->/,/<!-- END HARD-GATES -->/p' plugin/skills/using-bibliothek/SKILL.md | sed '1d;$d') plugin/governance/hard-gates.md   # Sync?
 bash tests/test-guard-wiki-writes.sh               # 6/6 PASS?
 bash tests/test-inject-lock-warning.sh             # 7/7 PASS?
@@ -106,6 +106,7 @@ bash tests/test-guard-pipeline-lock.sh             # 10/10 PASS?
 bash tests/test-advance-pipeline-lock.sh           # 20/20 PASS?
 bash tests/test-create-pipeline-lock.sh            # 30/30 PASS?
 bash tests/test-integration-pipeline.sh            # 164/164 PASS?
+bash tests/test-check-wiki-output-discovery.sh     # 17/17 PASS?
 ```
 
 Session-Neustart noetig nach Hook-Aenderungen (Claude Code cached im RAM).

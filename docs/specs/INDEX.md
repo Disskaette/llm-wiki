@@ -9,8 +9,8 @@ Bestehende Specs werden bei neuen Anforderungen aktualisiert, nicht dupliziert.
 |----|-------|--------|---------|----------------------|
 | [SPEC-001](SPEC-001-passive-hooks.md) | Passive Hook-Infrastruktur (Schreibschutz + Lock-Warnung) | Done | 1.0 | 2026-04-11 |
 | [SPEC-002](SPEC-002-pipeline-lock-enforcement.md) | Aktive Pipeline-Lock-Enforcement + Auto-Lock nach Worker-Stop | Done | 2.0 | 2026-04-13 |
-| [SPEC-003](SPEC-003-synthese-enforcement.md) | Synthese-Enforcement + Heuristik-Bereinigung | Done | 1.0 | 2026-04-11 |
-| [SPEC-004](SPEC-004-wiki-review-skill.md) | Wiki-Review-Skill (semantische Analyse + Verbesserungsplaene) | Done | 1.0 | 2026-04-11 |
+| [SPEC-003](SPEC-003-synthese-enforcement.md) | Synthese-Enforcement + Discovery-Logik | Done | 2.0 | 2026-04-14 |
+| [SPEC-004](SPEC-004-wiki-review-skill.md) | Wiki-Review-Skill (semantische Analyse + Discovery-Gesundheit) | Done | 1.1 | 2026-04-14 |
 | [SPEC-005](SPEC-005-domain-agnostik.md) | Domain-Agnostik — Universelles Wiki-Plugin | Done | 1.0 | 2026-04-13 |
 | [SPEC-006](SPEC-006-multi-format-ingest.md) | Multi-Format-Ingest — PDF, Markdown, URL | Done | 1.0 | 2026-04-13 |
 | [SPEC-007](SPEC-007-future-scaling.md) | Future — Skalierung, Lifecycle, Visualisierung | Backlog | 1.0 | 2026-04-13 |

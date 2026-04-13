@@ -1,9 +1,9 @@
 # SPEC-004: Wiki-Review-Skill
 
 **Status:** Done
-**Version:** 1.0
+**Version:** 1.1
 **Erstellt:** 2026-04-11
-**Aktualisiert:** 2026-04-11
+**Aktualisiert:** 2026-04-14
 
 ## Zusammenfassung
 
@@ -12,6 +12,10 @@ Prueft inhaltliche Qualitaet, Abdeckung und Standard-Drift — ergaenzt
 `/wiki-lint` (technisch) und `/katalog` (Navigation).
 
 Zweistufig: Quick-Scan zuerst, bei Befund Full-Audit als Batch.
+
+v1.1: Neue Pruefkategorie **Discovery-Gesundheit** (SPEC-003 v2.0).
+Erkennt wenn die Discovery-Logik nicht implementiert ist, uebersprungen
+wird, oder Rueckstau bei Konzept-Kandidaten/Schlagwort-Vorschlaegen entsteht.
 
 ## Abgrenzung
 
@@ -34,7 +38,9 @@ Quellen fuer den aktuellen Standard:
 3. `governance/naming-konvention.md` → Dateinamen + Link-Konventionen
 4. `governance/hard-gates.md` → Welche Gates gelten
 5. `hooks/config/valid-types.txt` → Erlaubte Seitentypen
-6. `hooks/check-wiki-output.sh` → Deterministische Checks (12 Stueck)
+6. `hooks/check-wiki-output.sh` → Deterministische Checks
+7. `wiki/_konzept-reife.md` → Discovery-Tracker (v1.1)
+8. `wiki/_schlagwort-vorschlaege.md` → Schlagwort-Rueckkanal (v1.1)
 
 Der Skill extrahiert Pflicht-Felder, Struktur-Reihenfolge und Konventionen
 aus diesen Dateien und vergleicht dann die Wiki-Seiten dagegen.
@@ -110,8 +116,27 @@ Zufaellige Seiten ziehen und pruefen:
 - `_vokabular.md`: Terme definiert aber nie verwendet? Terme in Frontmatter aber nicht definiert?
   (Check 03 prueft pro Seite — hier aggregiert ueber das ganze Wiki)
 
+**Phase 3b: Discovery-Gesundheit (v1.1, SPEC-003 v2.0)**
+
+Prueft ob die persistente Discovery-Logik funktioniert oder stillschweigend
+uebersprungen wird. Sechs Checks:
+
+| Check | Prueft | Ergebnis bei Versagen |
+|-------|--------|-----------------------|
+| DATEIEN-CHECK | `_konzept-reife.md` + `_schlagwort-vorschlaege.md` existieren | "Discovery-Dateien nicht angelegt. Wurde /synthese schon einmal ausgefuehrt?" |
+| STALE-CHECK | Letztes Update der Discovery-Dateien vs. Synthese-Laeufe seit letztem Update (aus `_log.md`) | "N Synthese-Laeufe seit letztem Discovery-Update. Discovery wird moeglicherweise uebersprungen." |
+| REIFE-CHECK | Reife Kandidaten (>=2 Quellen) ohne Konzeptseite seit >2 Synthese-Laeufen | "[Term] ist seit [Datum] reif (N Quellen), aber noch keine Konzeptseite. /synthese empfohlen." |
+| RUECKSTAU-CHECK | Offene Eintraege in `_schlagwort-vorschlaege.md` aelter als 3 Synthese-Laeufe | "N offene Schlagwort-Vorschlaege, aeltester seit [Datum]. /vokabular empfohlen." |
+| KONSISTENZ-CHECK | `konzept-kandidaten` in Quellenseiten-Frontmatter die NICHT in `_konzept-reife.md` stehen | "N Kandidaten aus Quellenseiten fehlen in _konzept-reife.md. Phase 0.0 Sync nicht gelaufen." |
+| GHOST-CHECK | Eintraege mit `status: erstellt` in `_konzept-reife.md` wo Konzeptseite nicht existiert | "[Term] als 'erstellt' markiert, aber Konzeptseite existiert nicht." |
+
+Self-Referential: Prueft `_konzept-reife.md` und `_schlagwort-vorschlaege.md`
+direkt (YAML-Frontmatter parsen), `_log.md` fuer Synthese-Lauf-Zaehlung,
+und `wiki/konzepte/` fuer Existenz-Checks.
+
 **Phase 4: Abdeckungs-Check**
 - Konzept-Kandidaten mit >=2 Quellen ohne eigene Seite
+  (v1.1: primaer aus `_konzept-reife.md` lesen statt grep, mit Fallback auf Quellenseiten-Frontmatter)
 - Quellenseiten ohne Konzeptseiten-Verlinkung
 
 **Phase 5: Ergebnis melden**
@@ -278,6 +303,14 @@ Phase 0: Governance laden
 - [ ] _pending.json: Verwaiste Locks erkannt
 - [ ] _vokabular.md: Unbenutzte Terme + fehlende Terme aggregiert
 
+### Discovery-Gesundheit (v1.1)
+- [ ] DATEIEN-CHECK: Erkennt fehlende `_konzept-reife.md` / `_schlagwort-vorschlaege.md`
+- [ ] STALE-CHECK: Erkennt wenn Discovery-Dateien nicht aktualisiert werden
+- [ ] REIFE-CHECK: Meldet reife Kandidaten (>=2 Quellen) ohne Konzeptseite
+- [ ] RUECKSTAU-CHECK: Meldet alte offene Schlagwort-Vorschlaege
+- [ ] KONSISTENZ-CHECK: Findet Quellenseiten-Kandidaten die nicht in Reife-Datei stehen
+- [ ] GHOST-CHECK: Findet "erstellt"-Eintraege ohne existierende Konzeptseite
+
 ### Content-Layer (Stichprobe 15 Seiten)
 - [ ] Struktur-Reihenfolge gegen Template
 - [ ] Widerspruchs-Marker: Callout-Syntax vs. Plaintext erkannt
@@ -298,7 +331,8 @@ Phase 0: Governance laden
 
 ## Abhaengigkeiten
 
-- SPEC-003 (Synthese-Enforcement) → Done
+- SPEC-003 v1.0 (Synthese-Enforcement) → Done
+- SPEC-003 v2.0 (Discovery-Logik) → In Progress (Discovery-Gesundheit-Checks haengen davon ab)
 - Frontmatter-Felder `materialgruppe`, `versagensart` → Done (in Templates)
 - `guard-wiki-writes.sh` muss `/wiki-review` als erlaubten Skill fuehren
   (fuer _review-report.md Write)
