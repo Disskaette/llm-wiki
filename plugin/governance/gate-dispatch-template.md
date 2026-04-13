@@ -51,6 +51,7 @@ Bei FAIL: Der Agent bewertet ob es ein echter Mangel oder ein False Positive ist
 |---|---|
 | `{{QUELLENSEITE_PFAD}}` | Absoluter Pfad zur neuen/aktualisierten Quellenseite |
 | `{{PDF_PFAD}}` | Absoluter Pfad zur Original-PDF (für Kapitelvergleich) |
+| `{{DOMAIN_GATES}}` | Aktive bedingte Gates (aus hard-gates.md + seitentypen.md) |
 
 ### Prompt-Template
 
@@ -117,6 +118,7 @@ Die vollständige Prüflogik mit Parts A-G ist in `agents/quellen-pruefer.md` de
 | `{{QUELLENSEITE_PFAD}}` | Absoluter Pfad zur Quellenseite |
 | `{{PDF_PFAD}}` | Absoluter Pfad zur Original-PDF (für Spot-Checks) |
 | `{{KONZEPTSEITEN_PFADE}}` | Komma-separierte Pfade zu betroffenen Konzeptseiten |
+| `{{DOMAIN_GATES}}` | Aktive bedingte Gates (aus hard-gates.md + seitentypen.md) |
 
 ### Prompt-Template
 
@@ -149,6 +151,11 @@ Melde alle PASS/FAIL/WARN im Pruefbericht. Die kontextuellen Pruefungen (Zahlenw
 
 ### A: Kontextuelle Quellenprüfung (ersetzt Shell-Checks 04, 05, 06)
 
+Falls "KEIN-NORMBEZUG-OHNE-ABSCHNITT" in den aktiven Domain-Gates:
+  Pruefe Normbezuege wie unten beschrieben.
+Falls nicht aktiv:
+  Ueberspringe Part A, melde "N/A (kein norm-Typ in diesem Wiki)".
+
 Diese Checks können NUR du bewerten — das Shell-Script gibt nur WARN:
 
 1. **Zahlenwerte (Shell-Check 04):** Lies den Body-Text. Für jeden
@@ -162,11 +169,11 @@ Diese Checks können NUR du bewerten — das Shell-Script gibt nur WARN:
      → Prüfe im PDF ob die Quelle auffindbar ist → Ergänze oder markiere
 
 2. **Normbezüge (Shell-Check 05):** Für jeden Verweis auf eine Norm
-   (EC2, EC5, DIN EN, CEN/TS):
+   (domain-spezifische Normen, falls norm-Typ aktiv):
    - Ist ein Abschnitt angegeben (§X.Y, Abschnitt X, Anhang Y)?
    - Buchtitel und bibliografische Daten brauchen KEINEN Abschnitt.
-   - Allgemeine Verweise ("nach EC2") in einleitendem Kontext sind OK.
-   - **Echter Mangel:** Normative Aussage ("gemäß EC2 gilt...") ohne §
+   - Allgemeine Verweise ("nach [Norm]") in einleitendem Kontext sind OK.
+   - **Echter Mangel:** Normative Aussage ("gemäß [Norm] gilt...") ohne §
      → Ergänze den Abschnitt
 
 3. **Seitenangaben (Shell-Check 06):** Für jeden Quellenverweis:
@@ -188,7 +195,7 @@ Lade die entsprechenden PDF-Seiten und prüfe:
 ### C: Umlaute (Shell-Check 09)
 
 Lies den Body-Text und prüfe auf verbleibende ASCII-Umlaut-Ersetzungen:
-- "fuer" statt "für", "ueber" statt "über", "Traeger" statt "Träger" etc.
+- "fuer" statt "für", "ueber" statt "über", "Laenge" statt "Länge" etc.
 - NICHT bemängeln: aktuell, manuell, virtuell, neue/neuer, Mauer, Dauer,
   Frequenz, Versuche, quer*, que*, Dateinamen, Code-Blocks
 - Bei Fund: DIREKT korrigieren (Edit-Tool), nicht nur melden.
@@ -229,6 +236,7 @@ Lies den Body-Text und prüfe auf verbleibende ASCII-Umlaut-Ersetzungen:
 | `{{QUELLENSEITE_PFAD}}` | Absoluter Pfad zur Quellenseite |
 | `{{KONZEPTSEITEN_PFADE}}` | Komma-separierte Pfade zu ALLEN Konzeptseiten |
 | `{{WIKI_ROOT}}` | Absoluter Pfad zum Wiki-Verzeichnis |
+| `{{DOMAIN_GATES}}` | Aktive bedingte Gates (aus hard-gates.md + seitentypen.md) |
 
 ### Prompt-Template
 
@@ -291,6 +299,7 @@ Wiki-Root: {{WIKI_ROOT}}
 |---|---|
 | `{{QUELLENSEITE_PFAD}}` | Absoluter Pfad zur Quellenseite |
 | `{{VOKABULAR_PFAD}}` | Absoluter Pfad zu wiki/_vokabular.md |
+| `{{DOMAIN_GATES}}` | Aktive bedingte Gates (aus hard-gates.md + seitentypen.md) |
 
 ### Prompt-Template
 

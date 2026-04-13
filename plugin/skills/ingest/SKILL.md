@@ -125,6 +125,9 @@ Subagent-Prompts werden NICHT frei formuliert. IMMER Template verwenden.
    - `{{QUELLENSEITE_DATEI}}`: nach Naming-Konvention ableiten
    - `{{BESTEHENDE_KONZEPTE}}`: Glob `wiki/konzepte/*.md` → Dateinamen-Liste
    - `{{VOKABULAR_TERME}}`: `grep "^### " wiki/_vokabular.md` → Term-Liste
+   - `{{DOMAIN_GATES}}`: Lese hard-gates.md → finde alle Gates mit `Bedingung:` 
+     die NICHT "keine (universell)" ist → pruefe ob der referenzierte Domain-Typ 
+     in seitentypen.md existiert → nur erfuellte Gates als Text einfuegen
 3. Modellwahl nach Seitenzahl (aus Phase 0.1):
    - **>200 Seiten** → `model: "opus"` (1M Context, komplexe Buecher)
    - **≤200 Seiten** → `model: "sonnet"` (fokussierte Extraktion, guenstiger)

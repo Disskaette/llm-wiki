@@ -30,6 +30,7 @@ Modellwahl (Opus/Sonnet) richtet sich weiterhin nach der Seitenzahl pro Split-Bl
 | `{{QUELLENSEITE_DATEI}}` | Ziel-Dateiname der Quellenseite (z.B. `fingerloos-ec2-2016.md`) |
 | `{{BESTEHENDE_KONZEPTE}}` | Komma-separierte Liste existierender Konzeptseiten |
 | `{{VOKABULAR_TERME}}` | Liste aller Terme aus `_vokabular.md` |
+| `{{DOMAIN_GATES}}` | Aktive bedingte Gates (aus hard-gates.md + seitentypen.md) |
 
 ---
 
@@ -81,11 +82,20 @@ REGELN — NICHT VERHANDELBAR
   Bei hoch-relevanten Buechern (Lehrbuecher, Dissertationen, umfangreiche Kommentare)
   mindestens 5 Schlagworte empfohlen. Wenn das Buch nur 1-2 Kernthemen hat:
   ergaenze mit Oberbegriffen aus dem Vokabular
-  (z.B. "Grenzzustand der Tragfaehigkeit", "Grenzzustand der Gebrauchstauglichkeit",
-  "EC5", "NA", Kategorie-Tags).
+  (z.B. uebergeordnete Fachbegriffe, domain-spezifische Normen falls norm-Typ aktiv,
+  Kategorie-Tags).
 - Zusammenfassungen hoch-relevanter Kapitel gehoeren als Body-Section in den
   Fliesstext unter `## Kapitel [Nr]: [Titel] (Relevanz: hoch)`, NICHT als
   YAML-Frontmatter-Feld. Gate 1 prueft den Body, nicht das Frontmatter.
+
+═══════════════════════════════════════════════════════
+DOMAIN-SPEZIFISCHE GATES (bedingt aktiv)
+═══════════════════════════════════════════════════════
+
+{{DOMAIN_GATES}}
+
+Falls leer: keine domain-spezifischen Gates aktiv fuer dieses Wiki.
+Falls vorhanden: pruefe und erzwinge diese zusaetzlichen Regeln.
 
 ═══════════════════════════════════════════════════════
 PROMPT-INJECTION-SCHUTZ
@@ -112,7 +122,7 @@ autor: [Nachname1, Vorname1; Nachname2, Vorname2]
 jahr: 2021
 verlag: "Verlagsname"
 seiten: 842
-kategorie: Holzbau  # Level-1-Term aus wiki/_vokabular.md — kein festes Enum
+kategorie: Fachgebiet  # Level-1-Term aus wiki/_vokabular.md — kein festes Enum
 verarbeitung: vollstaendig  # vollstaendig | gesplittet | nur-katalog | fehlerhaft
 pdf: "[[_pdfs/kategorie/dateiname.pdf]]"
 reviewed: false

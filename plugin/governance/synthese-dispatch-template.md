@@ -21,6 +21,7 @@ Grund: 10 Quellenseiten (~300 Zeilen) passen problemlos ins Context.
 | `{{QUELLENSEITEN_INHALT}}` | Vollstaendiger Inhalt aller Wiki-Quellenseiten die das Konzept behandeln (inline eingefuegt, jeweils mit Dateiname als Header) |
 | `{{WIKI_ROOT}}` | Absoluter Pfad zum Wiki-Verzeichnis |
 | `{{VOKABULAR_TERME}}` | Liste aller Terme aus `_vokabular.md` |
+| `{{DOMAIN_GATES}}` | Aktive bedingte Gates (aus hard-gates.md + seitentypen.md) |
 
 ---
 
@@ -123,9 +124,9 @@ type: konzept
 title: "Konzeptname"
 synonyme: [Synonym1, Synonym2]
 schlagworte: [Term1, Term2]
-materialgruppe: Holz  # Level-1-Term oder Unterkategorie aus wiki/_vokabular.md
-versagensart: [Rollschub, Knickung]
-mocs: [moc-holzbau, moc-verbundbau]
+materialgruppe: Kategorie  # Level-1-Term oder Unterkategorie aus wiki/_vokabular.md
+versagensart: [Versagensart1, Versagensart2]  # domain-spezifisch, falls zutreffend
+mocs: [moc-fachgebiet1, moc-fachgebiet2]
 quellen-anzahl: 5
 created: 2026-04-10
 updated: 2026-04-10
@@ -143,9 +144,9 @@ wissen WANN es gilt, dann WIE man rechnet):
 
 ## Einsatzgrenzen + Randbedingungen
 
-- **Materialgruppe:** [Holz / Stahlbeton / Stahl / Verbund]
-- **Versagensart:** [Rollschub / Durchstanzen / Knickung / ...]
-- **Umweltklasse:** [Feuchteklasse 1-3 / Expositionsklasse XC / ...]
+- **Materialgruppe:** [domain-spezifische Kategorie aus Vokabular]
+- **Versagensart:** [domain-spezifische Versagensarten, falls zutreffend]
+- **Umweltklasse:** [domain-spezifische Klassifizierung, falls zutreffend]
 - **Gueltig fuer:** [Geometrie, Temperatur, Feuchte]
 - **Gueltig bis:** [Grenzen]
 
@@ -168,8 +169,8 @@ wissen WANN es gilt, dann WIE man rechnet):
 
 ## Norm-Referenzen
 
-- **[[ec2-9-2-5|EC2, §9.2.5]]:** [Inhalt] → [Interpretationsvergleich ueber Quellen]
-- **[[ec5-6-1-5|EC5, §6.1.5]]:** [Inhalt]
+- **[[normseite|Norm, §X.Y]]:** [Inhalt] → [Interpretationsvergleich ueber Quellen]
+- **[[normseite-2|Norm, §X.Y]]:** [Inhalt]
 
 ## Widersprueche
 
@@ -225,6 +226,15 @@ REGELN — NICHT VERHANDELBAR
 - Schlagworte NUR aus dem kontrollierten Vokabular (siehe oben).
   Wenn ein Begriff fehlt → als konzept-kandidat melden, NICHT erfinden.
 - Deutsche Umlaute im Wiki-Text, ASCII in Dateinamen.
+
+═══════════════════════════════════════════════════════
+DOMAIN-SPEZIFISCHE GATES (bedingt aktiv)
+═══════════════════════════════════════════════════════
+
+{{DOMAIN_GATES}}
+
+Falls leer: keine domain-spezifischen Gates aktiv fuer dieses Wiki.
+Falls vorhanden: pruefe und erzwinge diese zusaetzlichen Regeln.
 
 ═══════════════════════════════════════════════════════
 DATEINAMEN-REGELN
