@@ -58,29 +58,43 @@ description: "Dokument vollstaendig lesen und ins Wiki einpflegen — Kern-Skill
    - Index-Dateien mit Tabellen-Header gemaess `governance/obsidian-setup.md`
    - Meldung an den Nutzer: "Wiki-Verzeichnis + Obsidian-Vault angelegt. Erster Ingest kann starten."
 
-1. **PDF lokalisieren:**
-   - Wenn expliziter Pfad angegeben → diesen verwenden
+1. **Quelle lokalisieren und Format erkennen:**
+   - Wenn expliziter Pfad/URL angegeben → Format ableiten:
+     - `.pdf` Extension → Format: PDF
+     - `.md` Extension → Format: Markdown
+     - `http://` oder `https://` Prefix → Format: URL
+     - Andere Extension → "Format nicht unterstuetzt", Abbruch
    - Wenn KEIN Pfad angegeben (z.B. "neue Quelle im Ordner"):
      → Scanne `wiki/pdfs/neu/` nach PDF-Dateien
-     → Liste alle gefundenen PDFs auf und frage welche(s) verarbeitet werden soll(en)
-     → Bei nur einem PDF: direkt verarbeiten
-   - Existiert die Datei?
-   - Text extrahierbar? (Read-Tool auf erste 5 Seiten testen)
-   - Wenn kein Text: PDF nach `wiki/pdfs/unlesbar/` verschieben (on-demand angelegt), Fallback `verarbeitung: nur-katalog`
-   - Seitenzahl und Dateigroesse ermitteln
+     → Scanne `wiki/quellen-dateien/neu/` nach Markdown-Dateien (falls Verzeichnis existiert)
+     → Liste alle gefundenen Quellen mit Format auf und frage welche verarbeitet werden soll
+     → Bei nur einer Quelle: direkt verarbeiten
+   - Existiert die Quelle?
+     - PDF: Datei vorhanden?
+     - Markdown: Datei vorhanden?
+     - URL: WebFetch-Test (erreichbar? Text extrahierbar?)
+   - Text extrahierbar?
+     - PDF: Read-Tool auf erste 5 Seiten testen. Kein Text → pdfs/unlesbar/ (on-demand angelegt)
+     - Markdown: Read-Tool direkt. Leere Datei → Abbruch
+     - URL: WebFetch → pruefe ob Ergebnis Text enthaelt (nicht nur JS/HTML-Shell)
+   - Groesse und Split-Entscheidung:
+     - PDF: Seitenzahl + Dateigroesse (>10 MB → Split-Ingest)
+     - Markdown: Dateigroesse (>500 KB → Split-Ingest)
+     - URL: Kein Split (Webseiten selten gross genug)
 
 2. **Duplikat-Check:**
    - Existiert bereits eine Quellenseite im Wiki fuer dieses Buch?
    - Wenn ja: UPDATE-MODUS (nicht Neuanlage)
    - Dispatch: `duplikat-validator` wenn unsicher
 
-3. **Split-Plan (wenn >10 MB Dateigroesse ODER >800K Tokens):**
+3. **Split-Plan (wenn >10 MB PDF, >500 KB Markdown, ODER >800K Tokens):**
    - **Trigger:** PDF-Dateigroesse >10 MB erzwingt Split-Ingest unabhaengig von
      der Token-Schaetzung (API-Request-Size-Limit ~25 MB, base64-Encoding +33%
-     Overhead → ab ~10 MB unsicher). Dateigroesse mit `ls -la` oder `stat` pruefen.
-   - Inhaltsverzeichnis lesen (erste 5-10 Seiten)
-   - Kapitel in Bloecke aufteilen die einzeln in den Context passen
-   - Split-Plan dokumentieren: welche Kapitel pro Durchgang
+     Overhead → ab ~10 MB unsicher). Markdown >500 KB analog.
+     Dateigroesse mit `ls -la` oder `stat` pruefen.
+   - Inhaltsverzeichnis lesen (PDF: erste 5-10 Seiten; Markdown: ## Headings scannen)
+   - Kapitel/Abschnitte in Bloecke aufteilen die einzeln in den Context passen
+   - Split-Plan dokumentieren: welche Kapitel/Abschnitte pro Durchgang
    - Zwischen-Wiki-Seiten werden nach jedem Durchgang gespeichert
    - Letzter Durchgang: Konsolidierung
 
@@ -128,10 +142,13 @@ Subagent-Prompts werden NICHT frei formuliert. IMMER Template verwenden.
    - `{{DOMAIN_GATES}}`: Lese hard-gates.md → finde alle Gates mit `Bedingung:` 
      die NICHT "keine (universell)" ist → pruefe ob der referenzierte Domain-Typ 
      in seitentypen.md existiert → nur erfuellte Gates als Text einfuegen
-3. Modellwahl nach Seitenzahl (aus Phase 0.1):
-   - **>200 Seiten** → `model: "opus"` (1M Context, komplexe Buecher)
-   - **≤200 Seiten** → `model: "sonnet"` (fokussierte Extraktion, guenstiger)
-   - **>10 MB Dateigroesse** → Split-Ingest-Protokoll aktivieren (siehe Phase 0 Schritt 3)
+3. Modellwahl nach Format und Groesse:
+   - **PDF >200 Seiten** → `model: "opus"` (1M Context, komplexe Buecher)
+   - **PDF ≤200 Seiten** → `model: "sonnet"` (fokussierte Extraktion, guenstiger)
+   - **PDF >10 MB Dateigroesse** → Split-Ingest-Protokoll aktivieren
+   - **Markdown >500 KB** → Split-Ingest-Protokoll aktivieren
+   - **Markdown ≤500 KB** → `model: "sonnet"` (Markdown ist kompakter als PDF)
+   - **URL** → `model: "sonnet"` (Webseiten sind kompakt)
 4. Dispatche Agent mit:
    - `subagent_type: "bibliothek:ingest-worker"` (PFLICHT — PreToolUse-Hook
      guard-pipeline-lock.sh matcht auf diesen String, um parallele Ingests zu
@@ -392,12 +409,16 @@ fordert es explizit und akzeptiert das Risiko reduzierter Gate-Kontrolle.
 
 ---
 
-## Split-Ingest-Protokoll (bei >10 MB Dateigroesse oder >800K Tokens)
+## Split-Ingest-Protokoll (bei >10 MB PDF, >500 KB Markdown, oder >800K Tokens)
 
 Trigger: PDF-Dateigroesse >10 MB (API-Request-Size-Limit, base64-Overhead)
+ODER Markdown-Dateigroesse >500 KB
 ODER geschaetzte Tokens >800K (Context-Window-Limit).
-Die MB-Schwelle greift frueher und zuverlaessiger — Dateigroesse ist exakt messbar,
+Die MB-/KB-Schwelle greift frueher und zuverlaessiger — Dateigroesse ist exakt messbar,
 Token-Schaetzung nur heuristisch.
+
+Bei Markdown-Quellen entfaellt das Seiten-Konzept. Stattdessen werden Abschnitte
+(## Headings) als Split-Grenzen verwendet.
 
 1. Phase 0 liest Inhaltsverzeichnis → erstellt Split-Plan
 2. Durchgang 1: Lese Kapitel 1-N, erstelle Zwischen-Wiki-Seiten
