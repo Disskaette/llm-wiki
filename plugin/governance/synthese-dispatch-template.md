@@ -22,6 +22,9 @@ Grund: 10 Quellenseiten (~300 Zeilen) passen problemlos ins Context.
 | `{{WIKI_ROOT}}` | Absoluter Pfad zum Wiki-Verzeichnis |
 | `{{VOKABULAR_TERME}}` | Liste aller Terme aus `_vokabular.md` |
 | `{{DOMAIN_GATES}}` | Aktive bedingte Gates (aus hard-gates.md + seitentypen.md) |
+| `{{KONZEPT_REIFE_INHALT}}` | Aktueller YAML-Inhalt von `_konzept-reife.md` (inline eingefuegt) |
+| `{{SCHLAGWORT_VORSCHLAEGE_INHALT}}` | Aktueller YAML-Inhalt von `_schlagwort-vorschlaege.md` (inline eingefuegt) |
+| `{{BESTEHENDE_KONZEPTE}}` | Komma-separierte Liste existierender Konzeptseiten |
 
 ---
 
@@ -54,6 +57,16 @@ Sie wurden durch die 4-Gate-Ingest-Pipeline geprueft und sind
 deine PRIMAERE Datenbasis.
 
 {{QUELLENSEITEN_INHALT}}
+
+═══════════════════════════════════════════════════════
+DISCOVERY-KONTEXT (INLINE)
+═══════════════════════════════════════════════════════
+
+Aktueller Stand der Konzept-Reife:
+{{KONZEPT_REIFE_INHALT}}
+
+Aktuelle Schlagwort-Vorschlaege:
+{{SCHLAGWORT_VORSCHLAEGE_INHALT}}
 
 ═══════════════════════════════════════════════════════
 AUFTRAG
@@ -220,8 +233,9 @@ Wenn dieses Konzept bisher nur als konzept-kandidat existiert
 REGELN — NICHT VERHANDELBAR
 ═══════════════════════════════════════════════════════
 
-- Jede Aussage MIT Seitenangabe.
-- Jeder Zahlenwert MIT Quelle + Seite.
+- Jede Aussage MIT Seitenangabe als PDF-Link: [[datei.pdf#page=N|Autor Jahr, S. N]]
+  (Seitenangabe IMMER als klickbarer Link, nie als Plaintext "(S. N)")
+- Jeder Zahlenwert MIT Quelle + Seite (als PDF-Link).
 - Jeder Normbezug MIT Abschnittsnummer.
 - Schlagworte NUR aus dem kontrollierten Vokabular (siehe oben).
   Wenn ein Begriff fehlt → als konzept-kandidat melden, NICHT erfinden.
@@ -282,6 +296,71 @@ Ergebnis am Ende melden:
 - Zahlenwerte: [Anzahl]
 - Widersprueche: [Anzahl]
 - PDF-Spot-Checks: [Anzahl]
+
+═══════════════════════════════════════════════════════
+PHASE 2e: DISCOVERY — NICHT VERHANDELBAR
+═══════════════════════════════════════════════════════
+
+Waehrend der vergleichenden Analyse (Phase 1-2) identifizierst du:
+
+1. KONZEPT-KANDIDATEN: Fachbegriffe die in mehreren Quellen substanziell
+   behandelt werden aber KEINE eigene Konzeptseite haben.
+   - Pruefe gegen {{BESTEHENDE_KONZEPTE}}
+   - Pruefe gegen bestehende Eintraege in _konzept-reife.md (oben inline)
+   - Nur melden wenn der Begriff substanziell behandelt wird (nicht nur erwaehnt)
+
+2. SCHLAGWORT-VORSCHLAEGE:
+   a) Neue Terme: Fachbegriffe die in den Quellen wiederholt verwendet werden
+      aber NICHT im kontrollierten Vokabular stehen.
+   b) Fehlende Zuordnungen: Quellenseiten die ein Thema ausfuehrlich behandeln
+      aber das entsprechende Schlagwort im Frontmatter nicht haben.
+
+3. VOKABULAR-ERGAENZUNGEN: Wenn ein neuer Term in >=2 Quellen substanziell
+   vorkommt und im Vokabular fehlt:
+   → Trage ihn DIREKT in _vokabular.md ein (nur additiv, nie loeschen).
+   → Verwende die Struktur der bestehenden Eintraege als Vorlage.
+
+4. SCHLAGWORT-PATCHES: Wenn eine Quellenseite ein Thema ausfuehrlich behandelt
+   aber das Schlagwort im Frontmatter fehlt:
+   → Ergaenze das schlagworte:-Feld DIREKT (nur additiv, nie entfernen).
+   → Nur Terme die im Vokabular existieren (ggf. erst Schritt 3).
+
+Melde ALLES im [DISCOVERY]-Block am Ende deines Outputs.
+Wenn nichts entdeckt: BEGRUENDUNG PFLICHT.
+
+═══════════════════════════════════════════════════════
+EXAKTE OUTPUT-STRUKTUR: [DISCOVERY]-BLOCK (PFLICHT)
+═══════════════════════════════════════════════════════
+
+Am Ende deines Ergebnis-Berichts, VOR der [SYNTHESE-ID]-Zeile:
+
+[DISCOVERY]
+
+KONZEPT-KANDIDATEN:
+- term: "Begriffsname"
+  quellen: quellenseite-a (Kap. X, S. Y-Z), quellenseite-b (Kap. X, S. Y-Z)
+
+SCHLAGWORT-VORSCHLAEGE:
+- neu: "Termname" — N Quellen verwenden den Begriff, fehlt im Vokabular
+- fehlend: quellenseite-a → [Term1, Term2]
+
+VOKABULAR-ERGAENZUNGEN:
+- "Termname" → in _vokabular.md eingetragen
+
+SCHLAGWORT-PATCHES:
+- quellenseite-a → schlagworte: +Term1, +Term2
+
+KEINE-DISCOVERY-BEGRUENDUNG: null
+
+Wenn nichts entdeckt — Begruendung PFLICHT (nicht nur "nichts gefunden"):
+
+KONZEPT-KANDIDATEN: keine
+SCHLAGWORT-VORSCHLAEGE: keine
+VOKABULAR-ERGAENZUNGEN: keine
+SCHLAGWORT-PATCHES: keine
+KEINE-DISCOVERY-BEGRUENDUNG: "Alle im Quellenvergleich aufgetretenen
+Fachbegriffe existieren bereits als Konzeptseiten. Keine Terme identifiziert
+die im Vokabular fehlen."
 
 ═══════════════════════════════════════════════════════
 PIPELINE-ID (PFLICHT — fuer Hook-Matching)
