@@ -70,13 +70,18 @@ Wenn sich Templates aendern, aendert sich automatisch was der Review als
   - Eindeutigkeitsregel ueber alle Verzeichnisse
 
 **Schritt 0.7 — Wiki-Inventar erstellen:**
-- Alle `.md`-Dateien unter `wiki/` zaehlen und kategorisieren (quellen/, konzepte/, normen/, verfahren/, baustoffe/, _index/, moc/, Sonderdateien)
+- Alle `.md`-Dateien unter `wiki/` zaehlen und kategorisieren
 - Sonderdateien: `_log.md`, `_vokabular.md`, `_pending.json`
-- **Bootstrap-Vollstaendigkeit pruefen:** Vergleiche vorhandene Verzeichnisse gegen
-  die Soll-Struktur aus dem Ingest-Skill Phase 0 Bootstrap:
-  `quellen/`, `konzepte/`, `normen/`, `baustoffe/`, `verfahren/`, `moc/`, `_index/`, `pdfs/`
-  Fehlende Verzeichnisse → in **FEHLENDE_VERZEICHNISSE** speichern (fuer Phase 3.5)
-- Ergebnis → **INVENTAR** mit Counts pro Verzeichnis + **FEHLENDE_VERZEICHNISSE**
+- Ergebnis → **INVENTAR** mit Counts pro Verzeichnis
+
+**Schritt 0.8 — Typ→Verzeichnis-Mapping extrahieren (dynamisch):**
+- Read `governance/seitentypen.md`
+- Extrahiere aus der Uebersichtstabelle (Spalten: Typ, Beantwortet, Beispiel, Verzeichnis)
+  alle `Typ → Verzeichnis`-Paare → **TYP_VERZEICHNIS_MAP**
+- Ergaenze Infrastruktur-Verzeichnisse (nicht typengebunden, aber immer erwartet):
+  `_index/`, `pdfs/`
+- NICHT hardcoden — wenn ein neuer Seitentyp in seitentypen.md aufgenommen wird,
+  erkennt der Review ihn automatisch
 
 ---
 
@@ -209,14 +214,31 @@ Falls das Wiki <15 inhaltliche Seiten hat: alle pruefen.
   - Melden: Typ, Stufe, Quelle, Alter
 - **Output:** Status der Pipeline-Lock
 
-**3.5 Bootstrap-Vollstaendigkeit:**
-- Pruefe **FEHLENDE_VERZEICHNISSE** aus Phase 0.7
-- Soll-Verzeichnisse (aus Ingest-Skill Phase 0 Bootstrap):
-  `quellen/`, `konzepte/`, `normen/`, `baustoffe/`, `verfahren/`, `moc/`, `_index/`, `pdfs/`
-- Fehlende Verzeichnisse → ERROR (Ingest/Synthese kann Seiten nicht korrekt ablegen,
-  MOC-Zuordnung unmoeglich wenn `moc/` fehlt, Batch-Tabellen fehlen wenn `_index/` fehlt)
-- Empfehlung pro fehlendem Verzeichnis: "Anlegen mit `mkdir -p wiki/<name>/`"
-- **Output:** `| Verzeichnis | Status | Empfehlung |`
+**3.5 Bootstrap-Vollstaendigkeit (content-driven):**
+
+Nutze **TYP_VERZEICHNIS_MAP** aus Phase 0.8 und **INVENTAR** aus Phase 0.7.
+Kein Verzeichnis wird pauschal als fehlend gemeldet — die Bewertung haengt
+davon ab ob das Wiki Inhalte hat die das Verzeichnis brauchen.
+
+Fuer jedes Typ→Verzeichnis-Paar aus der Map:
+1. **Verzeichnis existiert** → OK
+2. **Verzeichnis fehlt + Seiten dieses Typs existieren an anderer Stelle**
+   (z.B. `type: norm` in `wiki/konzepte/` statt `wiki/normen/`)
+   → ERROR: "N Seiten vom Typ X liegen falsch. Verzeichnis anlegen und verschieben."
+3. **Verzeichnis fehlt + Quellenseiten referenzieren diesen Typ**
+   (z.B. Quellenseiten enthalten Normverweise aber `normen/` fehlt)
+   → WARN: "Verzeichnis nicht angelegt, aber N Quellen verweisen auf Inhalte dieses Typs."
+4. **Verzeichnis fehlt + kein Inhalt dieses Typs im Wiki**
+   → INFO: "Verzeichnis nicht angelegt. Wird beim ersten Ingest/Synthese mit Inhalt
+   dieses Typs automatisch benoetigt."
+
+Sonderregeln:
+- `moc/` → erst ab >=10 Konzeptseiten als WARN melden ("Navigation via MOCs empfohlen"),
+  darunter nur INFO
+- `_index/` und `pdfs/` (Infrastruktur) → immer ERROR wenn fehlend
+  (ohne Index keine Katalog-Uebersicht, ohne pdfs/ keine PDF-Verlinkung)
+
+- **Output:** `| Verzeichnis | Soll-Typ | Status | Seiten | Empfehlung |`
 
 **3.4 _vokabular.md — Aggregierte Nutzungsanalyse:**
 - Alle definierten Terme in `wiki/_vokabular.md` laden
@@ -269,7 +291,7 @@ Quick-Scan Report (Chat-Output, kein File):
 - _index/: X verwaiste Eintraege, Y fehlende Eintraege
 - _pending.json: [frei | verwaist seit HH:MM | nicht vorhanden]
 - _vokabular.md: X unbenutzte Terme, Y undefinierte Schlagworte
-- Bootstrap: X/8 Verzeichnisse vorhanden [fehlend: ...]
+- Bootstrap: X ERROR, Y WARN, Z INFO [Details pro Verzeichnis]
 
 ### Abdeckung
 - Konzept-Kandidaten mit >=2 Quellen ohne Seite: X
