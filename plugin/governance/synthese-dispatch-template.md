@@ -123,7 +123,7 @@ type: konzept
 title: "Konzeptname"
 synonyme: [Synonym1, Synonym2]
 schlagworte: [Term1, Term2]
-materialgruppe: Holz
+materialgruppe: Holz  # Level-1-Term oder Unterkategorie aus wiki/_vokabular.md
 versagensart: [Rollschub, Knickung]
 mocs: [moc-holzbau, moc-verbundbau]
 quellen-anzahl: 5

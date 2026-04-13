@@ -112,7 +112,7 @@ autor: [Nachname1, Vorname1; Nachname2, Vorname2]
 jahr: 2021
 verlag: "Verlagsname"
 seiten: 842
-kategorie: Holzbau  # Holzbau | Stahlbeton | Bauphysik | Brandschutz | ...
+kategorie: Holzbau  # Level-1-Term aus wiki/_vokabular.md — kein festes Enum
 verarbeitung: vollstaendig  # vollstaendig | gesplittet | nur-katalog | fehlerhaft
 pdf: "[[_pdfs/kategorie/dateiname.pdf]]"
 reviewed: false

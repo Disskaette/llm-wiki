@@ -35,20 +35,27 @@ Buechern unter demselben Begriff gefunden wird — nicht einmal als
 - Nur genuein neue Konzepte werden als neuer Term angelegt
 - Alles andere wird als Synonym zum bestehenden Term hinzugefuegt
 
-## Kategorien (Oberbegriffe erster Ebene)
+## Hierarchie (max 3 Ebenen)
 
-- Holzbau
-- Stahlbeton
-- Verbundbau
-- Bauphysik
-- Brandschutz
-- Geotechnik
-- Stahlbau
-- Tragwerksplanung
-- Baustoffe
-- Normenwesen
-- Pruefverfahren
-- Mathematik-Mechanik
+### Ebene 1: Kategorien (== `kategorie:`-Feld in Quellenseiten)
+
+Level-1-Terme SIND die erlaubten Kategorien. Sie werden nicht hardcoded,
+sondern entstehen aus dem Inhalt:
+- Erster Ingest: Worker erkennt Themenfeld → legt Level-1-Term an
+- Folgende Ingests: Worker waehlt bestehenden Term oder legt neuen an
+- Gate 4 validiert: Kein Duplikat? Kein Synonym eines bestehenden Terms?
+
+Beispiele (Bauingenieurwesen): Holzbau, Stahlbeton, Bauphysik, Verbundbau
+Beispiele (Philosophie): Erkenntnistheorie, Ethik, Logik, Metaphysik
+Beispiele (Medizin): Kardiologie, Neurologie, Chirurgie, Pharmakologie
+
+### Ebene 2: Fachbegriffe
+
+Schlagworte die in Quellen- und Konzeptseiten verwendet werden.
+
+### Ebene 3: Spezialbegriffe
+
+Unterbegriffe von Fachbegriffen (selten noetig).
 
 ## Qualitaetskontrolle
 
