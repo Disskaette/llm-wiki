@@ -5,16 +5,25 @@ Jeder Typ hat Pflicht-Frontmatter-Felder.
 
 ---
 
-## Uebersicht
+## Core-Typen (immer vorhanden, nicht konfigurierbar)
 
 | Typ | Beantwortet | Beispiel | Verzeichnis |
 |-----|------------|---------|-------------|
-| **quelle** | "Was steht in diesem Buch?" | Fingerloos 2016 | `wiki/quellen/` |
+| **quelle** | "Was steht in dieser Quelle?" | Fingerloos 2016 | `wiki/quellen/` |
 | **konzept** | "Was ist das? Wie funktioniert es?" | Rollschub, Querdruck | `wiki/konzepte/` |
-| **norm** | "Was fordert die Norm?" | EC2 §9.2.5 | `wiki/normen/` |
-| **baustoff** | "Welche Eigenschaften hat das Material?" | BSH GL24h | `wiki/baustoffe/` |
-| **verfahren** | "Wie rechne ich das nach?" | Gamma-Verfahren | `wiki/verfahren/` |
-| **moc** | "Was gehoert thematisch zusammen?" | Querkraft | `wiki/moc/` |
+
+## Domain-Typen (aktiv in diesem Wiki, erweiterbar)
+
+| Typ | Beantwortet | Beispiel | Verzeichnis | Bedingter Gate |
+|-----|------------|---------|-------------|----------------|
+| **norm** | "Was fordert die Norm?" | EC2 §9.2.5 | `wiki/normen/` | KEIN-NORMBEZUG-OHNE-ABSCHNITT |
+| **baustoff** | "Welche Eigenschaften hat das Material?" | BSH GL24h | `wiki/baustoffe/` | — |
+| **verfahren** | "Wie rechne ich das nach?" | Gamma-Verfahren | `wiki/verfahren/` | — |
+| **moc** | "Was gehoert thematisch zusammen?" | Querkraft | `wiki/moc/` | — |
+
+> Domain-Typen werden vom Worker automatisch angelegt wenn er entsprechende
+> Strukturen im Quellmaterial erkennt. Neuer Typ = neue Zeile in dieser Tabelle
+> + Eintrag in `hooks/config/valid-types.txt`.
 
 ## Abgrenzung Konzept vs. Verfahren
 
@@ -44,7 +53,7 @@ autor: [Nachname1, Vorname1; Nachname2, Vorname2]
 jahr: 2021
 verlag: "Verlagsname"
 seiten: 842
-kategorie: Holzbau  # Holzbau | Stahlbeton | Bauphysik | Brandschutz | ...
+kategorie: Holzbau  # Level-1-Term aus _vokabular.md (keine feste Enum-Liste)
 verarbeitung: vollstaendig  # vollstaendig | gesplittet | nur-katalog | fehlerhaft
 pdf: "[[_pdfs/stahlbeton/fingerloos-ec2-2016.pdf]]"  # Obsidian-Link zum Original-PDF
 reviewed: false
@@ -104,7 +113,7 @@ reviewed: false
 ---
 type: baustoff
 title: "BSH GL24h"
-kategorie: Holz  # Holz | Beton | Stahl | Verbund
+kategorie: Holz  # Materialgruppe, Level-1-Term aus _vokabular.md
 norm: "EN 14080"
 schlagworte: [term1, term2]
 created: 2026-04-09
