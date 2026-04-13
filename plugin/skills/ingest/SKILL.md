@@ -382,6 +382,13 @@ Pflicht-Nebeneffekte:
 - [ ] **_log.md Eintrag** — Chronologischer Eintrag mit Datum, Buch, Ergebnis, beruehrte Seiten
 - [ ] **MOCs aktualisieren** — Neue Seiten in bestehende MOCs eintragen
 - [ ] **_vokabular.md aktualisieren** — Neue Terme hinzufuegen (via /vokabular wenn noetig)
+- [ ] **Konzept-Kandidaten in _konzept-reife.md eintragen** —
+      Fuer jeden `konzept-kandidat` aus dem Frontmatter der neuen Quellenseite:
+      1. Term schon in `_konzept-reife.md`? → Neue Quelle ergaenzen, Status neu berechnen
+      2. Term nicht vorhanden? → Neuen Eintrag mit `entdeckt-bei: "ingest:<quellenseite>"` anlegen
+      3. Status: >=2 Quellen → `reif`, <2 → `unreif`
+      4. Markdown-Body aus YAML regenerieren
+      Falls `_konzept-reife.md` noch nicht existiert: Datei mit leerem `kandidaten: []` Bootstrap anlegen.
 - [ ] **check-wiki-output.sh ausfuehren** — Auf jede neue/aktualisierte Datei
 - [ ] **[INGEST UNVOLLSTAENDIG] Marker entfernen** — Aus _log.md (Phase 0.4 Marker)
 - [ ] **Pipeline-Lock freigeben** — `rm -f wiki/_pending.json` als ALLERLETZTEN Schritt,
@@ -397,6 +404,7 @@ Log-Format:
 - Konzeptseiten neu: indirekte-lagerung.md
 - Normseiten aktualisiert: ec2-9-2-5.md, ec2-6-2.md
 - Neue Vokabular-Terme: indirekte-lagerung, aufhaengebewehrung
+- Konzept-Kandidaten: N in _konzept-reife.md eingetragen (M neu, K aktualisiert)
 - Gates: 4/4 PASS
 ```
 
