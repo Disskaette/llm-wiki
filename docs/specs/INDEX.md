@@ -13,6 +13,7 @@ Bestehende Specs werden bei neuen Anforderungen aktualisiert, nicht dupliziert.
 | [SPEC-004](SPEC-004-wiki-review-skill.md) | Wiki-Review-Skill (semantische Analyse + Verbesserungsplaene) | Done | 1.0 | 2026-04-11 |
 | [SPEC-005](SPEC-005-domain-agnostik.md) | Domain-Agnostik — Universelles Wiki-Plugin | Planned | 1.0 | 2026-04-13 |
 | [SPEC-006](SPEC-006-multi-format-ingest.md) | Multi-Format-Ingest — PDF, Markdown, URL | Planned | 1.0 | 2026-04-13 |
+| [SPEC-007](SPEC-007-future-scaling.md) | Future — Skalierung, Lifecycle, Visualisierung | Backlog | 1.0 | 2026-04-13 |
 
 ## Aussenstehende Arbeiten (nicht spec-wuerdig)
 
