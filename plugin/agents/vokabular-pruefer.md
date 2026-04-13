@@ -32,10 +32,10 @@ Prüfe das Frontmatter-Feld:
 
 ```yaml
 schlagworte:
-  - Querkraftübertragung
-  - Auflagerbereich
-  - Verbundspannung
-  - indirektes Auflager
+  - <Fachbegriff-A>
+  - <Fachbegriff-B>
+  - <Fachbegriff-C>
+  - <Fachbegriff-D>
 ```
 
 **Validierung:**
@@ -46,10 +46,10 @@ schlagworte:
 
 **Format in `_vokabular.md`:**
 ```markdown
-## Querkraftübertragung
-- **Synonyme:** Querkraft-Fluss, Querkraft-Weitergabe
-- **Oberbegriff:** Lastübertragung
-- **Unterbegriffe:** Querkraft im Auflagerbereich, Verbundquerkraft
+## <Hauptbegriff>
+- **Synonyme:** <Synonym-A>, <Synonym-B>
+- **Oberbegriff:** <Oberbegriff>
+- **Unterbegriffe:** <Unterbegriff-A>, <Unterbegriff-B>
 - **Definition:** [kurze Erklärung]
 ```
 
@@ -60,9 +60,9 @@ schlagworte:
 Prüfe, ob Schlagworte dem "preferred term" (Hauptbegriff) entsprechen:
 
 **Problem-Beispiel:**
-- Vokabular sagt: Hauptbegriff ist "Rollschubverhalten" mit Synonym "Rollschub-Effekt"
-- Kapitel hat Keyword: `rollschub-effekt` (Synonym, nicht Hauptbegriff)
-- **Das ist nicht OK** → sollte `Rollschubverhalten` sein
+- Vokabular sagt: Hauptbegriff ist "<Hauptbegriff>" mit Synonym "<Synonym>"
+- Kapitel hat Keyword: `<synonym>` (Synonym, nicht Hauptbegriff)
+- **Das ist nicht OK** → sollte `<Hauptbegriff>` sein
 
 **Validierung:**
 1. Prüfe jedes Keyword
@@ -71,9 +71,9 @@ Prüfe, ob Schlagworte dem "preferred term" (Hauptbegriff) entsprechen:
 
 **Korrekte Struktur in Vokabular:**
 ```markdown
-## Rollschubverhalten [Hauptbegriff]
-- **Synonyme:** Rollschub-Effekt, Rollschubphänomen
-- **Kontext:** "Verwende 'Rollschubverhalten' als Haupt-Keyword, nicht die Synonyme"
+## <Hauptbegriff> [Hauptbegriff]
+- **Synonyme:** <Synonym-A>, <Synonym-B>
+- **Kontext:** "Verwende '<Hauptbegriff>' als Haupt-Keyword, nicht die Synonyme"
 ```
 
 **Resultat:** Alle korrekt / Teilweise / Mehrere Synonyme als Tags.
@@ -84,11 +84,11 @@ Prüfe Oberbegriff-Zuordnung für jedes Keyword:
 
 **Beispiel:**
 ```markdown
-## Querkraftübertragung
-- **Oberbegriff:** Lastübertragung
+## <Fachbegriff-A>
+- **Oberbegriff:** <Oberbegriff-A>
 
-## Verbundspannung
-- **Oberbegriff:** Spannungen
+## <Fachbegriff-B>
+- **Oberbegriff:** <Oberbegriff-B>
 ```
 
 **Validierung:**
@@ -98,6 +98,18 @@ Prüfe Oberbegriff-Zuordnung für jedes Keyword:
 4. Prüfe, ob Unterbegriffe konsistent sind (wenn X Oberbegriff von Y, muss Y in X's Unterbegriffe-Liste stehen)
 
 **Resultat:** Konsistent / Teilweise inkonsistent / Unlogisch.
+
+### Part D: Kategorie-Validierung
+
+Prüfe ob der `kategorie:`-Wert im Frontmatter ein gültiger Level-1-Term in `_vokabular.md` ist:
+
+1. Öffne `wiki/_vokabular.md`
+2. Für jede Seite mit `kategorie:`-Wert:
+   - Ist der Wert ein Level-1-Term (Hauptüberschrift `## <Term>`) in `_vokabular.md`?
+   - Falls der Worker einen neuen Term angelegt hat: ist er kein Synonym eines bestehenden Terms? Keine Duplikate?
+   - Ist die Hierarchie-Ebene korrekt (Level-1, nicht Level-2/3)?
+
+**Resultat:** Alle Kategorien gültig / Teilweise ungültig / Fehlende Kategorie-Einträge.
 
 ## Output-Format
 
@@ -111,9 +123,9 @@ Prüfe Oberbegriff-Zuordnung für jedes Keyword:
 **Resultat:** [n Schlagworte, alle in Vokabular / m fehlen]
 
 Schlagworte-Liste:
-- ✓ `Querkraftübertragung` — definiert in _vokabular.md
-- ✓ `Auflagerbereich` — definiert in _vokabular.md
-- ✗ `Verbund-Kraft-Fluss` — NICHT in _vokabular.md
+- ✓ `<Fachbegriff-A>` — definiert in _vokabular.md
+- ✓ `<Fachbegriff-B>` — definiert in _vokabular.md
+- ✗ `<unbekannter-Term>` — NICHT in _vokabular.md
 
 Fehlende Einträge: [m]
 
@@ -125,8 +137,8 @@ Schlagworte nach Typ:
 - Synonyme (sollten nicht als Tag verwendet werden): [n mit Liste]
 
 Beispiele:
-- ✓ `Querkraftübertragung` — ist Hauptbegriff
-- ✗ `Querkraft-Fluss` — ist Synonym von "Querkraftübertragung", sollte Hauptbegriff sein
+- ✓ `<Hauptbegriff>` — ist Hauptbegriff
+- ✗ `<Synonym>` — ist Synonym von "<Hauptbegriff>", sollte Hauptbegriff sein
 
 ### Part C: Hierarchie-Konsistenz
 **Resultat:** [Konsistent / Teilweise / Inkonsistent]
@@ -137,8 +149,8 @@ Hierarchie-Überprüfung:
 - Zirkuläre Verweise: [n oder "keine"]
 
 Beispiele:
-- ✓ `Querkraftübertragung` → Oberbegriff `Lastübertragung` (definiert, korrekt)
-- ? `Verbundspannung` → Oberbegriff `Spannungen` (definiert, aber ist Oberbegriff sehr allgemein)
+- ✓ `<Fachbegriff-A>` → Oberbegriff `<Oberbegriff-A>` (definiert, korrekt)
+- ? `<Fachbegriff-B>` → Oberbegriff `<Oberbegriff-B>` (definiert, aber ist Oberbegriff sehr allgemein)
 - ✗ `X` → Oberbegriff `Y`, aber `Y` hat Oberbegriff `X` (zirkular)
 
 **Gesamtergebnis:** [PASS / PASS MIT HINWEISEN / FAIL]

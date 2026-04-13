@@ -37,13 +37,13 @@ Prüfe im gesamten Kapiteltext:
 
 **Format der Quellenangabe (nach Satz oder Absatz):**
 ```markdown
-... Dies zeigt, dass der Verbund unter Querkraft lokal versagt [[quelle_2024.pdf#page=156|Autor 2024, S. 156]].
+... Dies zeigt, dass <Fachaussage> [[quelle_2024.pdf#page=156|Autor 2024, S. 156]].
 ```
 
 oder
 
 ```markdown
-... das Rollschub-Verhalten bei BSP ist ein Kernproblem [[quelle_2024.pdf#page=45|Autor 2024, S. 45–47]].
+... <Fachaussage mit Kontext> ist ein Kernproblem [[quelle_2024.pdf#page=45|Autor 2024, S. 45–47]].
 ```
 
 **Anforderungen:**
@@ -57,14 +57,14 @@ oder
 ### Part B: Jeder Zahlenwert hat Quellenangabe
 
 Prüfe alle numerischen Werte:
-- Materialkennwerte (z.B. "E-Modul = 13.000 N/mm²")
-- Messergebnisse (z.B. "maximale Verbundspannung 8,5 MPa")
-- Normenbasierte Werte (z.B. "Sicherheitsbeiwert γ_M = 1,25")
-- Prozentsätze (z.B. "15 % der Lastübertragung")
+- Materialkennwerte (z.B. "Kennwert = 13.000 N/mm²")
+- Messergebnisse (z.B. "maximale Spannung 8,5 MPa")
+- Normenbasierte Werte (z.B. "Sicherheitsbeiwert γ = 1,25")
+- Prozentsätze (z.B. "15 % der Gesamtlast")
 
 **Format:**
 ```markdown
-Der Elastizitätsmodul von Fichtenbrettschichtholz beträgt etwa 12.600 N/mm² [[din1052-2004a1.pdf#page=12|DIN 1052:2004+A1, S. 12]].
+Der Kennwert beträgt etwa 12.600 N/mm² [[norm-2024.pdf#page=12|Norm 2024, S. 12]].
 ```
 
 **Anforderungen:**
@@ -76,19 +76,22 @@ Der Elastizitätsmodul von Fichtenbrettschichtholz beträgt etwa 12.600 N/mm² [
 
 ### Part C: Jede Normreferenz hat Abschnittsnummer
 
+> **Bedingung:** Part C (Normbezuege) nur ausfuehren wenn "KEIN-NORMBEZUG-OHNE-ABSCHNITT"
+> in {{DOMAIN_GATES}} steht. Falls nicht: "Part C: N/A (kein norm-Typ in diesem Wiki)" melden.
+
 Prüfe alle Verweise auf Normen, Standards, Richtlinien:
 
 **Format:**
 ```markdown
-Gemäß EC2 Abschnitt 6.2.2 zur Querkraftbemessung [[ec2-2004.pdf|EC2:2004]] gilt für die 
-Verbundverankerung [[ec2-2004.pdf#page=187|EC2:2004, Abschnitt 8.4.3, S. 187]]...
+Gemäß <Norm> Abschnitt <Nr> zur <Thematik> [[norm.pdf|Norm:Jahr]] gilt für die 
+<Anwendung> [[norm.pdf#page=187|Norm:Jahr, Abschnitt X.Y.Z, S. 187]]...
 ```
 
 **Anforderungen:**
-- Normenzug wird mit exaktem Abschnittsnummer identifiziert (nicht nur "EC2")
+- Normenzug wird mit exaktem Abschnittsnummer identifiziert (nicht nur der Normname)
 - Seitennummer in der Norm ist angegeben
 - Abschnittsnummer und Seitennummer stimmen überein (Spot-Check mit PDF)
-- Alte vs. neue Norm-Versionen sind unterschieden (z.B. DIN 1052:2004 vs. DIN EN 1995-1-1)
+- Alte vs. neue Norm-Versionen sind unterschieden (z.B. domain-spezifische Normen: EC, DIN, EN, ISO, oder andere Standards je nach Domain)
 
 **Resultat:** Normen erfasst/nicht erfasst mit korrektem Detailgrad.
 
@@ -123,12 +126,12 @@ mit dem Originaltext. Prüfe gezielt auf:
    - Wiki: "typischerweise 15%" → FAIL (Qualifier weggelassen)
 
 2. **Invertierte Aussagen:**
-   - Original: "die Schubfestigkeit nimmt ab"
-   - Wiki: "die Schubfestigkeit nimmt zu" → FAIL
+   - Original: "der Kennwert nimmt ab"
+   - Wiki: "der Kennwert nimmt zu" → FAIL
 
 3. **Generalisierung:**
-   - Original: "für Nadelholz der Festigkeitsklasse GL24h"
-   - Wiki: "für Holz" → FAIL (zu allgemein)
+   - Original: "für Material der Klasse X"
+   - Wiki: "für Material" → FAIL (zu allgemein)
 
 4. **Falsche Kausalität:**
    - Original: "A korreliert mit B"
@@ -141,7 +144,7 @@ mit dem Originaltext. Prüfe gezielt auf:
 Prüfe den Body-Text auf verbleibende ASCII-Umlaut-Ersetzungen:
 
 **Typische Artefakte:**
-- "fuer" statt "für", "ueber" statt "über", "Traeger" statt "Träger"
+- "fuer" statt "für", "ueber" statt "über", "aendern" statt "ändern"
 - Konvertierungs-Artefakte: "Köffizient" (aus Koeffizient), "züinander" (aus zueinander)
 
 **NICHT bemängeln:**
@@ -159,12 +162,12 @@ Prüfe den Body-Text auf verbleibende ASCII-Umlaut-Ersetzungen:
 Prüfe bei 3-5 zufälligen Zitationen ob der zitierte Inhalt thematisch
 zur Quelle PASST. Nutze den kapitel-index der Quellenseite:
 
-- Zitation: `[[mueller2020.pdf#page=45|Mueller 2020, S. 45]]` bei Aussage über Rollschub
-- Quellenseite Mueller2020: kapitel-index zeigt Kap. 3 (S. 40-60) = "Verbundverhalten"
-- Passt "Rollschub" thematisch zu "Verbundverhalten"? → JA, plausibel
+- Zitation: `[[autor2020.pdf#page=45|Autor 2020, S. 45]]` bei Aussage über <Konzept-A>
+- Quellenseite Autor2020: kapitel-index zeigt Kap. 3 (S. 40-60) = "<Oberthema>"
+- Passt <Konzept-A> thematisch zu "<Oberthema>"? → JA, plausibel
 
-- Zitation: `[[mueller2020.pdf#page=45|Mueller 2020, S. 45]]` bei Aussage über Brandschutz
-- Quellenseite Mueller2020: Kein Kapitel zu Brandschutz
+- Zitation: `[[autor2020.pdf#page=45|Autor 2020, S. 45]]` bei Aussage über <Konzept-B>
+- Quellenseite Autor2020: Kein Kapitel zu <Konzept-B>
 - → VERDACHT: Cross-Source-Kontamination. Nutzer konsultieren.
 
 **Resultat:** Alle thematisch konsistent / Verdachtsfälle identifiziert.
@@ -184,7 +187,7 @@ zur Quelle PASST. Nutze den kapitel-index der Quellenseite:
 - Aussagen ohne Beleg: [Liste oder "keine"]
 
 Beispiel fehlender Beleg:
-> "Der Querkraftwiderstand ist stark abhängig von der Auflager-Höhe [BELEG-FEHLT]"
+> "<Fachliche Aussage ohne Quellenangabe> [BELEG-FEHLT]"
 
 ### Part B: Zahlenwerte
 **Resultat:** [n Zahlenwerte gefunden, alle erfasst / m fehlend]
@@ -192,8 +195,8 @@ Beispiel fehlender Beleg:
 - Fehlende Quellenangaben: [Liste]
 
 Beispiel:
-- ✓ "E-Modul = 12.600 N/mm²" [[quelle_2024.pdf#page=34|Autor 2024, S. 34]]
-- ✗ "Verbundspannung max. 8,5 MPa" [BELEG-FEHLT]
+- ✓ "Kennwert = 12.600 N/mm²" [[quelle_2024.pdf#page=34|Autor 2024, S. 34]]
+- ✗ "Spannung max. 8,5 MPa" [BELEG-FEHLT]
 
 ### Part C: Normreferenzen
 **Resultat:** [n Normen, m mit korrekt dokumentiertem Abschnitt]
@@ -201,13 +204,13 @@ Beispiel:
 - Unvollständige Normzüge: [Liste]
 
 Beispiel:
-- ✓ "EC2 Abschnitt 6.2.2" [[ec2-2004.pdf#page=187|EC2:2004, S. 187]]
-- ✗ "DIN 1052" [nur Name, kein Abschnitt]
+- ✓ "<Norm> Abschnitt X.Y.Z" [[norm.pdf#page=187|Norm:Jahr, S. 187]]
+- ✗ "<Normname>" [nur Name, kein Abschnitt]
 
 ### Part D: Spot-Check Seitennummern
 **Stichprobengröße:** [n von N Zitationen] (min 5, skaliert mit 10%)
 - Spot-Check Beispiele:
-  - ✓ S. 156 in quelle_2024.pdf: "Verbundverhalten unter Querkraft" — korrekt
+  - ✓ S. 156 in quelle_2024.pdf: "<Fachthema>" — korrekt
   - ? S. 45 in quelle_2023.pdf: Text vorhanden, aber etwas anders formuliert — vermutlich korrekt
   - ✗ S. 500 in quelle_2024.pdf: Seite existiert nicht (PDF hat nur 380 Seiten)
 
@@ -220,8 +223,8 @@ Beispiel:
 ### Part F: Cross-Source-Kontamination
 **Resultat:** [Alle konsistent / n Verdachtsfälle]
 - Geprüfte Zitationen: [3-5]
-  - ✓ [[mueller2020.pdf#page=45|Mueller 2020, S. 45]] zu "Verbundverhalten" — passt zu kapitel-index
-  - ✗ [[mueller2020.pdf#page=45|Mueller 2020, S. 45]] zu "Brandschutz" — Quelle behandelt kein Brandschutz
+  - ✓ [[autor2020.pdf#page=45|Autor 2020, S. 45]] zu "<Oberthema>" — passt zu kapitel-index
+  - ✗ [[autor2020.pdf#page=45|Autor 2020, S. 45]] zu "<Fremdthema>" — Quelle behandelt dieses Thema nicht
 
 **Gesamtergebnis:** [PASS / PASS MIT HINWEISEN / FAIL]
 ```
@@ -259,7 +262,7 @@ Eines der Kriterien nicht erfüllt:
 
 - **<85 % faktische Aussagen belegt:** Systematische Lücken in der Quellenangabe
 - **≥2 Zahlenwerte ohne Quelle:** Materialkennwerte, Messergebnisse oder Normen-Werte sind unbelegt
-- **≥1 Normenzug ohne Abschnittsnummer:** z.B. nur "EC2" oder "DIN 1052" ohne Bezug zu Abschnitt und Seite
+- **≥1 Normenzug ohne Abschnittsnummer:** z.B. nur Normname ohne Bezug zu Abschnitt und Seite
 - **Spot-Check fehlgeschlagen:** ≥2 Stichproben nicht plausibel (z.B. Seitennummer existiert nicht)
 - **Semantische Verzerrung:** ≥1 Paraphrase materiell verzerrt (Qualifier weggelassen, invertiert, generalisiert)
 - **Cross-Source-Kontamination:** ≥1 Zitation thematisch inkompatibel mit der zitierten Quelle

@@ -29,13 +29,13 @@ Der Konsistenzprüfer ist die dritte Kontrollstelle. Er schaut, ob neu erfasstes
 
 Für jedes Konzept oder jeden technischen Sachverhalt, der im neuen Kapitel erwähnt wird:
 
-1. **Identifiziere Konzepte:** Suche nach Schlüsselbegriffen im Kapitel, die auf Wiki-Seiten verweisen könnten (z.B. "Querkraft", "Verbund", "Auflager").
+1. **Identifiziere Konzepte:** Suche nach Schlüsselbegriffen im Kapitel, die auf Wiki-Seiten verweisen könnten (z.B. domain-spezifische Fachbegriffe, Verfahren, Materialien).
 
 2. **Finde referenzierte Wiki-Seiten:** Prüfe, ob es Wikilinks gibt oder ob Konzepte in `wiki/konzepte/` dokumentiert sind.
 
 3. **Vergleiche Aussagen:**
-   - Neue Aussage: "Die Querkraftübertragung erfolgt primär über die Betonplatte."
-   - Wiki-Seite zu "Querkraftübertragung": Sagt diese das gleiche? Ergänzt es? Oder widerspricht es?
+   - Neue Aussage: "<Fachaussage zu einem bestehenden Konzept>"
+   - Wiki-Seite zu "<Konzeptname>": Sagt diese das gleiche? Ergänzt es? Oder widerspricht es?
 
 4. **Erkennung von Widersprüchen:**
    - **Direkter Widerspruch:** "X tritt auf" vs. "X tritt nicht auf"
@@ -49,9 +49,9 @@ Für jedes Konzept oder jeden technischen Sachverhalt, der im neuen Kapitel erw�
 Prüfe das Kapitel auf `[WIDERSPRUCH]`-Marker:
 
 ```markdown
-Die Querkraftübertragung bei indirekter Auflagerung erfolgt primär über 
-die Betonplatte [WIDERSPRUCH: Wiki "Querkraftübertragung" sagt "über Holz + Betonverbund", 
-Begründung der Abweichung: differente Lastfallbetrachtung S. 156].
+<Fachaussage> erfolgt primär über <Mechanismus A> 
+[WIDERSPRUCH: Wiki "<konzeptseite>" sagt "<Mechanismus B>", 
+Begründung der Abweichung: differente Betrachtungsweise S. 156].
 ```
 
 **Anforderungen:**
@@ -68,11 +68,11 @@ Prüfe alle Wikilinks im Kapitel:
 
 **Format:**
 ```markdown
-Die [[Querkraftübertragung|Querkraft]] im HBV-System zeigt typische Merkmale...
+Die [[<konzeptseite>|<Anzeigename>]] im <Fachbegriff> zeigt typische Merkmale...
 ```
 
 **Anforderungen:**
-- Link-Ziel (z.B. `Querkraftübertragung`) existiert in `wiki/konzepte/` oder `wiki/quellen/` als Datei
+- Link-Ziel (z.B. `<konzeptseite>`) existiert in `wiki/konzepte/` oder `wiki/quellen/` als Datei
 - Anchor-Links (z.B. `[[Seite#Abschnitt]]`) verweisen auf existente Überschriften
 - Keine Links auf nicht-existente Seiten
 
@@ -88,13 +88,13 @@ Die [[Querkraftübertragung|Querkraft]] im HBV-System zeigt typische Merkmale...
 Prüfe, ob neue Inhalte einem bestehenden Konzept entsprechen oder eine Doppelung sind:
 
 **Beispiel:** 
-- Neue Seite `wiki/konzepte/Rollschub-BSP.md`
-- Existierende Seite `wiki/konzepte/Rollschubverhalten.md`
+- Neue Seite `wiki/konzepte/<konzeptseite-A>.md`
+- Existierende Seite `wiki/konzepte/<konzeptseite-B>.md`
 - Sind diese beiden ein und dasselbe Konzept mit verschiedenen Titeln?
 
 **Anforderungen:**
-- Keine zwei Seiten für den gleichen Sachverhalt (z.B. "Querkraftübertragung" und "Kraftfluss-Querkraft")
-- Wenn Unterschied besteht (z.B. "Rollschub allgemein" vs. "Rollschub bei BSP"), ist das klar unterschiedene Konzepte (OK) oder unklare Abgrenzung (NICHT OK)?
+- Keine zwei Seiten für den gleichen Sachverhalt (z.B. "<Konzept-Langform>" und "<Konzept-Kurzform>")
+- Wenn Unterschied besteht (z.B. "<Konzept allgemein>" vs. "<Konzept in spezifischem Kontext>"), ist das klar unterschiedene Konzepte (OK) oder unklare Abgrenzung (NICHT OK)?
 - Synonyme sind in einer Seite dokumentiert, nicht in mehreren
 
 **Resultat:** Keine Dopplungen / fraglich / klare Doppelung.
@@ -111,8 +111,8 @@ Prüfe, ob neue Inhalte einem bestehenden Konzept entsprechen oder eine Doppelun
 **Resultat:** [Keine Widersprüche / Widersprüche identifiziert]
 
 Potenzielle Widersprüche:
-1. Aussage: "Querkraftübertragung primär über Betonplatte"
-   Wiki-Seite: `Querkraftübertragung` sagt "über Holz + Verbund"
+1. Aussage: "<Fachaussage aus neuem Kapitel>"
+   Wiki-Seite: `<konzeptseite>` sagt "<bestehende Aussage>"
    Status: [Potenzielle Abweichung] oder [Komplementär, kein Widerspruch]
    
 ### Part B: Markierung der Widersprüche
@@ -138,7 +138,7 @@ Validierte Wikilinks: [m/M]
 - Konzepte in diesem Kapitel: [n]
 - Überschneidungen mit bestehenden Seiten: [Liste oder "keine"]
 - Verdächtige Paare:
-  - `Querkraftübertragung` ↔️ `Kraftübertragung-Querkraft`?
+  - `<konzeptseite-A>` ↔️ `<konzeptseite-B>`?
     → Status: [Separate Konzepte] oder [Doppelung — sollte zusammengefasst werden]
 
 **Gesamtergebnis:** [PASS / PASS MIT HINWEISEN / FAIL]
@@ -184,7 +184,7 @@ Eines oder mehrere Kriterien nicht erfüllt:
 
 - **1 potenzieller Widerspruch:** Aussage könnte mit Wiki-Seite besser harmonisiert werden, ist aber aus anderem Blickwinkel nicht falsch
 - **Unvollständiger [WIDERSPRUCH]-Marker:** Marker vorhanden, aber Erläuterung könnte ausführlicher sein ("welche Quelle erklärt die Abweichung?")
-- **1–2 Schreib-Fehler in Wikilinks:** z.B. `[[Querkraft-Übertraung]]` (typo), aber Zielseite existiert mit korrekter Schreibweise
+- **1–2 Schreib-Fehler in Wikilinks:** z.B. `[[<Konzept-Tippfehler>]]` (typo), aber Zielseite existiert mit korrekter Schreibweise
 - **1 Konzept könnte zusammengefasst werden:** Überschneidung mit bestehender Seite ist teilweise, nicht vollständig (optional zu vereinigen)
 
 ## Re-Review-Limit

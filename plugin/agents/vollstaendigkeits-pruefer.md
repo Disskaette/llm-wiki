@@ -78,9 +78,9 @@ Zusammenfassung muss:
 Prüfe das **globale** `schlagworte:`-Feld im Frontmatter der Quellenseite (Array — gilt für das gesamte Buch, nicht pro Kapitel):
 - **Mindestens 3 Schlagworte insgesamt (PFLICHT — FAIL-Kriterium wenn <3)**
 - Mindestens 5 Schlagworte empfohlen bei hoch-relevanten Büchern (umfangreiche Lehrbücher, Dissertationen)
-- Schlagworte sind fachspezifisch, nicht generisch (z.B. "Querkraftverhalten im Auflagerbereich" nicht "wichtiges Thema")
+- Schlagworte sind fachspezifisch, nicht generisch (z.B. "<spezifischer Fachbegriff mit Kontext>" nicht "wichtiges Thema")
 - Mindestens 2 der Schlagworte sollten Begriffe sein, die auch in wiki/_vokabular.md definiert sind
-- Fallback-Strategie bei zu wenig spezifischen Tags: Oberbegriffe aus dem Vokabular ergänzen (z.B. "Grenzzustand der Tragfähigkeit", "Grenzzustand der Gebrauchstauglichkeit", Kategorie-Tags wie "EC5" oder "NA")
+- Fallback-Strategie bei zu wenig spezifischen Tags: Oberbegriffe aus dem Vokabular ergänzen (z.B. domain-spezifische Kategorie-Tags oder Oberbegriffe aus `_vokabular.md`)
 
 Zusätzlich (optional): pro Kapitel im `kapitel-index:`-Array kann ein eigenes `schlagworte:`-Feld existieren. Das ist empfehlenswert aber nicht Pflicht und wird nur als Hinweis gewertet.
 

@@ -15,7 +15,7 @@ Der Struktur-Reviewer ist eine **nicht blockierende**, diagnostische Komponente.
 - **Dispatcher:** `/wiki-lint` (manuell oder zeitgesteuert)
 - **Auslöser:** Alle 2 Wochen (optional) oder bei Benutzer-Anfrage
 - **Abhängigkeiten:** Keine
-- **Nachfolger:** Keine. Bericht wird ausgegeben, manuelle Revision durch Betreuer
+- **Nachfolger:** Keine. Bericht wird ausgegeben, manuelle Revision durch Nutzer
 - **Rollback:** Nicht zutreffend (kein Blockierungskriterium)
 
 ## Input
@@ -23,7 +23,7 @@ Der Struktur-Reviewer ist eine **nicht blockierende**, diagnostische Komponente.
 - Komplettes Wiki-Verzeichnis: `wiki/konzepte/`, `wiki/quellen/`, `wiki/verfahren/`
 - Alle Markdown-Dateien mit Wikilinks
 - MOC-Dateien (z.B. `wiki/moc/*.md`)
-- Gliederung und Kapitel aus Masterarbeit
+- Bestehende Gliederung und Kapitelstruktur
 
 ## Prüfungen & Kriterien
 
@@ -40,9 +40,9 @@ Der Struktur-Reviewer ist eine **nicht blockierende**, diagnostische Komponente.
 **Beispiel:**
 ```
 wiki/konzepte/
-  - Querkraft.md ← verlinkt von 5 Seiten
-  - Verbund.md ← verlinkt von 8 Seiten
-  - Rollschub-Nebenschub.md ← VERLINKT VON NIEMANDEM (Waise)
+  - <konzept-A>.md ← verlinkt von 5 Seiten
+  - <konzept-B>.md ← verlinkt von 8 Seiten
+  - <nische-konzept>.md ← VERLINKT VON NIEMANDEM (Waise)
 ```
 
 **Resultat:** Liste von Waisen-Seiten mit Status (neu? vergessen? niche-konzept?).
@@ -58,8 +58,8 @@ wiki/konzepte/
 **Beispiel:**
 ```
 wiki/konzepte/
-  - Verbund.md ← 23 eingehende Links (Hub!)
-  - Holz-Eigenschaften.md ← 18 eingehende Links (grenzwertig)
+  - <zentrales-konzept>.md ← 23 eingehende Links (Hub!)
+  - <breites-konzept>.md ← 18 eingehende Links (grenzwertig)
 ```
 
 **Mögliche Probleme:**
@@ -71,17 +71,17 @@ wiki/konzepte/
 
 ### Part C: Coverage-Lücken (Mentioned but No Page)
 
-**Definition:** Ein Konzept wird mehrfach in der Masterarbeit erwähnt, aber es gibt keine dedizierte Wiki-Seite dafür.
+**Definition:** Ein Konzept wird mehrfach in den Quellen erwähnt, aber es gibt keine dedizierte Wiki-Seite dafür.
 
 **Prüfmechanismus:**
-1. Scanne alle Kapitel der Masterarbeit (`Masterarbeit/kapitel/*.md`)
+1. Scanne alle erfassten Quellenseiten und Konzeptseiten
 2. Extrahiere erwähnte Fachbegriffe (z.B. über Keywords in Frontmatter)
 3. Prüfe, ob für jeden Begriff eine Seite in `wiki/konzepte/` existiert
 4. Dokumentiere Begriffe, die erwähnt, aber nicht als Seite dokumentiert sind
 
 **Beispiel:**
-- Kapitel 3 erwähnt "Schubdehnung" 12-mal
-- Keine Seite `wiki/konzepte/Schubdehnung.md`
+- Quelle X erwähnt "<Fachbegriff>" 12-mal
+- Keine Seite `wiki/konzepte/<fachbegriff>.md`
 - → Coverage-Lücke
 
 **Resultat:** Liste von Begriffen, die eine dedizierte Seite verdienen würden.
@@ -92,15 +92,15 @@ wiki/konzepte/
 
 **Struktur eines MOC:**
 ```markdown
-# MOC: Verbundverhalten
+# MOC: <Themengebiet>
 
 ## Kernkonzepte
-- [[Querkraftübertragung]]
-- [[Verbundspannung]]
-- [[Auflagerbereich]]
+- [[<Konzept-A>]]
+- [[<Konzept-B>]]
+- [[<Konzept-C>]]
 
 ## Prozesse
-- [[Verbundprüfung]]
+- [[<Verfahren-A>]]
 - ...
 ```
 
@@ -112,10 +112,10 @@ wiki/konzepte/
 
 **Beispiel:**
 ```
-MOC: Verbundverhalten
-- Verlinkt: [[Querkraftübertragung]], [[Verbundspannung]]
-- Fehlend: [[Rollschubverhalten]] (gehört logisch dazu, ist aber nicht verlinkt)
-- Falsch verlinkt: [[Holztrocknung]] (gehört nicht zu Verbundverhalten)
+MOC: <Themengebiet>
+- Verlinkt: [[<Konzept-A>]], [[<Konzept-B>]]
+- Fehlend: [[<Konzept-C>]] (gehört logisch dazu, ist aber nicht verlinkt)
+- Falsch verlinkt: [[<Fremd-Konzept>]] (gehört nicht zu <Themengebiet>)
 ```
 
 **Resultat:** Bericht über MOC-Abdeckung pro MOC.
@@ -138,8 +138,8 @@ MOC: Verbundverhalten
 
 | Seite | Grund? | Empfehlung |
 |-------|--------|------------|
-| `Rollschub-Nebenschub.md` | Niche-Konzept, schwach verlinkt | Gehört zur MOC? Mit anderen Links verbinden? |
-| `Historische-Normänderung.md` | Hintergrund-Info, nicht aktiv verlinkt | Zu MOC hinzufügen oder archivieren? |
+| `<nische-konzept>.md` | Niche-Konzept, schwach verlinkt | Gehört zur MOC? Mit anderen Links verbinden? |
+| `<hintergrund-seite>.md` | Hintergrund-Info, nicht aktiv verlinkt | Zu MOC hinzufügen oder archivieren? |
 | ... | ... | ... |
 
 ### Analyse:
@@ -154,8 +154,8 @@ MOC: Verbundverhalten
 
 | Seite | Eingehende Links | Status | Empfehlung |
 |-------|------------------|--------|------------|
-| `Verbund.md` | 23 | Legitimer Hub | Behalten, sehr zentral |
-| `Querkraftübertragung.md` | 21 | Möglicherweise zu breit | In Unter-Konzepte aufteilen? |
+| `<zentrales-konzept>.md` | 23 | Legitimer Hub | Behalten, sehr zentral |
+| `<breites-konzept>.md` | 21 | Möglicherweise zu breit | In Unter-Konzepte aufteilen? |
 | ... | ... | ... | ... |
 
 ### Analyse:
@@ -166,15 +166,15 @@ MOC: Verbundverhalten
 
 ## Part C: Coverage-Lücken (Mentioned but No Wiki Page)
 
-**Analysebereich:** Masterarbeit Kapitel + Keywords
+**Analysebereich:** Wiki-Quellen + Keywords
 
 **Anzahl:** [n Begriffe erwähnt, aber keine Seite]
 
 | Konzept | Erwähnungen | In Kapitel | Empfehlung |
 |---------|-------------|-----------|------------|
-| Schubdehnung | 12× | 2, 4, 5 | Neue Seite erstellen |
-| Verbund-Steifigkeit | 8× | 3 | Neue Seite oder zu bestehendem Konzept hinzufügen |
-| Konstruktive Details | 5× | 6 | Ist sehr breit — mehrere Seiten nötig |
+| <Fachbegriff-A> | 12× | Quelle 1, 3 | Neue Seite erstellen |
+| <Fachbegriff-B> | 8× | Quelle 2 | Neue Seite oder zu bestehendem Konzept hinzufügen |
+| <Fachbegriff-C> | 5× | Quelle 4 | Ist sehr breit — mehrere Seiten nötig |
 | ... | ... | ... | ... |
 
 ### Priorität:
@@ -188,7 +188,7 @@ MOC: Verbundverhalten
 
 **MOCs im Wiki:** [Gesamtanzahl]
 
-### MOC: Verbundverhalten
+### MOC: <Themengebiet-A>
 - **Einträge:** 15 Seiten verlinkt
 - **Status:** 
   - ✓ Vollständig und aktuell
@@ -196,13 +196,13 @@ MOC: Verbundverhalten
   - ✗ Unvollständig
 
 - **Fehlende Seiten:**
-  - `[[Rollschubverhalten]]` (gehört thematisch dazu)
-  - `[[Konstruktion-HBV]]` (optional)
+  - `[[<Konzept-C>]]` (gehört thematisch dazu)
+  - `[[<Konzept-D>]]` (optional)
 
 - **Verwaiste Verlinkungen:**
   - Keine
 
-### MOC: Auflagerausbildung
+### MOC: <Themengebiet-B>
 - Status: ⚠️ Teilweise verlinkt
 - Fehlende: [Liste]
 - Verwaiste: [Liste]
@@ -225,7 +225,7 @@ MOC: Verbundverhalten
 
 ---
 
-## Nächste Schritte (Betreuer-Empfehlung)
+## Nächste Schritte (Empfehlung)
 
 1. **Priorität Hoch:** Neue Seiten für hochfrequente Begriffe erstellen (Part C)
 2. **Priorität Mittel:** Waisen-Seiten überprüfen und verlinken oder archivieren (Part A)
@@ -235,7 +235,7 @@ MOC: Verbundverhalten
 
 ## Rückgabe
 
-**KEIN PASS/FAIL.** Dieser Agent gibt einen **informativen Bericht** aus. Das Ergebnis wird vom Betreuer oder Nutzer manuell reviewed.
+**KEIN PASS/FAIL.** Dieser Agent gibt einen **informativen Bericht** aus. Das Ergebnis wird vom Nutzer manuell reviewed.
 
 Mögliche Handlungen nach Bericht:
 - **Neue Seiten erstellen** für Coverage-Lücken
@@ -245,9 +245,9 @@ Mögliche Handlungen nach Bericht:
 
 ## Re-Review-Limit
 
-**NICHT-VERHANDELBAR für die Betreuer-Reviewzeit:** Maximal 2 Revisions-Schleifen pro Bericht-Zyklus.
+**NICHT-VERHANDELBAR für die Reviewzeit:** Maximal 2 Revisions-Schleifen pro Bericht-Zyklus.
 
-- **Iteration 1:** Bericht wird generiert, Betreuer reviewt und priorisiert Maßnahmen
+- **Iteration 1:** Bericht wird generiert, Nutzer reviewt und priorisiert Maßnahmen
 - **Iteration 2:** Nutzer nimmt Maßnahmen vor, neuer Bericht wird generiert zur Validierung
 - Nach Iteration 2: Bericht ist abgeschlossen; neue Probleme müssen auf nächsten `/wiki-lint` Lauf warten (typisch 2 Wochen später)
 

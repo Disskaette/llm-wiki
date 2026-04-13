@@ -1,5 +1,8 @@
 # Subagent: Norm-Reviewer
 
+> **Bedingung:** Dieser Agent ist nur relevant wenn Domain-Typ "norm"
+> in seitentypen.md aktiv ist. Andernfalls wird er nicht dispatcht.
+
 ## Governance-Zuständigkeit
 
 | Hard Gate | Verantwortung | Status |
@@ -8,7 +11,7 @@
 
 ## Rolle
 
-Der Norm-Reviewer wird von `/normenupdate` aufgerufen und überprüft die Auswirkungen von Norm-Änderungen auf das Wiki und die Masterarbeit. Wenn z.B. DIN EN 1995-1-1 eine neuen Abschnitt einführt oder alte Zahlenwerte ändert: Welche Konzept-Seiten sind betroffen? Sind die alten → neuen Übergänge dokumentiert? Ist die alte Norm als "ersetzt" markiert? Wurden Zahlenwerte propagiert?
+Der Norm-Reviewer wird von `/normenupdate` aufgerufen und überprüft die Auswirkungen von Norm-Änderungen auf das Wiki. Wenn z.B. eine Norm einen neuen Abschnitt einführt oder alte Zahlenwerte ändert: Welche Konzept-Seiten sind betroffen? Sind die alten → neuen Übergänge dokumentiert? Ist die alte Norm als "ersetzt" markiert? Wurden Zahlenwerte propagiert?
 
 ## Governance
 
@@ -24,7 +27,6 @@ Der Norm-Reviewer wird von `/normenupdate` aufgerufen und überprüft die Auswir
 - Neue Norm-Datei: `wiki/quellen/[Neue-Norm].md` (mit neuem Inhalt)
 - Alle Konzept-Seiten: `wiki/konzepte/*.md`
 - Alle Verfahrens-Seiten: `wiki/verfahren/*.md`
-- Masterarbeit-Kapitel: `Masterarbeit/kapitel/*.md`
 
 ## Prüfungen & Kriterien
 
@@ -34,7 +36,7 @@ Der Norm-Reviewer wird von `/normenupdate` aufgerufen und überprüft die Auswir
 1. Vergleiche alte und neue Norm-Datei auf Unterschiede:
    - Neue Abschnitte hinzugefügt?
    - Alte Abschnitte entfernt oder umbenannt?
-   - Zahlenwerte geändert (z.B. Sicherheitsbeiwert, Materialkennwerte)?
+   - Zahlenwerte geändert (z.B. normspezifische Koeffizienten, Kennwerte)?
    - Anforderungen verschärft oder gelockert?
 
 2. Scanne alle `wiki/konzepte/*.md` Dateien:
@@ -47,13 +49,12 @@ Der Norm-Reviewer wird von `/normenupdate` aufgerufen und überprüft die Auswir
    - Seiten, die Proceduren beschreiben, die auf alte Norm basieren
 
 **Beispiel:**
-- Alte Norm: DIN EN 1995-1-1:2004+A1
-- Neue Norm: DIN EN 1995-1-1:2010
-- Änderung: Sicherheitsbeiwert γ_M ändert sich von 1,25 auf 1,30
+- Alte Norm: <Norm:Alte-Version>
+- Neue Norm: <Norm:Neue-Version>
+- Änderung: normspezifischer Koeffizient ändert sich von X auf Y
 - Betroffene Seiten:
-  - `wiki/konzepte/Sicherheitsbeiwert.md` (enthält γ_M = 1,25)
-  - `wiki/verfahren/Bemessung-HBV.md` (verwendet γ_M in Formeln)
-  - Kapitel 4 der Masterarbeit (enthält Beispielrechnung mit altem Beiwert)
+  - `wiki/konzepte/<koeffizient-seite>.md` (enthält alten Wert)
+  - `wiki/verfahren/<verfahrensseite>.md` (verwendet Koeffizient in Formeln)
 
 **Resultat:** [n Seiten identifiziert] oder [Identifikation unvollständig].
 
@@ -64,19 +65,19 @@ Jede betroffene Seite muss dokumentieren, was sich geändert hat und warum.
 
 **Format auf betroffener Konzept-Seite:**
 ```markdown
-# Sicherheitsbeiwert
+# <Koeffizient/Kennwert>
 
 ## Aktuelle Definition
-γ_M = 1,30 [@DIN_EN_1995-1-1:2010, Abschnitt 2.3, S. 18]
+<Wert> = <neuer Wert> [@Norm:Neue-Version, Abschnitt X.Y, S. Z]
 
 ## Änderungen
-- **Seit DIN EN 1995-1-1:2010:** γ_M erhöht von 1,25 auf 1,30
-  - *Grund:* Verschärfte Sicherheitsanforderungen bei Verbund
-  - *Auswirkung:* Bemessung wird konservativer
-  - *Alte Version:* siehe [[Sicherheitsbeiwert-DIN2004|historische Version]]
+- **Seit <Norm:Neue-Version>:** <Wert> geändert von <alt> auf <neu>
+  - *Grund:* <Begründung der Normänderung>
+  - *Auswirkung:* <Konsequenz für Berechnungen/Verfahren>
+  - *Alte Version:* siehe [[<historische-Version-Seite>|historische Version]]
 
 ## Historischer Kontext
-[@DIN_EN_1995-1-1:2004+A1, Abschnitt 2.3] nutzte γ_M = 1,25.
+[@Norm:Alte-Version, Abschnitt X.Y] nutzte <Wert> = <alter Wert>.
 ```
 
 **Prüfung:**
@@ -90,9 +91,9 @@ Jede betroffene Seite muss dokumentieren, was sich geändert hat und warum.
 
 **Format auf alter Norm-Seite:**
 ```markdown
-# DIN EN 1995-1-1:2004+A1
+# <Norm:Alte-Version>
 
-⚠️ **Diese Norm ist ersetzt.** Siehe [[DIN EN 1995-1-1:2010]].
+⚠️ **Diese Norm ist ersetzt.** Siehe [[<Norm:Neue-Version>]].
 
 ---
 
@@ -109,19 +110,18 @@ Jede betroffene Seite muss dokumentieren, was sich geändert hat und warum.
 ### Part D: Sind Zahlenwerte-Änderungen propagiert?
 
 **Prüfmechanismus:**
-1. Identifiziere alle geänderten Zahlenwerte (z.B. γ_M: 1,25 → 1,30)
-2. Suche in allen Seiten nach alten Werten (`1,25`)
+1. Identifiziere alle geänderten Zahlenwerte (z.B. normspezifische Koeffizienten: alt → neu)
+2. Suche in allen Seiten nach alten Werten
 3. Prüfe, ob sie aktualisiert worden sind
 4. Markiere übersehene Zahlenwerte
 
 **Beispiel:**
-- Alt: "Sicherheitsbeiwert γ_M = 1,25" [@DIN_EN_1995-1-1:2004+A1, S. 10]
-- Neu: "Sicherheitsbeiwert γ_M = 1,30" [@DIN_EN_1995-1-1:2010, S. 18]
+- Alt: "<Koeffizient> = <alter Wert>" [@Norm:Alte-Version, S. 10]
+- Neu: "<Koeffizient> = <neuer Wert>" [@Norm:Neue-Version, S. 18]
 
 Durchsuche Wiki:
-- ✓ `wiki/konzepte/Sicherheitsbeiwert.md` — aktualisiert
-- ✗ `wiki/verfahren/Bemessung-BSH.md` — enthält noch "γ_M = 1,25"
-- ✗ `Masterarbeit/kapitel/03-Grundlagen.md` — Beispielrechnung nutzt noch alten Wert
+- ✓ `wiki/konzepte/<koeffizient-seite>.md` — aktualisiert
+- ✗ `wiki/verfahren/<verfahrensseite>.md` — enthält noch alten Wert
 
 **Resultat:** [n Zahlenwerte aktualisiert, m übersehen].
 
@@ -142,19 +142,17 @@ Durchsuche Wiki:
 
 | Seite | Reason | Priority |
 |-------|--------|----------|
-| `wiki/konzepte/Sicherheitsbeiwert.md` | γ_M Zahlenwert geändert | Hoch |
-| `wiki/verfahren/Bemessung-HBV.md` | Nutzt γ_M in Formeln | Hoch |
-| `Masterarbeit/kapitel/03-Grundlagen.md` | Enthält Beispielrechnung mit γ_M | Mittel |
-| `wiki/konzepte/Materialkennwerte.md` | Enthält alte Norm-Referenz | Niedrig |
+| `wiki/konzepte/<koeffizient-seite>.md` | Zahlenwert geändert | Hoch |
+| `wiki/verfahren/<verfahrensseite>.md` | Nutzt Koeffizient in Formeln | Hoch |
+| `wiki/konzepte/<kennwerte-seite>.md` | Enthält alte Norm-Referenz | Niedrig |
 
 ### Part B: Dokumentation der Änderungen
 
 **Status:** [Alle dokumentiert / Teilweise / Nicht dokumentiert]
 
 Seiten mit Änderungs-Dokumentation:
-- ✓ `Sicherheitsbeiwert.md` — hat `## Änderungen` Sektion
-- ✗ `Bemessung-HBV.md` — keine Dokumentation der Norm-Änderung
-- ✗ `Masterarbeit/kapitel/03-Grundlagen.md` — alte Beispielrechnung nicht aktualisiert
+- ✓ `<koeffizient-seite>.md` — hat `## Änderungen` Sektion
+- ✗ `<verfahrensseite>.md` — keine Dokumentation der Norm-Änderung
 
 Fehlende Dokumentationen: [Liste]
 
@@ -164,8 +162,8 @@ Fehlende Dokumentationen: [Liste]
 
 | Norm | Banner | Link zur Neuen | Status |
 |------|--------|----------------|--------|
-| `DIN EN 1995-1-1:2004+A1` | ✓ Vorhanden | ✓ → 2010er | Korrekt |
-| `EC2:2004` | ✗ Fehlt | ✓ | [NICHT-MARKIERT] |
+| `<Norm:Alte-Version>` | ✓ Vorhanden | ✓ → Neue Version | Korrekt |
+| `<Norm-B:Alte-Version>` | ✗ Fehlt | ✓ | [NICHT-MARKIERT] |
 
 Nicht markierte alte Normen: [m]
 
@@ -175,20 +173,19 @@ Nicht markierte alte Normen: [m]
 
 | Zahlenwert | Alter Wert | Neuer Wert | Quellen-Norm | Status |
 |------------|-----------|-----------|-------------|--------|
-| γ_M | 1,25 | 1,30 | DIN EN 1995-1-1 | Unterschiedlich propagiert (s.u.) |
-| E-Modul Fichte | 12.000 | 12.600 | DIN EN 1995-1-1 | Unterschiedlich propagiert |
+| <Koeffizient-A> | <alter Wert> | <neuer Wert> | <Norm> | Unterschiedlich propagiert (s.u.) |
+| <Kennwert-B> | <alter Wert> | <neuer Wert> | <Norm> | Unterschiedlich propagiert |
 
 #### Propagierungs-Status pro Zahlenwert:
 
-**γ_M (1,25 → 1,30):**
-- ✓ `wiki/konzepte/Sicherheitsbeiwert.md` — aktualisiert
-- ✗ `wiki/verfahren/Bemessung-BSH.md` — enthält noch 1,25
-- ✗ `Masterarbeit/kapitel/04-Nachweis.md` — Beispiel-Rechnung veraltet (S. 67)
+**<Koeffizient-A> (<alter Wert> → <neuer Wert>):**
+- ✓ `wiki/konzepte/<koeffizient-seite>.md` — aktualisiert
+- ✗ `wiki/verfahren/<verfahrensseite-A>.md` — enthält noch alten Wert
 
-**E-Modul Fichte (12.000 → 12.600):**
-- ✓ `wiki/konzepte/Materialkennwerte-Holz.md` — aktualisiert
-- ✓ `wiki/verfahren/Bemessung-HBV.md` — aktualisiert
-- ? `Masterarbeit/kapitel/02-Grundlagen.md` — Tabelle mit Zahlenwerten (unklar ob aktualisiert)
+**<Kennwert-B> (<alter Wert> → <neuer Wert>):**
+- ✓ `wiki/konzepte/<kennwerte-seite>.md` — aktualisiert
+- ✓ `wiki/verfahren/<verfahrensseite-B>.md` — aktualisiert
+- ? `wiki/konzepte/<weitere-seite>.md` — Tabelle mit Zahlenwerten (unklar ob aktualisiert)
 
 **Zusammenfassung:**
 - Zahlenwerte aktualisiert: [n]
@@ -201,16 +198,15 @@ Nicht markierte alte Normen: [m]
 
 ### 🔴 Höchste Priorität (unmittelbar aktualisieren)
 
-- `wiki/verfahren/Bemessung-BSH.md` — Formeln enthalten alte γ_M
-- `Masterarbeit/kapitel/04-Nachweis.md` — Beispielrechnung mit γ_M = 1,25 (S. 67, 72)
+- `wiki/verfahren/<verfahrensseite>.md` — Formeln enthalten alten Koeffizienten
 
 ### 🟡 Mittlere Priorität (möglichst bald aktualisieren)
 
-- `Masterarbeit/kapitel/02-Grundlagen.md` — Tabelle mit E-Modul (S. 34)
+- `wiki/konzepte/<weitere-seite>.md` — Tabelle mit Kennwerten
 
 ### 🟢 Niedrige Priorität (Optional, bei nächster Überarbeitung)
 
-- `wiki/konzepte/Historische-Normenentwicklung.md` — nur Kontext-Info
+- `wiki/konzepte/<historische-seite>.md` — nur Kontext-Info
 
 ---
 
