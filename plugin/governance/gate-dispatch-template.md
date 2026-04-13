@@ -51,6 +51,7 @@ Bei FAIL: Der Agent bewertet ob es ein echter Mangel oder ein False Positive ist
 |---|---|
 | `{{QUELLENSEITE_PFAD}}` | Absoluter Pfad zur neuen/aktualisierten Quellenseite |
 | `{{PDF_PFAD}}` | Absoluter Pfad zur Original-PDF (für Kapitelvergleich) |
+| `{{QUELLEN_FORMAT}}` | Format der Quelle: `pdf`, `markdown` oder `url` |
 | `{{DOMAIN_GATES}}` | Aktive bedingte Gates (aus hard-gates.md + seitentypen.md) |
 
 ### Prompt-Template
@@ -74,9 +75,11 @@ Original-PDF: {{PDF_PFAD}}
 0. **Mechanischer Check:** Fuehre zuerst check-wiki-output.sh auf die Quellenseite aus.
    Melde PASS/FAIL/WARN-Ergebnisse im Pruefbericht.
 
-1. **Kapitelerfassung:** Lies das Inhaltsverzeichnis der PDF (erste 5-10 Seiten).
-   Vergleiche mit dem kapitel-index im Frontmatter der Quellenseite.
-   Fehlen ganze Kapitel?
+1. **Kapitelerfassung:** Pruefstrategie je nach Quellen-Format (aus {{QUELLEN_FORMAT}}):
+   - **pdf:** Inhaltsverzeichnis (erste 5-10 Seiten) gegen kapitel-index pruefen
+   - **markdown:** Headings (## und ###) gegen kapitel-index pruefen
+   - **url:** Reduzierte Pruefung — Hauptinhalt erfasst? (keine strenge Kapitelstruktur erwartet)
+   Fehlen ganze Kapitel bzw. wesentliche Abschnitte?
 
 2. **kapitel-index:** Ist er vollständig? Hat jeder Eintrag Seitenangaben?
    Stimmt die Reihenfolge?
@@ -117,6 +120,7 @@ Die vollständige Prüflogik mit Parts A-G ist in `agents/quellen-pruefer.md` de
 |---|---|
 | `{{QUELLENSEITE_PFAD}}` | Absoluter Pfad zur Quellenseite |
 | `{{PDF_PFAD}}` | Absoluter Pfad zur Original-PDF (für Spot-Checks) |
+| `{{QUELLEN_FORMAT}}` | Format der Quelle: `pdf`, `markdown` oder `url` |
 | `{{KONZEPTSEITEN_PFADE}}` | Komma-separierte Pfade zu betroffenen Konzeptseiten |
 | `{{DOMAIN_GATES}}` | Aktive bedingte Gates (aus hard-gates.md + seitentypen.md) |
 
@@ -184,13 +188,17 @@ Diese Checks können NUR du bewerten — das Shell-Script gibt nur WARN:
    - **Echter Mangel:** Inhaltliche Aussage mit "(Autor Jahr)" aber ohne S. X
      → Prüfe im PDF → Ergänze
 
-### B: Spot-Check gegen PDF (min. 5 Stichproben)
+### B: Spot-Check (min. 5 Stichproben bei pdf/markdown, min. 3 bei url)
 
-Wähle mindestens 5 zufällige Seitenangaben aus der Quellenseite.
-Lade die entsprechenden PDF-Seiten und prüfe:
-- Steht die zitierte Aussage tatsächlich auf dieser Seite?
+Spot-Check-Strategie je nach Quellen-Format (aus {{QUELLEN_FORMAT}}):
+- **pdf:** 5 zufaellige Seitenangaben gegen PDF-Seiten verifizieren
+- **markdown:** 5 zufaellige Abschnitts-Referenzen gegen Datei verifizieren
+- **url:** WebFetch erneut ausfuehren + 3 Stichproben pruefen (Inhalt kann sich seit Ingest geaendert haben)
+
+Prüfe bei jeder Stichprobe:
+- Steht die zitierte Aussage tatsächlich an der angegebenen Stelle?
 - Ist die Paraphrase semantisch treu (keine Qualifier weggelassen)?
-- Stimmt die Seitennummer?
+- Stimmt die Seitenangabe bzw. Abschnittsreferenz?
 
 ### C: Umlaute (Shell-Check 09)
 
