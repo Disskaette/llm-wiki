@@ -65,15 +65,15 @@ Grund: Obsidian "shortest path" Wikilink-Aufloesung verlangt Eindeutigkeit.
 VERBOTEN: `wiki/konzepte/querkraft.md` + `wiki/moc/querkraft.md` (Namenskollision)
 ERLAUBT: `wiki/moc/moc-querkraft.md` (Praefix unterscheidet)
 
-## Link-Konventionen
+## Link-Konventionen (5 Typen)
 
-Drei Link-Typen, kontextabhaengig:
-
-| Kontext | Ziel | Syntax |
-|---------|------|--------|
-| Beleg im Fliesstext | PDF mit Seitenangabe | `[[datei.pdf#page=N\|Autor Jahr, S. N]]` |
-| ## Quellen-Abschnitt | Wiki-Quellenseite | `[[quellenseite\|Autor Jahr]]` |
-| Fachbegriff | Konzeptseite | `[[konzeptname\|Anzeigename]]` |
+| Nr | Typ | Quellformat | Syntax |
+|----|-----|-------------|--------|
+| 1 | PDF-Beleg | PDF | `[[datei.pdf#page=N\|Autor Jahr, S. N]]` |
+| 2 | Fachbegriff | Alle | `[[konzeptname\|Anzeigename]]` |
+| 3 | Normverweis | Alle (nur bei aktivem norm-Typ) | `[[normseite\|Norm, §X.Y]]` |
+| 4 | Markdown-Beleg | Markdown | `[[datei.md#heading\|Autor Jahr, Abschnitt "Titel"]]` |
+| 5 | URL-Beleg | URL | `[Titel](url)` (Standard-Markdown-Link, externer Verweis) |
 
 Obsidian Shortest-Path-Aufloesung: Voller Pfad nicht noetig wenn Dateiname eindeutig.
 
