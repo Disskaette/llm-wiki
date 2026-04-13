@@ -1,6 +1,6 @@
 # SPEC-006: Multi-Format-Ingest — PDF, Markdown, URL
 
-**Status:** Planned
+**Status:** Done
 **Version:** 1.0
 **Erstellt:** 2026-04-13
 **Aktualisiert:** 2026-04-13

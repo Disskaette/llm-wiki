@@ -1,5 +1,17 @@
 # Changelog — Bibliothek-Plugin
 
+## 2026-04-13 — SPEC-006: Multi-Format-Ingest
+
+- Format-Erkennung in Phase 0 (PDF/Markdown/URL)
+- {{QUELLEN_FORMAT}} und {{QUELLEN_PFAD}} Platzhalter in Dispatch-Template
+- Frontmatter: pdf: / quelle-datei: / url: + abgerufen: je nach Format
+- 5 Link-Typen (+ Markdown-Beleg, URL-Beleg)
+- Gate 1+2 Format-spezifische Pruefstrategien
+- check-wiki-output.sh Check 17: Quellpfad-Validierung
+- Split-Trigger: PDF >10 MB, Markdown >500 KB
+
+---
+
 ## 2026-04-13 — SPEC-005: Domain-Agnostik
 
 - Core/Domain-Split in seitentypen.md (2 Core + N Domain-Typen)

@@ -4,7 +4,7 @@
 
 ```mermaid
 graph LR
-    A["📄 PDF-Literatur\n(Normen, Papers,\nForschungsberichte)"] -->|"/ingest\n(Split bei >800K)"| B["📖 Wiki-Seiten\n(Quellen, Konzepte,\nNormen, Baustoffe)"]
+    A["📄 PDF / Markdown / URL\n(Normen, Papers,\nForschungsberichte,\nWeb-Artikel)"] -->|"/ingest\n(Format-Erkennung\nin Phase 0)"| B["📖 Wiki-Seiten\n(Quellen, Konzepte,\nNormen, Baustoffe)"]
     B -->|/vokabular| C["📋 Kontrolliertes\nVokabular\n(_vokabular.md)"]
     B -->|/katalog| D["🗂️ Katalog-Index\n(Quellenliste,\nAbdeckungsanalyse)"]
     B -->|/wiki-lint| E["✅ Qualitäts-Check\n(12 Output-Checks,\n19 Konsistenz-Checks)"]
@@ -23,7 +23,7 @@ graph LR
 
 | Skill | Input | Output | Dispatches | Gate-Check |
 |-------|-------|--------|-----------|-----------|
-| `ingest` | PDF-Datei, Metadaten | Wiki-Seite (.md) | → vokabular, katalog | INGEST_STRUCTURE |
+| `ingest` | PDF/Markdown/URL, Metadaten | Wiki-Seite (.md) | → vokabular, katalog | INGEST_STRUCTURE |
 | `vokabular` | Wiki-Seiten | wiki/_vokabular.md | ← ingest, synthese | VOKABULAR_ENFORCEMENT |
 | `katalog` | Wiki-Seiten + Metadaten | INDEX.md, literatur.bib-Vorschlag | ← ingest, normenupdate | KATALOG_CONSISTENCY |
 | `wiki-lint` | Alle Wiki-Seiten | Fehlerbericht, Fixes | ← katalog | WIKI_LINT_RULES |
@@ -56,7 +56,7 @@ Es gibt 9 Subagents, aufgeteilt in 4 Rollen (siehe `governance/naming-konvention
 
 | Agent | Dispatcht von | Auftrag |
 |-------|---------------|---------|
-| `ingest-worker` | /ingest (Phase 0.6) | PDF vollstaendig lesen, Quellenseite erstellen |
+| `ingest-worker` | /ingest (Phase 0.6) | Quelle vollstaendig lesen (PDF/Markdown/URL), Quellenseite erstellen |
 | `synthese-worker` | /synthese (Phase 0.6) | Konzeptseite aus Wiki-Quellenseiten vertiefen |
 
 ### Validator (Format-Check)
@@ -119,6 +119,18 @@ INSTANZ (das konkrete Wiki)
 └── Spezifische Domain-Typ-Konfiguration
 ```
 
+## Multi-Format-Ingest (seit SPEC-006)
+
+Unterstuetzte Quellformate:
+
+| Format | Erkennung | Lese-Strategie | Beleg-Format |
+|--------|-----------|----------------|--------------|
+| PDF | .pdf Extension | Read-Tool mit pages | [[datei.pdf#page=N\|S. N]] |
+| Markdown | .md Extension | Read-Tool direkt | [[datei.md#heading\|Abschnitt "Titel"]] |
+| URL | http(s):// Prefix | WebFetch | [Titel](url) |
+
+Format-Erkennung in Phase 0 (deterministisch). Split-Trigger: PDF >10 MB, Markdown >500 KB.
+
 ## Shell-Checks und Hooks
 
 ### Aktive Hooks (Stand SPEC-003, 2026-04-11)
@@ -147,6 +159,7 @@ INSTANZ (das konkrete Wiki)
 14. **Wikilinks-Aufloesbar**: Alle [[...]]-Links auf existierende Wiki-Dateien (mit Umlaut-Mapping)
 15. **Widerspruch-Marker**: [WIDERSPRUCH]-Marker muessen zwei Quellen nennen
 16. **Review-Status**: Feld `reviewed:` sollte im Frontmatter vorhanden sein
+17. **Quellpfad-Validierung**: Quellenseiten brauchen genau ein Quellpfad-Feld (`pdf:`, `quelle-datei:` oder `url:`)
 
 Entfernte heuristische Checks (brauchen Kontext, den Gate-Agents liefern):
 - ~~04 Zahlenwert-Quelle~~ → Gate 2 (quellen-pruefer), Part A

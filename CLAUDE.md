@@ -105,7 +105,7 @@ bash tests/test-inject-lock-warning.sh             # 7/7 PASS?
 bash tests/test-guard-pipeline-lock.sh             # 10/10 PASS?
 bash tests/test-advance-pipeline-lock.sh           # 20/20 PASS?
 bash tests/test-create-pipeline-lock.sh            # 30/30 PASS?
-bash tests/test-integration-pipeline.sh            # 137/137 PASS?
+bash tests/test-integration-pipeline.sh            # 164/164 PASS?
 ```
 
 Session-Neustart noetig nach Hook-Aenderungen (Claude Code cached im RAM).
