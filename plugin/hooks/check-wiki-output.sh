@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-wiki-output.sh — 13 deterministische Checks fuer Wiki-Seiten
+# check-wiki-output.sh — 14 deterministische Checks fuer Wiki-Seiten
 # Aufruf: ./check-wiki-output.sh <wiki-datei.md> [vokabular-datei.md] [wiki-verzeichnis]
 #
 # Exit 0 = nur PASS/WARN
@@ -226,6 +226,20 @@ if [ "$FM_TYPE" = "quelle" ]; then
     fi
 else
     check PASS "17-quellpfad" "(Typ $FM_TYPE — nicht erforderlich)"
+fi
+
+# --- Check 18: Discovery-Dateien existieren (nur bei Konzeptseiten) ---
+if [ "$FM_TYPE" = "konzept" ]; then
+    DISCOVERY_MISSING=""
+    [ ! -f "${WIKI_DIR}/_konzept-reife.md" ] && DISCOVERY_MISSING="${DISCOVERY_MISSING}_konzept-reife.md, "
+    [ ! -f "${WIKI_DIR}/_schlagwort-vorschlaege.md" ] && DISCOVERY_MISSING="${DISCOVERY_MISSING}_schlagwort-vorschlaege.md, "
+    if [ -n "$DISCOVERY_MISSING" ]; then
+        check FAIL "18-discovery-dateien" "Discovery-Dateien fehlen: ${DISCOVERY_MISSING%, }"
+    else
+        check PASS "18-discovery-dateien" ""
+    fi
+else
+    check PASS "18-discovery-dateien" "(Typ $FM_TYPE — nicht erforderlich)"
 fi
 
 # --- Ergebnis ---
