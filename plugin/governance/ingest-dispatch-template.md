@@ -124,7 +124,7 @@ verlag: "Verlagsname"
 seiten: 842
 kategorie: Fachgebiet  # Level-1-Term aus wiki/_vokabular.md — kein festes Enum
 verarbeitung: vollstaendig  # vollstaendig | gesplittet | nur-katalog | fehlerhaft
-pdf: "[[_pdfs/kategorie/dateiname.pdf]]"
+pdf: "[[pdfs/kategorie/dateiname.pdf]]"
 reviewed: false
 ingest-datum: 2026-04-10
 schlagworte: [Term1, Term2, Term3]  # PFLICHT mindestens 3, empfohlen 5+ bei hoch-relevanten Buechern

@@ -1,5 +1,18 @@
 # Changelog — Bibliothek-Plugin
 
+## 2026-04-13 — SPEC-005: Domain-Agnostik
+
+- Core/Domain-Split in seitentypen.md (2 Core + N Domain-Typen)
+- Bedingte Gates in hard-gates.md (KEIN-NORMBEZUG-OHNE-ABSCHNITT bedingt)
+- Dynamische Kategorien via Vokabular-Oberbegriffe (Level-1 = Kategorien)
+- Bootstrap nur Core-Verzeichnisse, Domain on-demand (Phase 2g)
+- {{DOMAIN_GATES}} Platzhalter in Dispatch-Templates
+- Agent-Beispiele domain-agnostisch parametrisiert
+- valid-types Sync-Check + domain-gates.txt (Check 20+21)
+- _pdfs/ → pdfs/ Vereinheitlichung
+
+---
+
 ## [1.0.0] — 2026-04-08
 
 ### Erstversion
@@ -106,10 +119,10 @@
 - Suchstrategien in using-bibliothek dokumentiert
 
 **PDF-Workflow:**
-- `wiki/_pdfs/neu/` als Eingangsordner — PDFs reinwerfen, "/ingest" oder "neue Quelle" sagen
-- Auto-Sortierung nach Ingest: `_pdfs/<kategorie>/` (holzbau, stahlbeton, normen, etc.)
-- Obsidian PDF-Links im Frontmatter: `pdf: [[_pdfs/kategorie/datei.pdf]]`
-- Trigger-Phrase "neue Quelle im Ordner" scannt automatisch `_pdfs/neu/`
+- `wiki/pdfs/neu/` als Eingangsordner — PDFs reinwerfen, "/ingest" oder "neue Quelle" sagen
+- Auto-Sortierung nach Ingest: `pdfs/<kategorie>/` (holzbau, stahlbeton, normen, etc.)
+- Obsidian PDF-Links im Frontmatter: `pdf: [[pdfs/kategorie/datei.pdf]]`
+- Trigger-Phrase "neue Quelle im Ordner" scannt automatisch `pdfs/neu/`
 
 **Neutralisierung:**
 - Alle Namensreferenzen (Maximilian/Maxi) durch "Nutzer" ersetzt

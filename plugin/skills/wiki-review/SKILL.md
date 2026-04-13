@@ -115,7 +115,7 @@ Ein einziger Fund reicht fuer Full-Audit-Empfehlung.
     - Konzept: `[[konzeptname|Anzeigename]]`
     - Quellenseite: `[[quellenseite|Autor Jahr]]`
   - Markdown-Links (`[text](url)`) statt Wikilinks? → melden
-  - PDF-Links: Existiert die referenzierte PDF im Vault (`wiki/_pdfs/`)?
+  - PDF-Links: Existiert die referenzierte PDF im Vault (`wiki/pdfs/`)?
 - **Output:** Tabelle `| Quelle | Link | Problem |`
 
 **1.3 Dateinamen-Konventionen:**

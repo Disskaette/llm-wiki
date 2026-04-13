@@ -94,32 +94,9 @@ Alle `_index/*.md`-Dateien nutzen einheitliches Tabellenformat:
 | [[querkraftuebertragung]] | Querkraft-Fluss | 3 | 2026-04-09 | false |
 ```
 
-### _index/normen.md
-```markdown
-# Index: Normen
-
-| Datei | Norm | Abschnitt | Ausgabe | Status | Reviewed |
-|-------|------|-----------|---------|--------|----------|
-| [[ec2-9-2-5]] | DIN EN 1992-1-1 | 9.2.5 | 2011-01 | gueltig | false |
-```
-
-### _index/baustoffe.md
-```markdown
-# Index: Baustoffe
-
-| Datei | Kategorie | Norm | Reviewed |
-|-------|-----------|------|----------|
-| [[bsh-gl24h]] | Holz | EN 14080 | false |
-```
-
-### _index/verfahren.md
-```markdown
-# Index: Verfahren
-
-| Datei | Norm-Basis | Anwendung | Reviewed |
-|-------|-----------|-----------|----------|
-| [[gamma-verfahren]] | EC5 Anhang B | Nachgiebig verbundene Biegetraeger | false |
-```
+Index-Dateien werden pro existierendem Verzeichnis on-demand angelegt
+(Core: quellen.md, konzepte.md; Domain: bei Bedarf).
+Tabellenformat folgt dem jeweiligen Seitentyp-Schema aus seitentypen.md.
 
 ## Graph View Konfiguration
 
@@ -134,13 +111,10 @@ Zeigt: Konzepte, Verfahren, Baustoffe, Normen, MOCs.
 
 ### Gruppen-Coloring
 
-| Gruppe | Query | Farbe |
-|--------|-------|-------|
-| MOC | `path:moc/` | Rot (grosse Knoten) |
-| Konzept | `path:konzepte/` | Blau |
-| Verfahren | `path:verfahren/` | Gruen |
-| Norm | `path:normen/` | Orange |
-| Baustoff | `path:baustoffe/` | Violett |
+Graph-View-Queries werden aus den aktiven Seitentypen in seitentypen.md
+abgeleitet. Jeder Typ mit eigenem Verzeichnis bekommt eine Farbgruppe:
+- Core-Typen (quellen/, konzepte/) → immer sichtbar
+- Domain-Typen → nur wenn Verzeichnis existiert
 
 Attachments-Toggle: AUS — damit PDFs nicht im Graph erscheinen.
 

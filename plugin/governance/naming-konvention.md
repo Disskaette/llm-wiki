@@ -55,7 +55,7 @@ check-wiki-output.sh Check 3 matcht case-insensitive (grep -qi).
 Beispiele:
 - `quellen/fingerloos-ec2-2016.md` (nicht: `Fingerloos EC2 2016.md`)
 - `konzepte/aufhaengebewehrung.md` (nicht: `Aufhängebewehrung.md`)
-- `normen/ec2-9-2-5.md` (nicht: `EC2 §9.2.5.md`)
+- `normen/<norm-abschnitt>.md` (falls norm-Typ aktiv; nicht: `EC2 §9.2.5.md`)
 
 ## Dateinamen-Eindeutigkeit (NICHT-VERHANDELBAR)
 

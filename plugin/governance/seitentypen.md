@@ -55,7 +55,7 @@ verlag: "Verlagsname"
 seiten: 842
 kategorie: Holzbau  # Level-1-Term aus _vokabular.md (keine feste Enum-Liste)
 verarbeitung: vollstaendig  # vollstaendig | gesplittet | nur-katalog | fehlerhaft
-pdf: "[[_pdfs/stahlbeton/fingerloos-ec2-2016.pdf]]"  # Obsidian-Link zum Original-PDF
+pdf: "[[pdfs/stahlbeton/fingerloos-ec2-2016.pdf]]"  # Obsidian-Link zum Original-PDF
 reviewed: false
 ingest-datum: 2026-04-09
 schlagworte: [term1, term2, term3]

@@ -26,15 +26,12 @@ des Konstruktiven Ingenieurbaus. Es wird vom **Bibliothek-Plugin** verwaltet.
 
 ## Verzeichnisstruktur
 
-- `quellen/` — Quellenseiten (Buch-Zusammenfassungen)
-- `konzepte/` — Konzeptseiten (Fachbegriffe, Phaenomene)
-- `normen/` — Normseiten (Paragraph-Kommentare)
-- `baustoffe/` — Baustoffseiten (Materialeigenschaften)
-- `verfahren/` — Verfahrensseiten (Rechenmethoden)
-- `moc/` — Maps of Content (Navigationsseiten)
-- `_pdfs/` — Original-PDFs (per [[link.pdf]] in Obsidian oeffnen)
-  - `_pdfs/neu/` — Eingangsordner (neue PDFs hier ablegen)
-- `_index/` — Teilindizes pro Seitentyp
+- `quellen/` — Quellenseiten (Core)
+- `konzepte/` — Konzeptseiten (Core)
+- `_index/` — Navigationsindizes (Core)
+- `pdfs/` — Quell-Dateien (Core)
+- Weitere Verzeichnisse (normen/, baustoffe/, verfahren/, moc/) entstehen
+  on-demand wenn der Ingest-Worker entsprechende Inhalte erkennt.
 - `_vokabular.md` — Kontrolliertes Fachvokabular
 - `_log.md` — Chronologisches Aenderungsprotokoll
 
