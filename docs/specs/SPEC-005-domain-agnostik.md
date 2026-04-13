@@ -234,7 +234,7 @@ wiki-review Phase 0.8 liest bereits seitentypen.md dynamisch. Ergaenzungen:
 - [ ] config/valid-types.txt wird aus seitentypen.md abgeleitet
 - [ ] Bestehendes Bauingenieur-Wiki funktioniert ohne Aenderung
 - [ ] check-consistency.sh validiert Core/Domain-Split
-- [ ] 19/19 Konsistenz-Checks PASS
+- [ ] 21/21 Konsistenz-Checks PASS (2 neue: valid-types-sync, domain-gates-valid)
 - [ ] Alle bestehenden Hook-Tests PASS (Rueckwaertskompatibilitaet)
 
 ## Edge Cases
