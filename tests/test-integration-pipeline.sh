@@ -20,7 +20,7 @@
 #   5. Cleanup — Lock geloescht, System wieder frei
 #   6. Multi-Skill — synthese/normenupdate/vokabular Transcripts
 #   7. Edge Cases — korrupte Daten, fehlende Dateien
-#   8. check-wiki-output — deterministische Seiten-Checks (12 Checks)
+#   8. check-wiki-output — deterministische Seiten-Checks (13 Checks)
 #   9. Synthese-Pipeline-Lifecycle — synthese-worker Lock, Cross-Block
 #  10. INGEST-ID-Matching — ID-basiertes Gate-Counting
 #  11. Vollstaendiger Lifecycle (End-to-End Replay)
@@ -557,6 +557,7 @@ ausgabe: 2022
 schlagworte:
   - Stahlbeton
   - Querkraft
+pdf: stahlbetonbau-ec2.pdf
 kapitel-index:
   - "1. Grundlagen"
   - "2. Bemessung"
@@ -625,6 +626,7 @@ type: quelle
 title: "Mit Markern"
 schlagworte:
   - Stahlbeton
+pdf: marker-test.pdf
 kapitel-index:
   - "1. Test"
 reviewed: false
@@ -648,6 +650,7 @@ type: quelle
 title: "Synthese Marker"
 schlagworte:
   - Stahlbeton
+pdf: synth-marker-test.pdf
 kapitel-index:
   - "1. Test"
 reviewed: false
@@ -672,6 +675,7 @@ title: "Unbekannte Tags"
 schlagworte:
   - Stahlbeton
   - NichtImVokabular
+pdf: bad-tags-test.pdf
 kapitel-index:
   - "1. Test"
 reviewed: false
@@ -693,6 +697,7 @@ type: quelle
 title: "Ohne Index"
 schlagworte:
   - Biegung
+pdf: ohne-index-test.pdf
 reviewed: false
 ---
 
@@ -733,6 +738,7 @@ type: quelle
 title: "Stahlbetonbau nach EC2"
 schlagworte:
   - Stahlbeton
+pdf: dupe-test.pdf
 kapitel-index:
   - "1. Test"
 reviewed: false
@@ -805,6 +811,7 @@ cat > "$INLINE_TAGS_PAGE" << 'INLINE_EOF'
 type: quelle
 title: "Inline Tags"
 schlagworte: [Stahlbeton, Querkraft]
+pdf: inline-tags-test.pdf
 kapitel-index:
   - "1. Test"
 reviewed: false
@@ -826,6 +833,7 @@ type: quelle
 title: "Ohne Review"
 schlagworte:
   - Biegung
+pdf: ohne-review-test.pdf
 kapitel-index:
   - "1. Test"
 ---
@@ -869,6 +877,7 @@ title: "Single Quote Tags"
 schlagworte:
   - 'Stahlbeton'
   - 'Querkraft'
+pdf: single-quote-test.pdf
 kapitel-index:
   - "1. Test"
 reviewed: false
@@ -889,6 +898,7 @@ type: quelle
 title: "Beton"
 schlagworte:
   - Stahlbeton
+pdf: beton-kurz-test.pdf
 kapitel-index:
   - "1. Test"
 reviewed: false
@@ -919,6 +929,118 @@ TYPTEST_EOF
   OUT_TT=$(bash "$CHECK_OUTPUT" "$TYPTEST_PAGE" "$VOKABULAR" "$SANDBOX/wiki/" 2>&1)
   assert_not_contains "E: Typ '${VALID_TYPE}' → Check 02 kein FAIL" "02-seitentyp-gueltig.*FAIL" "$OUT_TT"
 done
+
+# 8v: Check 17 — Quellenseite mit pdf: → PASS
+QP_PDF_PAGE="$SANDBOX/wiki/quellen/qp-pdf.md"
+cat > "$QP_PDF_PAGE" << 'QP_PDF_EOF'
+---
+type: quelle
+title: "Quelle mit PDF"
+schlagworte:
+  - Stahlbeton
+pdf: test-source.pdf
+kapitel-index:
+  - "1. Test"
+reviewed: false
+---
+
+# Quelle mit PDF
+QP_PDF_EOF
+
+OUT_8V=$(bash "$CHECK_OUTPUT" "$QP_PDF_PAGE" "$VOKABULAR" "$SANDBOX/wiki/" 2>&1)
+RC_8V=$?
+assert "E: Quellenseite mit pdf: → exit 0" "0" "$RC_8V"
+assert_not_contains "E: Check 17 kein FAIL bei pdf:" "17-quellpfad.*FAIL" "$OUT_8V"
+
+# 8w: Check 17 — Quellenseite mit quelle-datei: → PASS
+QP_DATEI_PAGE="$SANDBOX/wiki/quellen/qp-datei.md"
+cat > "$QP_DATEI_PAGE" << 'QP_DATEI_EOF'
+---
+type: quelle
+title: "Quelle mit Datei"
+schlagworte:
+  - Stahlbeton
+quelle-datei: vorlesung-scan.jpg
+kapitel-index:
+  - "1. Test"
+reviewed: false
+---
+
+# Quelle mit Datei
+QP_DATEI_EOF
+
+OUT_8W=$(bash "$CHECK_OUTPUT" "$QP_DATEI_PAGE" "$VOKABULAR" "$SANDBOX/wiki/" 2>&1)
+RC_8W=$?
+assert "E: Quellenseite mit quelle-datei: → exit 0" "0" "$RC_8W"
+assert_not_contains "E: Check 17 kein FAIL bei quelle-datei:" "17-quellpfad.*FAIL" "$OUT_8W"
+
+# 8x: Check 17 — Quellenseite mit url: + abgerufen: → PASS (kein WARN)
+QP_URL_PAGE="$SANDBOX/wiki/quellen/qp-url.md"
+cat > "$QP_URL_PAGE" << 'QP_URL_EOF'
+---
+type: quelle
+title: "Quelle mit URL"
+schlagworte:
+  - Stahlbeton
+url: https://example.com/paper.html
+abgerufen: 2026-04-13
+kapitel-index:
+  - "1. Test"
+reviewed: false
+---
+
+# Quelle mit URL
+QP_URL_EOF
+
+OUT_8X=$(bash "$CHECK_OUTPUT" "$QP_URL_PAGE" "$VOKABULAR" "$SANDBOX/wiki/" 2>&1)
+RC_8X=$?
+assert "E: Quellenseite mit url: + abgerufen: → exit 0" "0" "$RC_8X"
+assert_not_contains "E: Check 17 kein FAIL bei url:" "17-quellpfad.*FAIL" "$OUT_8X"
+assert_not_contains "E: Check 17 kein WARN bei url: + abgerufen:" "17-url-abgerufen.*WARN" "$OUT_8X"
+
+# 8y: Check 17 — Quellenseite mit url: OHNE abgerufen: → WARN (nicht FAIL)
+QP_URL_NOWARN_PAGE="$SANDBOX/wiki/quellen/qp-url-no-abruf.md"
+cat > "$QP_URL_NOWARN_PAGE" << 'QP_URL_NOWARN_EOF'
+---
+type: quelle
+title: "URL ohne Abrufdatum"
+schlagworte:
+  - Stahlbeton
+url: https://example.com/paper2.html
+kapitel-index:
+  - "1. Test"
+reviewed: false
+---
+
+# URL ohne Abrufdatum
+QP_URL_NOWARN_EOF
+
+OUT_8Y=$(bash "$CHECK_OUTPUT" "$QP_URL_NOWARN_PAGE" "$VOKABULAR" "$SANDBOX/wiki/" 2>&1)
+RC_8Y=$?
+assert "E: Quellenseite mit url: ohne abgerufen: → exit 0 (nur WARN, kein FAIL)" "0" "$RC_8Y"
+assert_contains "E: Check 17 WARN bei url: ohne abgerufen:" "17-url-abgerufen" "$OUT_8Y"
+assert_not_contains "E: Check 17 kein FAIL bei url: ohne abgerufen:" "17-quellpfad.*FAIL" "$OUT_8Y"
+
+# 8z: Check 17 — Quellenseite OHNE jeglichen Quellpfad → FAIL
+QP_NONE_PAGE="$SANDBOX/wiki/quellen/qp-none.md"
+cat > "$QP_NONE_PAGE" << 'QP_NONE_EOF'
+---
+type: quelle
+title: "Quelle ohne Pfad"
+schlagworte:
+  - Stahlbeton
+kapitel-index:
+  - "1. Test"
+reviewed: false
+---
+
+# Quelle ohne Pfad
+QP_NONE_EOF
+
+OUT_8Z=$(bash "$CHECK_OUTPUT" "$QP_NONE_PAGE" "$VOKABULAR" "$SANDBOX/wiki/" 2>&1)
+RC_8Z=$?
+assert "E: Quellenseite ohne Quellpfad → exit 1 (FAIL)" "1" "$RC_8Z"
+assert_contains "E: Check 17 meldet fehlenden Quellpfad" "17-quellpfad" "$OUT_8Z"
 
 # ============================================================
 # PHASE 9: Synthese-Pipeline-Lifecycle

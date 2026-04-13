@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-wiki-output.sh — 12 deterministische Checks fuer Wiki-Seiten
+# check-wiki-output.sh — 13 deterministische Checks fuer Wiki-Seiten
 # Aufruf: ./check-wiki-output.sh <wiki-datei.md> [vokabular-datei.md] [wiki-verzeichnis]
 #
 # Exit 0 = nur PASS/WARN
@@ -203,6 +203,29 @@ if grep -q '^reviewed:' "$FILE" 2>/dev/null; then
     check PASS "16-review-status" ""
 else
     check WARN "16-review-status" "Feld 'reviewed:' fehlt im Frontmatter"
+fi
+
+# --- Check 17: Quellpfad vorhanden (nur type: quelle) ---
+if [ "$FM_TYPE" = "quelle" ]; then
+    HAS_PDF=$(grep -c '^pdf:' "$FILE" 2>/dev/null) || HAS_PDF=0
+    HAS_DATEI=$(grep -c '^quelle-datei:' "$FILE" 2>/dev/null) || HAS_DATEI=0
+    HAS_URL=$(grep -c '^url:' "$FILE" 2>/dev/null) || HAS_URL=0
+    if [ "$HAS_PDF" -eq 0 ] && [ "$HAS_DATEI" -eq 0 ] && [ "$HAS_URL" -eq 0 ]; then
+        check FAIL "17-quellpfad" "Weder pdf:, quelle-datei: noch url: im Frontmatter"
+    else
+        check PASS "17-quellpfad" ""
+    fi
+    # URL-Quellen muessen ein Abrufdatum haben
+    if [ "$HAS_URL" -gt 0 ]; then
+        HAS_ABGERUFEN=$(grep -c '^abgerufen:' "$FILE" 2>/dev/null) || HAS_ABGERUFEN=0
+        if [ "$HAS_ABGERUFEN" -eq 0 ]; then
+            check WARN "17-url-abgerufen" "url: ohne abgerufen:-Datum"
+        else
+            check PASS "17-url-abgerufen" ""
+        fi
+    fi
+else
+    check PASS "17-quellpfad" "(Typ $FM_TYPE — nicht erforderlich)"
 fi
 
 # --- Ergebnis ---
