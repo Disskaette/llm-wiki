@@ -30,35 +30,27 @@ description: "Dokument vollstaendig lesen und ins Wiki einpflegen — Kern-Skill
 
 0. **Wiki-Bootstrap (einmalig):**
    - Pruefe ob das Wiki-Verzeichnis existiert: `wiki/`
-   - Falls NICHT: Erstelle die komplette Verzeichnisstruktur:
+   - Falls NICHT: Erstelle die Core-Verzeichnisstruktur:
      ```
      wiki/
      ├── quellen/
      ├── konzepte/
-     ├── normen/
-     ├── baustoffe/
-     ├── verfahren/
-     ├── moc/
      ├── _index/
      │   ├── quellen.md    (leer, mit Header)
-     │   ├── konzepte.md   (leer, mit Header)
-     │   ├── normen.md     (leer, mit Header)
-     │   ├── baustoffe.md  (leer, mit Header)
-     │   └── verfahren.md  (leer, mit Header)
-     ├── _pdfs/
-     │   ├── neu/          (Eingangsordner fuer neue PDFs)
-     │   ├── holzbau/
-     │   ├── stahlbeton/
-     │   ├── normen/
-     │   ├── bauphysik/
-     │   ├── verbundbau/
-     │   └── unlesbar/     (Fallback fuer OCR-lose Scans)
-     ├── _vokabular.md     (leer, mit Header + Kategorie-Gerüst)
+     │   └── konzepte.md   (leer, mit Header)
+     ├── pdfs/
+     │   └── neu/          (Eingangsordner fuer neue Quellen)
+     ├── _vokabular.md     (leer, mit Header + Kategorie-Geruest)
      ├── _log.md           (leer, mit Header)
      ├── .obsidian/
      │   └── app.json      (Obsidian Vault-Konfiguration)
      └── CLAUDE.md          (Regeln fuer LLMs — aus governance/wiki-claude-md.md)
      ```
+   > **Domain-Verzeichnisse on-demand:** Verzeichnisse fuer Domain-Typen (normen/,
+   > baustoffe/, verfahren/, moc/) und Quellen-Unterordner (pdfs/<kategorie>/) werden
+   > NICHT beim Bootstrap angelegt. Sie entstehen automatisch wenn der Worker erstmals
+   > Inhalte dieses Typs erkennt (siehe Phase 2g). Auch die zugehoerigen Index-Dateien
+   > (_index/normen.md etc.) werden erst on-demand erstellt.
    - Wiki-Pfad ist RELATIV zum Projekt-Root: `wiki/`
    - using-bibliothek referenziert diesen Pfad, ARCHITECTURE.md dokumentiert ihn
    - Obsidian-Config: `wiki/.obsidian/app.json` mit Wikilink-Einstellungen
@@ -69,12 +61,12 @@ description: "Dokument vollstaendig lesen und ins Wiki einpflegen — Kern-Skill
 1. **PDF lokalisieren:**
    - Wenn expliziter Pfad angegeben → diesen verwenden
    - Wenn KEIN Pfad angegeben (z.B. "neue Quelle im Ordner"):
-     → Scanne `wiki/_pdfs/neu/` nach PDF-Dateien
+     → Scanne `wiki/pdfs/neu/` nach PDF-Dateien
      → Liste alle gefundenen PDFs auf und frage welche(s) verarbeitet werden soll(en)
      → Bei nur einem PDF: direkt verarbeiten
    - Existiert die Datei?
    - Text extrahierbar? (Read-Tool auf erste 5 Seiten testen)
-   - Wenn kein Text: PDF nach `wiki/_pdfs/unlesbar/` verschieben, Fallback `verarbeitung: nur-katalog`
+   - Wenn kein Text: PDF nach `wiki/pdfs/unlesbar/` verschieben (on-demand angelegt), Fallback `verarbeitung: nur-katalog`
    - Seitenzahl und Dateigroesse ermitteln
 
 2. **Duplikat-Check:**
@@ -254,6 +246,24 @@ Alle Fachbegriffe die als Schlagworte verwendet werden sollen:
    → Gate 4 (vokabular-pruefer) wird PASS MIT HINWEISEN geben
    → Nutzer klaert spaeter via /vokabular
 
+**2g: Domain-Verzeichnisse on-demand anlegen**
+
+Wenn der Worker eine Seite eines Domain-Typs erstellen will (z.B. Normseite):
+1. Pruefe ob das Ziel-Verzeichnis existiert (z.B. `wiki/normen/`)
+2. Falls nicht: Verzeichnis anlegen (`mkdir -p wiki/normen/`)
+3. Pruefe ob eine Index-Datei existiert (`_index/normen.md`)
+4. Falls nicht: Index-Datei mit Tabellen-Header anlegen
+5. Pruefe ob der Typ in `hooks/config/valid-types.txt` steht
+6. Falls nicht: Typ als neue Zeile unter `# Domain-Typen` appenden
+7. Pruefe ob der Typ in `governance/seitentypen.md` Domain-Tabelle steht
+8. Falls nicht: Zeile in Domain-Tabelle ergaenzen
+9. Seite im neuen Verzeichnis erstellen
+
+Fuer Quellen-Unterordner (pdfs/<kategorie>/):
+1. Pruefe ob `pdfs/<kategorie>/` existiert
+2. Falls nicht: `mkdir -p wiki/pdfs/<kategorie>/`
+3. PDF dorthin verschieben/kopieren
+
 ---
 
 ### Phase 3: 4-Gate Review (IRON LAW)
@@ -339,10 +349,11 @@ oder eine andere Aktion gestartet wird.
 
 Pflicht-Nebeneffekte:
 
-- [ ] **PDF sortieren** — Verschiebe das PDF von `_pdfs/neu/` nach `_pdfs/<kategorie>/`
+- [ ] **PDF sortieren** — Verschiebe das PDF von `pdfs/neu/` nach `pdfs/<kategorie>/`
       Kategorie = Frontmatter `kategorie:` der Quellenseite (holzbau, stahlbeton, normen, etc.)
       Dateiname: `<nachname>-<kurztitel>-<jahr>.pdf` (konsistent mit Quellenseite)
-- [ ] **PDF-Link in Quellenseite** — Fuege `pdf: [[_pdfs/<kategorie>/<dateiname>.pdf]]`
+      Falls `pdfs/<kategorie>/` nicht existiert: on-demand anlegen (siehe Phase 2g)
+- [ ] **PDF-Link in Quellenseite** — Fuege `pdf: [[pdfs/<kategorie>/<dateiname>.pdf]]`
       ins Frontmatter ein (Obsidian oeffnet PDF per Klick)
 - [ ] **_index/ aktualisieren** — Neue/aktualisierte Seiten in die relevanten Teilindizes eintragen
 - [ ] **_log.md Eintrag** — Chronologischer Eintrag mit Datum, Buch, Ergebnis, beruehrte Seiten
