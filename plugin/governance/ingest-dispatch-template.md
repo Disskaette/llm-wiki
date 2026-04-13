@@ -25,7 +25,9 @@ Modellwahl (Opus/Sonnet) richtet sich weiterhin nach der Seitenzahl pro Split-Bl
 
 | Platzhalter | Inhalt |
 |-------------|--------|
-| `{{PDF_PFAD}}` | Absoluter Pfad zur PDF-Datei |
+| `{{PDF_PFAD}}` | Absoluter Pfad zur PDF-Datei (Alias fuer `{{QUELLEN_PFAD}}` wenn Format=pdf) |
+| `{{QUELLEN_FORMAT}}` | pdf, markdown oder url |
+| `{{QUELLEN_PFAD}}` | Absoluter Pfad zur Datei oder URL |
 | `{{WIKI_ROOT}}` | Absoluter Pfad zum Wiki-Verzeichnis |
 | `{{QUELLENSEITE_DATEI}}` | Ziel-Dateiname der Quellenseite (z.B. `fingerloos-ec2-2016.md`) |
 | `{{BESTEHENDE_KONZEPTE}}` | Komma-separierte Liste existierender Konzeptseiten |
@@ -58,10 +60,25 @@ Kontrolliertes Vokabular (erlaubte Terme):
 {{VOKABULAR_TERME}}
 
 ═══════════════════════════════════════════════════════
+QUELLEN-FORMAT UND LESE-STRATEGIE
+═══════════════════════════════════════════════════════
+
+Format: {{QUELLEN_FORMAT}}
+Pfad:   {{QUELLEN_PFAD}}
+
+Lese-Strategie:
+- pdf: Read-Tool mit pages-Parameter. Jede Seite lesen.
+  Seitenangaben im Text: (S. 42), (S. 42-48)
+- markdown: Read-Tool direkt auf gesamte Datei.
+  Abschnitts-Referenzen statt Seiten: (Abschnitt "Titel")
+- url: WebFetch-Tool. HTML als Text extrahieren.
+  Abschnitts-Referenzen wenn Headings vorhanden, sonst keine.
+
+═══════════════════════════════════════════════════════
 AUFTRAG
 ═══════════════════════════════════════════════════════
 
-1. Lies die PDF VOLLSTAENDIG. Jede Seite. Kein Ueberspringen.
+1. Lies die Quelle VOLLSTAENDIG. Jede Seite / jeden Abschnitt. Kein Ueberspringen.
 2. Schreibe GENAU EINE Quellenseite: {{WIKI_ROOT}}/quellen/{{QUELLENSEITE_DATEI}}
 3. Aktualisiere bestehende Konzeptseiten (neuen Quellenverweis + Seitenangabe
    hinzufuegen) — NUR Seiten aus der Liste {{BESTEHENDE_KONZEPTE}}.
@@ -124,7 +141,11 @@ verlag: "Verlagsname"
 seiten: 842
 kategorie: Fachgebiet  # Level-1-Term aus wiki/_vokabular.md — kein festes Enum
 verarbeitung: vollstaendig  # vollstaendig | gesplittet | nur-katalog | fehlerhaft
-pdf: "[[pdfs/kategorie/dateiname.pdf]]"
+# Genau EINES der folgenden Felder (je nach Quellen-Format):
+pdf: "[[pdfs/kategorie/dateiname.pdf]]"           # nur bei PDF-Quellen
+quelle-datei: "[[quellen-dateien/kategorie/dateiname.md]]"  # nur bei Markdown-Quellen
+url: "https://example.com/artikel"                 # nur bei URL-Quellen
+abgerufen: 2026-04-13                              # nur bei URL-Quellen (Pflicht)
 reviewed: false
 ingest-datum: 2026-04-10
 schlagworte: [Term1, Term2, Term3]  # PFLICHT mindestens 3, empfohlen 5+ bei hoch-relevanten Buechern
