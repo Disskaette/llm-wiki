@@ -10,9 +10,17 @@
 
 **Specs:** `docs/specs/SPEC-005-domain-agnostik.md`, `docs/specs/SPEC-006-multi-format-ingest.md`
 
+**Bekannte Code-Realitaeten (aus Validierung 2026-04-13):**
+- `_pdfs/` im Code vs `pdfs/` im Wiki — Wiki verwendet `pdfs/` (ohne Unterstrich).
+  Governance-Dateien referenzieren noch `_pdfs/`. Migration auf `pdfs/` in Task 8.
+- check-wiki-output.sh hat KEINEN bestehenden `pdf:`-Check — Task 15 schreibt neuen Check.
+- norm-reviewer Dispatch-Bedingung ist Prompt-Level (dispatchender Skill prueft seitentypen.md),
+  nicht Hook-Level (hooks.json Matcher bleiben unveraendert).
+- plugin.json Version-Bump in Task 10.
+
 **Pflicht-Checks nach JEDEM Task:**
 ```bash
-bash plugin/hooks/check-consistency.sh plugin/    # 19/19 PASS?
+bash plugin/hooks/check-consistency.sh plugin/    # 19/19 PASS? (ab Task 3: 21/21)
 diff <(sed -n '/<!-- BEGIN HARD-GATES -->/,/<!-- END HARD-GATES -->/p' plugin/skills/using-bibliothek/SKILL.md | sed '1d;$d') plugin/governance/hard-gates.md
 bash tests/test-guard-wiki-writes.sh
 bash tests/test-inject-lock-warning.sh
@@ -518,16 +526,32 @@ Ersetze die feste Verzeichnisliste durch Core + Hinweis auf Domain:
   on-demand wenn der Ingest-Worker entsprechende Inhalte erkennt.
 ```
 
-- [ ] **Step 3: naming-konvention.md — Beispiele generalisieren**
+- [ ] **Step 3: `_pdfs/` → `pdfs/` Vereinheitlichung**
+
+Das tatsaechliche Wiki verwendet `pdfs/` (ohne Unterstrich). Governance-Dateien
+referenzieren noch `_pdfs/`. Ersetze in allen Governance-Dateien `_pdfs/` durch `pdfs/`:
+
+```bash
+grep -rl '_pdfs/' plugin/governance/ plugin/skills/ | head -20
+```
+
+Fuer jede Fundstelle: `_pdfs/` → `pdfs/` ersetzen. Betrifft mindestens:
+- seitentypen.md (Frontmatter-Beispiel)
+- ingest-dispatch-template.md (pdf:-Feld)
+- ingest SKILL.md (Bootstrap, PDF-Sortierung)
+- wiki-claude-md.md (Verzeichnis-Doku)
+- obsidian-setup.md (Index-Referenzen)
+
+- [ ] **Step 4: naming-konvention.md — Beispiele generalisieren**
 
 Ersetze `normen/ec2-9-2-5.md` durch `normen/<norm-abschnitt>.md (falls norm-Typ aktiv)`.
 Behalte die generische Namensregel (lowercase, Bindestriche, keine Umlaute).
 
-- [ ] **Step 4: CHANGELOG.md ergaenzen**
+- [ ] **Step 5: CHANGELOG.md ergaenzen**
 
 Fuege SPEC-005 Eintrag hinzu mit Datum und Zusammenfassung.
 
-- [ ] **Step 5: Konsistenz-Check + Commit**
+- [ ] **Step 6: Konsistenz-Check + Commit**
 
 ```bash
 bash plugin/hooks/check-consistency.sh plugin/
@@ -563,8 +587,13 @@ Alle universellen Gates bekommen `—` in der Bedingungs-Spalte.
 Fuege Hinweis ein:
 ```markdown
 > **Bedingung:** Dieser Skill ist nur relevant wenn Domain-Typ "norm"
-> in seitentypen.md aktiv ist.
+> in seitentypen.md aktiv ist. Pruefe beim Skill-Start ob der Typ existiert.
+> Falls nicht: "Kein norm-Typ in diesem Wiki aktiv. /normenupdate nicht verfuegbar."
 ```
+
+norm-reviewer Agent wird ebenfalls nur dispatcht wenn norm-Typ aktiv ist.
+Dies ist eine Prompt-Level-Bedingung (der dispatchende Skill prueft seitentypen.md),
+KEINE Hook-Level-Aenderung (hooks.json Matcher bleiben unveraendert).
 
 - [ ] **Step 3: wiki-review Phase 0.8 verifizieren**
 
@@ -596,16 +625,23 @@ git commit -m "refactor: Skill-Governance bedingte Gates + Beispiele generalisie
 - Modify: `CLAUDE.md`
 - Modify: `docs/specs/SPEC-005-domain-agnostik.md`
 
-- [ ] **Step 1: ARCHITECTURE.md aktualisieren**
+- [ ] **Step 1: plugin.json Version-Bump**
+
+In `plugin/.claude-plugin/plugin.json`: Version auf `2.0.0` setzen
+(Major-Bump wegen Breaking Change: Core/Domain-Split, dynamische Typen).
+Description aktualisieren: "Universelle LLM-gepflegte Wissensdatenbank" statt
+"Technische Wissensdatenbank".
+
+- [ ] **Step 2: ARCHITECTURE.md aktualisieren**
 
 Ergaenze die 3-Schichten-Architektur (Core/Domain/Instanz) im Architektur-Dokument.
 Aktualisiere Diagramme falls vorhanden.
 
-- [ ] **Step 2: CLAUDE.md Enforcement-Abschnitt aktualisieren**
+- [ ] **Step 3: CLAUDE.md Enforcement-Abschnitt aktualisieren**
 
 Ergaenze den Hinweis auf bedingte Gates und die neuen Konsistenz-Checks (21/21).
 
-- [ ] **Step 3: Alle Tests laufen lassen — Vollstaendige Pflicht-Checkliste**
+- [ ] **Step 4: Alle Tests laufen lassen — Vollstaendige Pflicht-Checkliste**
 
 ```bash
 bash plugin/hooks/check-consistency.sh plugin/    # 21/21 PASS?
@@ -620,12 +656,12 @@ bash tests/test-integration-pipeline.sh            # 152/152 PASS?
 
 Alle muessen PASS sein. Bei FAIL: analysieren und fixen.
 
-- [ ] **Step 4: SPEC-005 Status auf Done setzen**
+- [ ] **Step 5: SPEC-005 Status auf Done setzen**
 
 In `docs/specs/SPEC-005-domain-agnostik.md`: Status → Done.
 In `docs/specs/INDEX.md`: Status → Done.
 
-- [ ] **Step 5: Commit + Push**
+- [ ] **Step 6: Commit + Push**
 
 ```bash
 git add ARCHITECTURE.md CLAUDE.md docs/specs/SPEC-005-domain-agnostik.md docs/specs/INDEX.md
@@ -830,13 +866,14 @@ git commit -m "feat: Gate-Pruefstrategien pro Quellen-Format (SPEC-006 Schritt 4
 - Modify: `plugin/hooks/check-wiki-output.sh`
 - Modify: `tests/test-integration-pipeline.sh`
 
-- [ ] **Step 1: check-wiki-output.sh — pdf: Feld-Pruefung erweitern**
+- [ ] **Step 1: check-wiki-output.sh — NEUEN Quellpfad-Check schreiben**
 
-Finde den Check der das `pdf:` Feld prueft (falls vorhanden). Erweitere auf:
+ACHTUNG: Es gibt KEINEN bestehenden pdf:-Check in check-wiki-output.sh.
+Dies ist ein komplett neuer Check (z.B. Check 17 oder naechste freie Nummer).
+
+Fuege nach dem letzten bestehenden Check einen neuen Block ein:
 Das Frontmatter muss MINDESTENS eines von `pdf:`, `quelle-datei:` oder `url:` enthalten
 (nur fuer `type: quelle`). Bei `url:` muss auch `abgerufen:` vorhanden sein.
-
-Falls der Check aktuell nur `pdf:` sucht, aendere die Logik zu:
 ```bash
 # Check: Quellenseite hat Quellpfad
 if [ "$TYPE" = "quelle" ]; then
