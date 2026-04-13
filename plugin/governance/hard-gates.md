@@ -6,6 +6,7 @@ Inline-Kopie in using-bibliothek SKILL.md muss identisch sein.
 ---
 
 <HARD-GATE: KEIN-BUCH-OHNE-VOLLSTAENDIGE-LESUNG>
+Bedingung: keine (universell)
 Jedes Dokument wird beim Ingest KOMPLETT gelesen. Jede Seite, jedes Kapitel.
 Kein Ueberspringen, kein "Kapitel 7 scheint nicht relevant".
 Erst nach vollstaendiger Lesung wird entschieden was ins Wiki kommt.
@@ -17,6 +18,7 @@ Split-Plan bei >800K Tokens schafft nachvollziehbare Kapitel-Zuordnung.)
 </HARD-GATE>
 
 <HARD-GATE: KEIN-INHALT-OHNE-SEITENANGABE>
+Bedingung: keine (universell)
 Jede Aussage auf einer Wiki-Seite braucht Quelle + Seitenangabe.
 "Steht im Fingerloos" ist FAIL.
 "Fingerloos 2016, S. 234-237" ist PASS.
@@ -27,6 +29,7 @@ Durchsetzung: Machine-Law (check-wiki-output.sh Check 6)
 </HARD-GATE>
 
 <HARD-GATE: KEIN-ZAHLENWERT-OHNE-QUELLE>
+Bedingung: keine (universell)
 Jeder Zahlenwert (Festigkeit, Steifigkeit, Beiwert, Prozentangabe, Dimension,
 geometrische Groesse) MUSS eine Quellenangabe mit Seitenreferenz haben.
 Beispiel PASS: "f_v,R = 1,2 N/mm² (Ehrhart/Brandner 2018, S. 8, Tab. 3)"
@@ -36,6 +39,7 @@ Durchsetzung: Machine-Law (check-wiki-output.sh Check 4)
 </HARD-GATE>
 
 <HARD-GATE: KEIN-NORMBEZUG-OHNE-ABSCHNITT>
+Bedingung: Domain-Typ "norm" ist in seitentypen.md aktiv.
 Nicht "nach EC5", sondern "EC5, §6.1.5" oder "DIN EN 1995-1-1, Abschnitt 6.1.5".
 Nicht "gemaess CEN/TS 19103", sondern "CEN/TS 19103, §7.2".
 Jeder Normverweis braucht den konkreten Abschnitt, Absatz oder Gleichungsnummer.
@@ -43,6 +47,7 @@ Durchsetzung: Machine-Law (check-wiki-output.sh Check 5)
 </HARD-GATE>
 
 <HARD-GATE: KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS>
+Bedingung: keine (universell)
 Jede Konzept-, Verfahrens- und Baustoffseite muss mindestens EINEN Wikilink
 [[...]] zu einer anderen Wiki-Seite enthalten (nicht zur eigenen Quellenseite).
 Isolierte Seiten sind verboten — sie brechen die Navigierbarkeit.
@@ -50,6 +55,7 @@ Durchsetzung: Machine-Law (check-wiki-output.sh Check 7)
 </HARD-GATE>
 
 <HARD-GATE: KEIN-SCHLAGWORT-OHNE-VOKABULAR>
+Bedingung: keine (universell)
 Jedes Schlagwort im Frontmatter-Feld `schlagworte:` MUSS im kontrollierten
 Vokabular (`wiki/_vokabular.md`) existieren. Neue Begriffe werden ueber
 /vokabular angelegt — NIEMALS ad-hoc in einer Quellen- oder Konzeptseite.
@@ -58,6 +64,7 @@ Durchsetzung: Machine-Law (check-wiki-output.sh Check 3)
 </HARD-GATE>
 
 <HARD-GATE: KEIN-UPDATE-OHNE-DIFF>
+Bedingung: keine (universell)
 Wenn eine bestehende Wiki-Seite durch ein neues Buch aktualisiert wird:
 1. Das Diff muss in `wiki/_log.md` dokumentiert werden
 2. Format: Was hat sich geaendert, warum, welche neue Quelle
@@ -66,6 +73,7 @@ Durchsetzung: Hybrid (Skill-Phase prueft + _log.md Pflicht-Schritt; Shell-Check 
 </HARD-GATE>
 
 <HARD-GATE: KEIN-WIDERSPRUCH-OHNE-MARKIERUNG>
+Bedingung: keine (universell)
 Wenn zwei Quellen unterschiedliche Werte oder Aussagen liefern:
 1. NICHT stillschweigend eine Version waehlen
 2. Explizit markieren: `[WIDERSPRUCH: Quelle A sagt X, Quelle B sagt Y]`
@@ -75,6 +83,7 @@ Durchsetzung: Hybrid (Shell-Check auf WIDERSPRUCH-Marker + Konsistenz-Pruefer)
 </HARD-GATE>
 
 <HARD-GATE: KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG>
+Bedingung: keine (universell)
 Jede Aenderung an einer Wiki-Seite (Neuanlage oder Update) erfordert das
 Lesen der zugehoerigen Originalquelle im selben Context.
 
@@ -97,6 +106,7 @@ Keine mechanische Pruefung ob PDF tatsaechlich geladen wurde.)
 </HARD-GATE>
 
 <HARD-GATE: KORREKTE-UMLAUTE>
+Bedingung: keine (universell)
 In ALLEN Ausgabedateien MUESSEN deutsche Umlaute als Unicode geschrieben werden:
 ä, ö, ü, Ä, Ö, Ü, ß (Unicode U+00E4, U+00F6, U+00FC, U+00C4, U+00D6, U+00DC, U+00DF).
 NIEMALS ASCII-Ersetzungen: ae statt ä, oe statt ö, ue statt ü, ss statt ß.
