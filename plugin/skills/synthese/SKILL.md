@@ -16,7 +16,7 @@ description: "Konzeptseiten vertiefen — Quellen vergleichen, Formeln ausarbeit
 | KEIN-ZAHLENWERT-OHNE-QUELLE | ✅ Aktiv | Phase 1 recherchiert + vergleicht Zahlenwerte | — |
 | KEIN-NORMBEZUG-OHNE-ABSCHNITT | ✅ Aktiv | Phase 1 identifiziert Norm-Paragraphen exakt | norm-Typ aktiv |
 | KEINE-KONZEPTSEITE-OHNE-QUERVERWEIS | ⚪ N/A | Synthese traegt zu Querverweisen bei, setzt sie nicht | — |
-| KEIN-SCHLAGWORT-OHNE-VOKABULAR | 🔄 Delegiert | Dispatch: vokabular-pruefer | — |
+| KEIN-SCHLAGWORT-OHNE-VOKABULAR | ✅ Aktiv | Phase 2e: Worker schreibt Vokabular + patcht Quellenseiten, Gate 3 Part D verifiziert | — |
 | KEIN-UPDATE-OHNE-DIFF | ✅ Aktiv | Phase 2 dokumentiert Diffs zwischen Alt + Neu | — |
 | KEIN-WIDERSPRUCH-OHNE-MARKIERUNG | ✅ Aktiv | Phase 2 markiert ALLE Widersprueche mit [WIDERSPRUCH] | — |
 | KEINE-WIKI-AENDERUNG-OHNE-QUELLENLESUNG | ✅ Aktiv | Wiki-Quellenseiten als Primaerquelle (4-Gate-geprueft), PDF-Spot-Check bei Widerspruechen/Unklarheiten | — |
@@ -28,13 +28,39 @@ description: "Konzeptseiten vertiefen — Quellen vergleichen, Formeln ausarbeit
 
 ## Phasen
 
-### Phase 0.0: Konzept-Kandidaten sammeln
+### Phase 0.0: Konzept-Discovery auswerten
 
-1. Scanne alle Quellenseiten: `grep "konzept-kandidaten:" wiki/quellen/*.md`
-2. Zaehle pro Kandidat: wie viele Quellen nennen ihn?
-3. Kandidaten mit >=2 Quellen → zur Synthese-Liste hinzufuegen
-4. Meldung an Nutzer: "N neue Konzeptseiten koennen erstellt werden: [Liste]"
-5. Nutzer entscheidet welche Konzepte synthetisiert werden
+1. **Primaere Quelle:** Lies `_konzept-reife.md` (YAML-Frontmatter parsen)
+   → Liste aller Kandidaten mit Status (unreif/reif/erstellt)
+
+2. **Rueckwaertskompatibilitaet:** Scanne Quellenseiten-Frontmatter:
+   `grep "konzept-kandidaten:" wiki/quellen/*.md`
+   → Kandidaten die NICHT in `_konzept-reife.md` stehen → dort nachtragen
+   → Status berechnen: >=2 Quellen → reif, <2 → unreif
+
+3. **Reife-Bericht an Nutzer:**
+   ```
+   Reife Kandidaten (>=2 Quellen):
+   - Rollschub — 3 Quellen (fingerloos-ec2-2016, colling-holzbau-2023, blass-holzbau-2022)
+   - [...]
+   
+   Unreife Kandidaten (1 Quelle):
+   - Gamma-Verfahren — 1 Quelle (blass-holzbau-2022)
+   
+   Seit letzter Synthese neu: [Liste]
+   ```
+
+4. **Nutzer waehlt** welche reifen Kandidaten synthetisiert werden
+
+5. **Schlagwort-Vorschlaege pruefen:**
+   - Lies `_schlagwort-vorschlaege.md`
+   - Offene Vorschlaege melden:
+     "N offene Schlagwort-Vorschlaege. /vokabular empfohlen?"
+
+Falls `_konzept-reife.md` nicht existiert (erster Synthese-Lauf):
+→ Datei mit Bootstrap-Inhalt anlegen (leeres `kandidaten: []`).
+Falls `_schlagwort-vorschlaege.md` nicht existiert:
+→ Datei mit Bootstrap-Inhalt anlegen (leere `neue-terme: []`, `fehlende-zuordnungen: []`).
 
 ---
 
@@ -112,6 +138,9 @@ Subagent-Prompts werden NICHT frei formuliert. IMMER Template verwenden.
    - `{{QUELLENSEITEN_INHALT}}`: Read aller Wiki-Quellenseiten → inline einfuegen
    - `{{WIKI_ROOT}}`: Projektpfad + `/wiki/`
    - `{{VOKABULAR_TERME}}`: `grep "^### " wiki/_vokabular.md` → Term-Liste
+   - `{{KONZEPT_REIFE_INHALT}}`: Read `_konzept-reife.md` → inline einfuegen
+   - `{{SCHLAGWORT_VORSCHLAEGE_INHALT}}`: Read `_schlagwort-vorschlaege.md` → inline einfuegen
+   - `{{BESTEHENDE_KONZEPTE}}`: `ls wiki/konzepte/*.md` → Komma-separierte Liste
 3. Dispatche Agent mit:
    - `subagent_type: "bibliothek:synthese-worker"` (PFLICHT — PreToolUse-Hook
      guard-pipeline-lock.sh matcht auf diesen String, um parallele Synthesen
@@ -268,6 +297,24 @@ Wenn unsicher ob relevant: AUFNEHMEN. Weglassen nur mit expliziter Begruendung.
 
 ---
 
+### Phase 2e: Discovery-Erkennung (im Worker)
+
+Der Synthese-Worker fuehrt Phase 2e automatisch aus (Anweisung im Dispatch-Template).
+Der Hauptagent muss NICHTS tun — Phase 2e ist Worker-intern.
+
+**Was der Worker tut:**
+- Identifiziert Konzept-Kandidaten beim Quellenvergleich
+- Erkennt fehlende Vokabular-Terme
+- Schreibt neue Terme in `_vokabular.md` (additiv)
+- Patcht Quellenseiten-Schlagworte (additiv)
+- Meldet alles im `[DISCOVERY]`-Block
+
+**Was der Hauptagent verifiziert (nach Worker-Rueckkehr):**
+- `[DISCOVERY]`-Block im Worker-Output vorhanden?
+- Gate 3 (konsistenz-pruefer) Part D prueft die Details
+
+---
+
 ### Phase 3: Dispatch Review-Gates
 
 <NICHT-VERHANDELBAR>
@@ -306,16 +353,30 @@ Ergebnis ist PASS oder FAIL — kein Mittelweg.
 **Pflicht:**
 - [ ] **Seite speichern** (mit Seitenangaben, Formeln, Widersprueche)
 - [ ] **_index aktualisieren** (Konzeptseite hinzufuegen falls neu)
-- [ ] **_log.md Eintrag:**
+- [ ] **_log.md Eintrag** (inkl. Discovery-Zusammenfassung):
   ```markdown
-  ## [2026-04-09] synthese | Querkraft-Transfer
-  - Target: konzepte/querkraft-transfer.md (UPDATED)
-  - Quellen re-gelesen: Fingerloos EC2, CEN/TS 19103
-  - Formeln: 2 neu hinzugefuegt + 1 korrigiert
-  - Widersprueche: 1 markiert (Norm-Versionen)
-  - Gates: quellen-pruefer PASS, konsistenz-pruefer PASS
+  ## [DATUM] synthese | Konzeptname
+  - Target: konzepte/konzeptname.md (NEU/UPDATED)
+  - Quellen re-gelesen: [Liste]
+  - Formeln: N neu + M korrigiert
+  - Widersprueche: N markiert
+  - Gates: quellen-pruefer PASS, konsistenz-pruefer PASS, vokabular-pruefer PASS
+  - Discovery: N Konzept-Kandidaten, M Schlagwort-Vorschlaege, K Vokabular-Ergaenzungen, L Patches
   ```
 - [ ] **MOC pruefen:** Wenn neue Konzeptseite → in relevante MOCs eintragen
+- [ ] **Discovery persistieren** (Worker hat `_vokabular.md` + Quellenseiten-Patches
+  bereits geschrieben, Gates haben verifiziert — jetzt nur Tracking-Metadaten):
+  1. `[DISCOVERY]`-Block aus Worker-Output parsen
+  2. Konzept-Kandidaten → `_konzept-reife.md`:
+     - Fuer jeden Kandidaten: Term schon vorhanden? → Quellen ergaenzen, Status neu berechnen
+     - Neuer Term? → Eintrag anlegen mit `entdeckt-bei: "synthese:<konzeptname>"`
+     - Konzeptseite existiert bereits? → Nicht eintragen
+     - Status: >=2 Quellen → `reif`, <2 → `unreif`
+  3. Schlagwort-Vorschlaege → `_schlagwort-vorschlaege.md`:
+     - Neue Terme eintragen (Duplikat-Check)
+     - Fehlende Zuordnungen eintragen
+     - Bereits umgesetzte Patches als `status: umgesetzt` markieren
+  4. Markdown-Body beider Dateien aus YAML regenerieren
 - [ ] **check-wiki-output.sh auf die Seite**
 - [ ] **Pipeline-Lock freigeben** — `rm -f wiki/_pending.json` als ALLERLETZTEN Schritt
 
