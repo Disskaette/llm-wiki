@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-consistency.sh — 19 Plugin-interne Konsistenzpruefungen
+# check-consistency.sh — 21 Plugin-interne Konsistenzpruefungen
 # Aufruf: ./check-consistency.sh [plugin-root]
 #
 # Exit 0 = alles konsistent
@@ -254,6 +254,53 @@ if [ "$GATE_REF" -ge 1 ]; then
     check PASS "19-skill-gate-referenz" ""
 else
     check FAIL "19-skill-gate-referenz" "/ingest SKILL.md referenziert gate-dispatch-template nicht"
+fi
+
+# --- Check 20: valid-types.txt ↔ seitentypen.md Sync ---
+VT_FILE="${PLUGIN_ROOT}/hooks/config/valid-types.txt"
+ST_FILE2="${PLUGIN_ROOT}/governance/seitentypen.md"
+if [ -f "$VT_FILE" ] && [ -f "$ST_FILE2" ]; then
+    # Extract types from valid-types.txt (skip comments and blank lines)
+    VT_TYPES=$(grep -v '^#' "$VT_FILE" | grep -v '^$' | sort)
+    # Extract types from seitentypen.md: lines matching "| **typename** |"
+    ST_TYPES=$(grep '^| \*\*' "$ST_FILE2" | sed 's/^| \*\*\([a-z]*\)\*\*.*/\1/' | sort)
+    if [ -z "$VT_TYPES" ] || [ -z "$ST_TYPES" ]; then
+        check FAIL "20-valid-types-sync" "Konnte Typen nicht extrahieren (valid-types: $(echo "$VT_TYPES" | wc -l | tr -d ' '), seitentypen: $(echo "$ST_TYPES" | wc -l | tr -d ' '))"
+    elif diff -q <(echo "$VT_TYPES") <(echo "$ST_TYPES") > /dev/null 2>&1; then
+        check PASS "20-valid-types-sync" ""
+    else
+        ONLY_VT=$(comm -23 <(echo "$VT_TYPES") <(echo "$ST_TYPES") | tr '\n' ',' | sed 's/,$//')
+        ONLY_ST=$(comm -13 <(echo "$VT_TYPES") <(echo "$ST_TYPES") | tr '\n' ',' | sed 's/,$//')
+        DETAIL=""
+        [ -n "$ONLY_VT" ] && DETAIL="Nur in valid-types.txt: $ONLY_VT. "
+        [ -n "$ONLY_ST" ] && DETAIL="${DETAIL}Nur in seitentypen.md: $ONLY_ST."
+        check FAIL "20-valid-types-sync" "$DETAIL"
+    fi
+else
+    check FAIL "20-valid-types-sync" "Dateien nicht gefunden"
+fi
+
+# --- Check 21: domain-gates.txt ↔ hard-gates.md Validierung ---
+DG_FILE="${PLUGIN_ROOT}/hooks/config/domain-gates.txt"
+if [ -f "$DG_FILE" ] && [ -f "$HG_FILE" ]; then
+    DG_INVALID=""
+    while IFS= read -r line; do
+        # Skip comments and blank lines
+        case "$line" in
+            \#*|"") continue ;;
+        esac
+        GATE_NAME="${line%%:*}"
+        if ! grep -q "HARD-GATE: ${GATE_NAME}" "$HG_FILE" 2>/dev/null; then
+            DG_INVALID="${DG_INVALID}${GATE_NAME}, "
+        fi
+    done < "$DG_FILE"
+    if [ -n "$DG_INVALID" ]; then
+        check FAIL "21-domain-gates-valid" "Gate nicht in hard-gates.md: ${DG_INVALID%, }"
+    else
+        check PASS "21-domain-gates-valid" ""
+    fi
+else
+    check FAIL "21-domain-gates-valid" "Dateien nicht gefunden (domain-gates: $([ -f "$DG_FILE" ] && echo ja || echo nein), hard-gates: $([ -f "$HG_FILE" ] && echo ja || echo nein))"
 fi
 
 # --- Ergebnis ---

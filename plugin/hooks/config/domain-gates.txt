@@ -1,0 +1,3 @@
+# Aktive bedingte Gates (aus hard-gates.md, Bedingung erfuellt)
+# Format: GATE-NAME:BEDINGUNG-TYP
+KEIN-NORMBEZUG-OHNE-ABSCHNITT:norm

@@ -94,7 +94,7 @@ In der Nebeneffekte-Phase (nach allen Seiteneffekten) wird die Datei geloescht.
 
 Nach jeder Aenderung IMMER:
 ```bash
-bash plugin/hooks/check-consistency.sh plugin/    # 19/19 PASS?
+bash plugin/hooks/check-consistency.sh plugin/    # 21/21 PASS?
 diff <(sed -n '/<!-- BEGIN HARD-GATES -->/,/<!-- END HARD-GATES -->/p' plugin/skills/using-bibliothek/SKILL.md | sed '1d;$d') plugin/governance/hard-gates.md   # Sync?
 bash tests/test-guard-wiki-writes.sh               # 6/6 PASS?
 bash tests/test-inject-lock-warning.sh             # 7/7 PASS?

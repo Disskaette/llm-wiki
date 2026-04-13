@@ -1,7 +1,7 @@
-# Gueltige Wiki-Seitentypen (type:-Feld im Frontmatter).
-# Ein Typ pro Zeile. Wird von check-wiki-output.sh Check 02 geladen.
+# Core-Typen (immer vorhanden)
 quelle
 konzept
+# Domain-Typen (aus seitentypen.md, erweiterbar)
 norm
 baustoff
 verfahren
