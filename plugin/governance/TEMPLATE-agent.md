@@ -39,21 +39,22 @@ Du erhaeltst:
 
 ## Rueckgabe
 
-Einheitliches 3-Stufen-Format (PFLICHT fuer alle Agents):
+Einheitliches 2-Stufen-Format (PFLICHT fuer alle Agents):
 
 | Stufe | Bedeutung | Reaktion der Hauptinstanz |
 |-------|-----------|--------------------------|
-| **PASS** | Keine Befunde | Weiter |
-| **PASS MIT HINWEISEN** | Warnungen vorhanden | Hauptinstanz prueft JEDEN Hinweis, arbeitet sinnvolle ein. Kein Re-Review noetig. |
-| **FAIL** | Kritische Fehler | Beheben → Re-Review dispatchen (max 3 Iterationen, dann Eskalation an den Nutzer) |
+| **PASS** | Keine behebungspflichtigen Befunde | Weiter |
+| **FAIL** | Konkreter, behebbarer Mangel | Beheben → Re-Review dispatchen (max 3 Iterationen, dann Eskalation an den Nutzer) |
 
-**Kurzformel: Falsch = FAIL, besser machbar = Hinweis.**
+**Kurzformel: Fixbar = FAIL. Subjektiv = PASS.**
+
+Kein Mittelweg. Wenn der Agent ein konkretes Problem identifiziert
+(toter Link, fehlende Seitenangabe, fehlendes Vokabular), ist es FAIL.
+Wenn es rein subjektiv ist ("koennte besser sein" ohne konkreten Fix),
+ist es PASS — nicht erwaehnen.
 
 ### FAIL-Kriterien (agent-spezifisch)
 [Was bei diesem Agent ein FAIL ist]
-
-### Hinweis-Kriterien (agent-spezifisch)
-[Was bei diesem Agent ein Hinweis ist]
 
 ---
 

@@ -226,54 +226,41 @@ Beispiel:
   - ✓ [[autor2020.pdf#page=45|Autor 2020, S. 45]] zu "<Oberthema>" — passt zu kapitel-index
   - ✗ [[autor2020.pdf#page=45|Autor 2020, S. 45]] zu "<Fremdthema>" — Quelle behandelt dieses Thema nicht
 
-**Gesamtergebnis:** [PASS / PASS MIT HINWEISEN / FAIL]
+**Gesamtergebnis:** [PASS / FAIL]  ← NUR diese zwei Werte. Kein "PASS MIT HINWEISEN". Hinweise gehoeren in den Befunde-Abschnitt, aendern aber das Ergebnis nicht.
 ```
 
 ## Rückgabe
 
 ### PASS
 Alle Teile bestanden:
-- Part A: ≥95 % der faktischen Aussagen haben Quellenangabe mit Seitennummer
+- Part A: Alle faktischen Aussagen haben Quellenangabe mit Seitennummer
 - Part B: Alle Zahlenwerte sind belegt
 - Part C: Alle Normreferenzen enthalten Abschnittsnummer und Seite
-- Part D: Spot-Check: 100 % der Stichproben verifiziert oder plausibel
+- Part D: Spot-Check: 100 % der Stichproben verifiziert
+- Part E: Keine semantischen Verzerrungen
+- Part F: Keine Cross-Source-Kontamination
 
 **Aktion:** Weiterleitung zu Gate 3 (konsistenz-pruefer).
 
-### PASS MIT HINWEISEN
-Überwiegend korrekt, aber mit Verbesserungsmöglichkeiten:
-- Part A: 90–95 % erfasst; 1–2 Aussagen könnten präzisere Seitennummern haben ("Kap. 3" statt "S. 78")
-- Part B: Alle wichtigen Zahlenwerte erfasst, aber 1–2 Nebenwerte fehlen
-- Part C: Normen dokumentiert, aber 1 Normen-Verweis könnte spezifischere Abschnittsnummer haben
-- Part D: Spot-Check erfolgreich, aber 1 Seitennummer ist grenzwertig (z.B. Text ähnlich, aber nicht identisch)
-
-**Aktion:** Weiterleitung zu Gate 3 mit Hinweis. Autor sollte flagged items nacharbeiten.
-
 ### FAIL
-Eines der Kriterien nicht erfüllt:
-- Part A: <85 % der Aussagen sind belegt, oder systematische Lücken (ganze Abschnitte unbelegt)
-- Part B: ≥2 Zahlenwerte ohne Quellenangabe
-- Part C: ≥1 Normenzug ohne Abschnittsnummer
-- Part D: Spot-Check zeigt inkorrekte oder nicht-existente Seitennummern (≥2 Fehlschläge)
+Mindestens ein konkreter Mangel:
+- Part A: ≥1 Aussage ohne Quellenangabe (inkl. unspezifische Angaben wie "Kap. 3" wenn exakte Seite bestimmbar)
+- Part B: ≥1 Zahlenwert ohne Quellenangabe
+- Part C: ≥1 Normverweis ohne Abschnittsnummer
+- Part D: ≥1 Spot-Check-Fehlschlag (inkorrekte/nicht-existente Seitennummer)
+- Part E: ≥1 Paraphrase materiell verzerrt (Qualifier weggelassen, invertiert, generalisiert)
+- Part F: ≥1 Zitation thematisch inkompatibel mit der zitierten Quelle
 
 **Aktion:** Rückweisung. Kapitel wird mit `[QUELLEN-FEHLT]` markiert. Autor erhält detaillierte Liste mit fehlenden Belegen und wird zur Nachbearbeitung aufgefordert.
 
 ## FAIL-Kriterien (nicht verhandelbar)
 
-- **<85 % faktische Aussagen belegt:** Systematische Lücken in der Quellenangabe
-- **≥2 Zahlenwerte ohne Quelle:** Materialkennwerte, Messergebnisse oder Normen-Werte sind unbelegt
-- **≥1 Normenzug ohne Abschnittsnummer:** z.B. nur Normname ohne Bezug zu Abschnitt und Seite
-- **Spot-Check fehlgeschlagen:** ≥2 Stichproben nicht plausibel (z.B. Seitennummer existiert nicht)
-- **Semantische Verzerrung:** ≥1 Paraphrase materiell verzerrt (Qualifier weggelassen, invertiert, generalisiert)
+- **≥1 Aussage ohne Quellenangabe:** Jede faktische Aussage braucht Beleg mit Seitennummer
+- **≥1 Zahlenwert ohne Quelle:** Materialkennwerte, Messergebnisse oder Normen-Werte unbelegt
+- **≥1 Normverweis ohne Abschnittsnummer:** Normname ohne Bezug zu Abschnitt und Seite
+- **≥1 Spot-Check-Fehlschlag:** Stichprobe nicht plausibel (z.B. Seitennummer existiert nicht, Text weicht ab)
+- **Semantische Verzerrung:** ≥1 Paraphrase materiell verzerrt
 - **Cross-Source-Kontamination:** ≥1 Zitation thematisch inkompatibel mit der zitierten Quelle
-
-## Hinweis-Kriterien (sind verhandelbar)
-
-- **90–95 % Aussagen belegt:** Wenige Aussagen könnten mit Quellenangabe versehen werden, sind aber im Kontext plausibel
-- **Seitennummer unspezifisch:** Aussage ist belegt, aber mit "Kap. 3" statt exakter Seitenzahl (verbesserte Präzision wünschenswert)
-- **1–2 Zahlenwerte ohne direkter Quelle:** z.B. gerundete Werte aus komplexeren Formeln, Kontext erklärt die Herkunft
-- **Normen-Referenzen teilweise unvollständig:** 1–2 Normen haben keine Abschnittsnummer, aber Kontext macht die Referenz eindeutig
-- **1 Spot-Check-Anomalie:** Z.B. Text auf angegebener Seite ähnlich, aber nicht identisch — könnte Transkriptionsvariante sein
 
 ## Re-Review-Limit
 

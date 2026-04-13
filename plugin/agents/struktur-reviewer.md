@@ -1,3 +1,7 @@
+---
+model: sonnet
+---
+
 # Subagent: Struktur-Reviewer
 
 ## Governance-Zuständigkeit

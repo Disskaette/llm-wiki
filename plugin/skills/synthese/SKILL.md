@@ -281,6 +281,8 @@ Wenn unsicher ob relevant: AUFNEHMEN. Weglassen nur mit expliziter Begruendung.
 2. Lade `governance/gate-dispatch-template.md`
 3. Fuelle `{{PIPELINE_ID_MARKER}}` mit `[SYNTHESE-ID:<konzeptname>]`
 4. Dispatche 3 Gate-Agents — IMMER mit Template-Prompt:
+   Modellwahl: quellen-pruefer erbt Opus. konsistenz- und vokabular-pruefer
+   haben Sonnet im Frontmatter. Siehe gate-dispatch-template.md "Modellwahl".
 </NICHT-VERHANDELBAR>
 
 **Gate 1: quellen-pruefer**
@@ -294,6 +296,7 @@ Wenn unsicher ob relevant: AUFNEHMEN. Weglassen nur mit expliziter Begruendung.
 - Falls neue Schlagworte noetig: Delegation an `/vokabular`
 
 **Bei FAIL:** Synthese korrigiert + erneutes Dispatch. Max 3 Iterationen.
+Ergebnis ist PASS oder FAIL — kein Mittelweg.
 **Alle 3 PASS:** `advance-pipeline-lock.sh` hat `stufe` automatisch auf `sideeffects` gesetzt → weiter mit Phase 5.
 
 ---
@@ -335,6 +338,23 @@ Wenn unsicher ob relevant: AUFNEHMEN. Weglassen nur mit expliziter Begruendung.
 3. Durchgang 2: Lade Zwischen-Seite, fuege Quellen 3-4 hinzu
 4. Final: Konsolidierung, [SPLIT]-Marker entfernen
 5. 2-Gate Review auf Finale Seite
+
+---
+
+## Batch-Modus + Concurrency-Limit
+
+<NICHT-VERHANDELBAR>
+**Concurrency-Limit: Max 4 Agents gleichzeitig.**
+
+Bei mehreren Konzepten: sequentiell verarbeiten.
+Pro Konzept der vollstaendige Ablauf:
+Synthese-Worker → 3 Gate-Agents → Nebeneffekte → naechstes Konzept.
+
+- KEIN paralleles Dispatchen mehrerer Synthese-Workers.
+- KEIN paralleles Dispatchen von Gates verschiedener Konzepte.
+- Bei Gate-Nachholung: SEQUENTIELL pro Konzept abarbeiten.
+- Einzige erlaubte Parallelitaet: die 3 Gates EINES Konzepts.
+</NICHT-VERHANDELBAR>
 
 ---
 

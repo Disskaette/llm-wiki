@@ -263,8 +263,8 @@ Alle Fachbegriffe die als Schlagworte verwendet werden sollen:
 3. Genuein neuer Term? → Via /vokabular anlegen
 4. Falls /vokabular PENDING zurueckgibt (ambiger Term):
    → Ingest faehrt fort mit [PENDING]-Schlagwort im Frontmatter
-   → Gate 4 (vokabular-pruefer) wird PASS MIT HINWEISEN geben
-   → Nutzer klaert spaeter via /vokabular
+   → Gate 4 (vokabular-pruefer) wird FAIL geben → nach Klaerung Re-Gate
+   → Nutzer klaert via /vokabular
 
 **2g: Domain-Verzeichnisse on-demand anlegen**
 
@@ -307,6 +307,9 @@ Checkliste:
    `[INGEST-ID:<_pending.json.quelle>]`
    (advance-pipeline-lock.sh verifiziert den Marker gegen _pending.json.quelle)
 5. Gate 1-4 parallel dispatchen — IMMER mit Template-Prompt, NIE frei formuliert
+   Modellwahl: Gate 1 bekommt `model: "sonnet"` (PDF ≤200 Seiten) oder
+   `model: "opus"` (PDF >200 Seiten). Gate 2 erbt Opus. Gate 3+4 haben
+   Sonnet im Frontmatter. Siehe gate-dispatch-template.md "Modellwahl".
 6. Gate 2 (quellen-pruefer) fuehrt die kontextuellen Checks (Zahlenwerte, Normbezuege,
    Seitenangaben, Umlaute) durch — diese brauchen Kontext den Shell nicht liefern kann
 7. Alle 4 PASS → weiter zu Phase 4 (Nebeneffekte)
@@ -320,6 +323,7 @@ Checkliste:
 
 Alle generierten/aktualisierten Wiki-Seiten durchlaufen 4 Gates.
 Jedes Gate wird als unabhaengiger Subagent dispatcht.
+Ergebnis ist PASS oder FAIL — kein Mittelweg.
 
 **Gate 1: Vollstaendigkeits-Pruefer**
 Dispatch: `vollstaendigkeits-pruefer`
@@ -355,7 +359,6 @@ Prueft:
 **Bei FAIL:** Korrigieren → betroffenes Gate ERNEUT dispatchen (frischer Agent,
 gleiches Template). Korrektur ohne Re-Gate zaehlt NICHT als bestanden.
 Max 3 Zyklen pro Gate, dann Eskalation an den Nutzer.
-**Bei PASS MIT HINWEISEN:** Hinweise pruefen, sinnvolle einarbeiten. Kein Re-Review.
 
 ---
 
@@ -404,8 +407,16 @@ Log-Format:
 Bei mehreren PDFs: sequentiell verarbeiten. Pro PDF der vollstaendige Ablauf:
 Template → Ingest-Agent → check-wiki-output.sh → 4 Gate-Agents → Nebeneffekte → naechste PDF.
 
-**KEIN paralleles Dispatchen** mehrerer Ingest-Agents — ausser der Nutzer
-fordert es explizit und akzeptiert das Risiko reduzierter Gate-Kontrolle.
+<NICHT-VERHANDELBAR>
+**Concurrency-Limit: Max 4 Agents gleichzeitig.**
+
+- KEIN paralleles Dispatchen mehrerer Ingest-Workers.
+- KEIN paralleles Dispatchen von Gates verschiedener Quellen.
+- Bei Gate-Nachholung (mehrere Quellen ohne Gates):
+  SEQUENTIELL pro Quelle — erst alle 4 Gates fuer Quelle 1 abwarten,
+  dann Quelle 2, etc.
+- Einzige erlaubte Parallelitaet: die 4 Gates EINER Quelle.
+</NICHT-VERHANDELBAR>
 
 ---
 

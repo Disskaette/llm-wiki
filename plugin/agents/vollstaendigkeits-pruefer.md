@@ -62,7 +62,7 @@ Für jedes Kapitel mit `relevanz: hoch`:
 - Im Body der Quellenseite muss eine Section existieren: `## Kapitel [Nr]: [Titel] (Relevanz: hoch)` oder `## Kapitel [Nr]: [Titel] (Relevanz: hoch/mittel)`
 - Der Fließtext unter dieser Section ist die Zusammenfassung (100–300 Wörter empfohlen, mindestens 50 Wörter Pflicht)
 
-Für `relevanz: mittel`: Body-Section empfohlen, aber optional (PASS MIT HINWEISEN wenn fehlt).
+Für `relevanz: mittel`: Body-Section empfohlen, aber optional (kein FAIL wenn fehlt).
 Für `relevanz: niedrig`: keine Anforderung.
 
 Zusammenfassung muss:
@@ -82,7 +82,7 @@ Prüfe das **globale** `schlagworte:`-Feld im Frontmatter der Quellenseite (Arra
 - Mindestens 2 der Schlagworte sollten Begriffe sein, die auch in wiki/_vokabular.md definiert sind
 - Fallback-Strategie bei zu wenig spezifischen Tags: Oberbegriffe aus dem Vokabular ergänzen (z.B. domain-spezifische Kategorie-Tags oder Oberbegriffe aus `_vokabular.md`)
 
-Zusätzlich (optional): pro Kapitel im `kapitel-index:`-Array kann ein eigenes `schlagworte:`-Feld existieren. Das ist empfehlenswert aber nicht Pflicht und wird nur als Hinweis gewertet.
+Zusätzlich (optional): pro Kapitel im `kapitel-index:`-Array kann ein eigenes `schlagworte:`-Feld existieren. Das ist empfehlenswert aber nicht Pflicht.
 
 **Resultat:** Vollständig/teilweise/unzureichend.
 
@@ -114,32 +114,24 @@ Zusätzlich (optional): pro Kapitel im `kapitel-index:`-Array kann ein eigenes `
 - Spezifität: ✓ / ✗ (mit Beispiel)
 - Vocab-Abdeckung: [m/n] Begriffe in wiki/_vokabular.md
 
-**Gesamtergebnis:** [PASS / PASS MIT HINWEISEN / FAIL]
+**Gesamtergebnis:** [PASS / FAIL]  ← NUR diese zwei Werte. Kein "PASS MIT HINWEISEN". Hinweise gehoeren in den Befunde-Abschnitt, aendern aber das Ergebnis nicht.
 ```
 
 ## Rückgabe
 
 ### PASS
 Alle Prüfungen bestanden:
-- Part A: Kapitel vollständig erfasst
-- Part B: kapitel-index vollständig und korrekt
+- Part A: Kapitel vollständig erfasst (keine fehlenden Abschnitte)
+- Part B: kapitel-index vollständig, korrekte Seitenbereiche, richtige Reihenfolge
 - Part C: Alle high-relevanz Kapitel haben Zusammenfassungen
-- Part D: Schlagworte sind zahlreich, spezifisch und reichen für Suchfindbarkeit
+- Part D: Schlagworte sind zahlreich (>=3), spezifisch und im Vokabular
 
 **Aktion:** Weiterleitung zu Gate 2 (quellen-pruefer).
 
-### PASS MIT HINWEISEN
-Kapitel ist verwendbar, aber mit Empfehlungen:
-- Part C: Medium-relevanz Kapitel hätte von einer Zusammenfassung profitiert
-- Part D: 1–2 Schlagworte könnten spezifischer sein (Beispiele geben)
-- Geringfügige Strukturierungsprobleme im kapitel-index (z.B. Formatierung)
-
-**Aktion:** Weiterleitung zu Gate 2 mit Hinweis-Notiz. Autor sollte nacharbeiten.
-
 ### FAIL
 Mindestens eines der Kriterien nicht erfüllt:
-- Part A: Ganze Abschnitte oder Kapitel fehlen (>20% des erwarteten Inhalts)
-- Part B: kapitel-index fehlt komplett oder ist strukturell fehlerhaft
+- Part A: Abschnitte oder Kapitel fehlen (einzelne Absaetze zaehlen)
+- Part B: kapitel-index fehlt, ist strukturell fehlerhaft, hat fehlende Seitenbereiche oder falsche Reihenfolge
 - Part C: High-relevanz Kapitel ohne Zusammenfassung
 - Part D: Weniger als 3 Schlüsselwörter oder überwiegend generische Schlagworte
 
@@ -147,17 +139,10 @@ Mindestens eines der Kriterien nicht erfüllt:
 
 ## FAIL-Kriterien (nicht verhandelbar)
 
-- **Fehlende Kapitel:** ≥1 großer Abschnitt (>500 Wörter erwartete Länge) ist nicht erfasst
-- **Kein kapitel-index:** Struktur-Feld komplett abwesend oder leer
+- **Fehlende Kapitel/Abschnitte:** ≥1 Abschnitt ist nicht erfasst
+- **kapitel-index fehlerhaft:** Struktur abwesend, leer, Seitenbereiche fehlen bei Eintraegen, oder Reihenfolge stimmt nicht
 - **Hoch-relevanz ohne Body-Zusammenfassung:** Kapitel mit `relevanz: hoch` im kapitel-index hat keine zugehörige `## Kapitel [Nr]: [Titel]`-Section im Body, oder die Section existiert aber hat <50 Wörter Zusammenfassung
 - **Unzureichende Schlagworte:** <3 Einträge im globalen `schlagworte:`-Frontmatter-Feld, oder >50% sind generisch/nichtssagend
-
-## Hinweis-Kriterien (sind verhandelbar)
-
-- **Teilweise erfasst:** 85–100% des Inhalts erfasst, aber einzelne Absätze fehlen
-- **kapitel-index unvollständig:** Struktur vorhanden, aber Seitenbereiche fehlen bei einigen Einträgen, oder Reihenfolge ist nicht präzise
-- **Medium-relevanz ohne Zusammenfassung:** `relevanz: medium` und keine Zusammenfassung (wird als Hinweis ausgegeben, nicht als Fehler)
-- **Schwache Schlagworte:** 4–5 Schlagworte vorhanden, aber 1–2 sind zu generisch oder wiederholen sich
 
 ## Re-Review-Limit
 

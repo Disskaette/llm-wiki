@@ -42,7 +42,7 @@ if [ -n "$LAST_MSG" ]; then
     exit 0
   fi
   # Gate-FAIL-Check: Wenn das Gate FAIL als Ergebnis meldet, Counter NICHT inkrementieren.
-  # Erzwingt Re-Gate-Dispatch nach Korrektur. "PASS MIT HINWEISEN" matcht nicht.
+  # Erzwingt Re-Gate-Dispatch nach Korrektur.
   if echo "$LAST_MSG" | grep -q 'Ergebnis:.*FAIL'; then
     exit 0
   fi

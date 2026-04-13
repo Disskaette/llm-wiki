@@ -1,3 +1,7 @@
+---
+model: sonnet
+---
+
 # Subagent: Vokabulärprüfer
 
 ## Governance-Zuständigkeit
@@ -153,7 +157,7 @@ Beispiele:
 - ? `<Fachbegriff-B>` → Oberbegriff `<Oberbegriff-B>` (definiert, aber ist Oberbegriff sehr allgemein)
 - ✗ `X` → Oberbegriff `Y`, aber `Y` hat Oberbegriff `X` (zirkular)
 
-**Gesamtergebnis:** [PASS / PASS MIT HINWEISEN / FAIL]
+**Gesamtergebnis:** [PASS / FAIL]  ← NUR diese zwei Werte. Kein "PASS MIT HINWEISEN". Hinweise gehoeren in den Befunde-Abschnitt, aendern aber das Ergebnis nicht.
 ```
 
 ## Rückgabe
@@ -164,37 +168,22 @@ Alle Prüfungen bestanden:
 - Part B: Alle Schlagworte sind Hauptbegriffe, keine Synonyme als Primär-Tags
 - Part C: Oberbegriff-Hierarchie ist konsistent, keine Zirkularitäten
 
-**Aktion:** Kapitel wird **freigegeben**. Übergabe zum Publikations-System oder zur Wiki-Integration.
-
-### PASS MIT HINWEISEN
-Überwiegend korrekt, aber mit Verbesserungsmöglichkeiten:
-- Part A: 1–2 neue Schlagworte könnten optional zu `_vokabular.md` hinzugefügt werden (sind aber fachlich verständlich auch ohne formalen Eintrag)
-- Part B: Alle Schlagworte sind Hauptbegriffe, aber 1 Keyword könnte einen zusätzlichen Synonym-Eintrag bekommen
-- Part C: Hierarchie ist konsistent, aber 1 Oberbegriff könnte präzisiert werden (z.B. sehr allgemein)
-
-**Aktion:** Kapitel wird freigegeben. Autor sollte optionale Verbesserungen in zukünftigen Updates vornehmen.
+**Aktion:** Kapitel wird **freigegeben**.
 
 ### FAIL
-Eines oder mehrere Kriterien nicht erfüllt:
-- Part A: ≥2 Schlagworte fehlen in `_vokabular.md`
+Mindestens ein konkreter Mangel:
+- Part A: ≥1 Schlagwort fehlt in `_vokabular.md`
 - Part B: ≥1 Keyword ist ein Synonym, das nicht als Hauptbegriff definiert ist
 - Part C: Hierarchie ist inkonsistent oder zirkulär (Oberbegriff nicht definiert, oder Zirkelverweis)
 
-**Aktion:** Rückweisung. Kapitel wird mit `[VOKABULAR-FEHLER]` markiert. Autor wird aufgefordert, fehlende Vokabular-Einträge zu ergänzen, Synonyme durch Hauptbegriffe zu ersetzen und Hierarchie zu korrigieren.
+**Aktion:** Rückweisung. Kapitel wird mit `[VOKABULAR-FEHLER]` markiert. Fehlende Vokabular-Einträge ergänzen, Synonyme durch Hauptbegriffe ersetzen, Hierarchie korrigieren.
 
 ## FAIL-Kriterien (nicht verhandelbar)
 
-- **≥2 Schlagworte nicht in Vokabular:** Einträge fehlen komplett in `_vokabular.md`
-- **≥1 Synonym als Hauptbegriff:** Keyword ist ein dokumentiertes Synonym eines anderen Begriffs (nicht dessen Hauptbegriff)
+- **≥1 Schlagwort nicht in Vokabular:** Eintrag fehlt in `_vokabular.md`
+- **≥1 Synonym als Hauptbegriff:** Keyword ist ein dokumentiertes Synonym eines anderen Begriffs
 - **Zirkuläre Oberbegriff-Struktur:** X → Y → X oder längere Zyklen
 - **Oberbegriff nicht definiert:** Ein Keyword hat einen Oberbegriff, der selbst nicht in `_vokabular.md` existiert
-
-## Hinweis-Kriterien (sind verhandelbar)
-
-- **1 Keyword könnte in Vokabular ergänzt werden:** Ist fachlich verständlich, aber formal nicht dokumentiert (optional)
-- **Oberbegriff ist sehr allgemein:** z.B. Oberbegriff ist "Konzepte" oder "Themen" (könnite präzisiert werden, ist aber nicht falsch)
-- **1 Keyword könnte zusätzliche Synonyme bekommen:** Vokabular-Eintrag ist vorhanden, könnte aber erweitert werden
-- **Hierarchie könnte strukturierter sein:** Keine Fehler, aber Konsolidierung von sehr ähnlichen Begriffen wäre möglich
 
 ## Re-Review-Limit
 

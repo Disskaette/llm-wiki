@@ -1,3 +1,7 @@
+---
+model: sonnet
+---
+
 # Subagent: Konsistenzprüfer
 
 ## Governance-Zuständigkeit
@@ -141,7 +145,7 @@ Validierte Wikilinks: [m/M]
   - `<konzeptseite-A>` ↔️ `<konzeptseite-B>`?
     → Status: [Separate Konzepte] oder [Doppelung — sollte zusammengefasst werden]
 
-**Gesamtergebnis:** [PASS / PASS MIT HINWEISEN / FAIL]
+**Gesamtergebnis:** [PASS / FAIL]  ← NUR diese zwei Werte. Kein "PASS MIT HINWEISEN". Hinweise gehoeren in den Befunde-Abschnitt, aendern aber das Ergebnis nicht.
 ```
 
 ## Rückgabe
@@ -149,44 +153,30 @@ Validierte Wikilinks: [m/M]
 ### PASS
 Alle Prüfungen bestanden:
 - Part A: Keine Widersprüche zu bestehenden Wiki-Seiten erkannt, oder Widersprüche sind begründet unterschiedliche Perspektiven
-- Part B: Alle potenziellen Widersprüche sind mit `[WIDERSPRUCH]` gekennzeichnet und erläutert
+- Part B: Alle potenziellen Widersprüche sind mit `[WIDERSPRUCH]` gekennzeichnet und ausreichend erläutert
 - Part C: Alle Wikilinks sind gültig und zeigen auf existente Seiten
 - Part D: Keine Dopplungen in Konzept-Seiten
 
 **Aktion:** Weiterleitung zu Gate 4 (vokabular-pruefer).
 
-### PASS MIT HINWEISEN
-Überwiegend konsistent, aber mit kleinen Anmerkungen:
-- Part A: 1 Aussage könnte mit vorhandener Wiki-Seite klarer harmonisiert werden (aber kein echter Widerspruch)
-- Part B: 1 Widerspruch ist markiert, aber die Erläuterung könnte ausführlicher sein
-- Part C: 1–2 Wikilinks sind ungültig (z.B. falsche Schreibweise), aber leicht zu korrigieren
-- Part D: 1 Konzept könnte mit ähnlicher bestehender Seite zusammengefasst werden (optional)
-
-**Aktion:** Weiterleitung zu Gate 4 mit Hinweis. Autor sollte die Anmerkungen nacharbeiten.
-
 ### FAIL
-Eines oder mehrere Kriterien nicht erfüllt:
-- Part A: Klarer Widerspruch zu bestehender Wiki-Seite, nicht begründet (z.B. "X ist wahr" vs. "X ist falsch")
-- Part B: Unmarkierter Widerspruch vorhanden (Autor hat potenziellen Konflikt ignoriert)
-- Part C: ≥2 ungültige Wikilinks (Links zeigen ins Leere)
-- Part D: Klare Doppelung mit bestehender Konzept-Seite (zwei Seiten für gleichen Sachverhalt)
+Mindestens ein konkreter Mangel:
+- Part A: Klarer Widerspruch zu bestehender Wiki-Seite, nicht begründet
+- Part B: Unmarkierter Widerspruch vorhanden, oder Widerspruch-Erläuterung unzureichend
+- Part C: ≥1 ungültiger Wikilink (Link zeigt ins Leere)
+- Part D: Klare Doppelung mit bestehender Konzept-Seite
 
 **Aktion:** Rückweisung. Kapitel wird mit `[KONSISTENZ-FEHLER]` markiert. Autor wird aufgefordert, Widersprüche zu klären, tote Links zu reparieren und Dopplungen aufzulösen.
 
 ## FAIL-Kriterien (nicht verhandelbar)
 
-- **Unmarkierter Widerspruch:** Kapitel widerspricht bestehender Wiki-Seite, aber es gibt keinen `[WIDERSPRUCH]`-Marker und keine Erläuterung
-- **≥2 tote Wikilinks:** Links zeigen auf nicht-existente Seiten, keine Fallback-Erklärung
+- **Unmarkierter Widerspruch:** Kapitel widerspricht bestehender Wiki-Seite ohne `[WIDERSPRUCH]`-Marker
+- **Unzureichende Widerspruch-Erläuterung:** Marker vorhanden, aber Erläuterung fehlt oder ist unklar
+- **≥1 toter Wikilink:** Link zeigt auf nicht-existente Seite
 - **Klare Doppelung:** Zwei Konzept-Seiten für denselben Sachverhalt ohne erkennbare Unterscheidung
-- **Unklar markierte Widersprüche:** `[WIDERSPRUCH]`-Marker vorhanden, aber Erläuterung ist unlesbar oder führt zu keiner Klärung
-
-## Hinweis-Kriterien (sind verhandelbar)
 
 - **1 potenzieller Widerspruch:** Aussage könnte mit Wiki-Seite besser harmonisiert werden, ist aber aus anderem Blickwinkel nicht falsch
 - **Unvollständiger [WIDERSPRUCH]-Marker:** Marker vorhanden, aber Erläuterung könnte ausführlicher sein ("welche Quelle erklärt die Abweichung?")
-- **1–2 Schreib-Fehler in Wikilinks:** z.B. `[[<Konzept-Tippfehler>]]` (typo), aber Zielseite existiert mit korrekter Schreibweise
-- **1 Konzept könnte zusammengefasst werden:** Überschneidung mit bestehender Seite ist teilweise, nicht vollständig (optional zu vereinigen)
-
 ## Re-Review-Limit
 
 **NICHT-VERHANDELBAR:** Max. 3 Re-Review-Iterationen pro Kapitel.

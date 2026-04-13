@@ -1,5 +1,9 @@
 # Subagent: Norm-Reviewer
 
+---
+model: sonnet
+---
+
 > **Bedingung:** Dieser Agent ist nur relevant wenn Domain-Typ "norm"
 > in seitentypen.md aktiv ist. Andernfalls wird er nicht dispatcht.
 
@@ -210,7 +214,7 @@ Nicht markierte alte Normen: [m]
 
 ---
 
-**Gesamtergebnis:** [PASS / PASS MIT HINWEISEN / FAIL]
+**Gesamtergebnis:** [PASS / FAIL]  ← NUR diese zwei Werte. Kein "PASS MIT HINWEISEN". Hinweise gehoeren in den Befunde-Abschnitt, aendern aber das Ergebnis nicht.
 ```
 
 ## Rückgabe
@@ -224,37 +228,21 @@ Norm-Update vollständig durchgearbeitet:
 
 **Aktion:** Bericht wird ausgegeben als Info. Norm-Update ist abgeschlossen.
 
-### PASS MIT HINWEISEN
-Überwiegend vollständig, aber mit kleineren Anmerkungen:
-- Part A: Alle wichtigen Seiten identifiziert, aber 1 Seite könnte noch überprüft werden
-- Part B: Änderungen sind dokumentiert, aber 1 Sektion könnte ausführlicher sein
-- Part C: Alte Norm ist korrekt markiert
-- Part D: Fast alle Zahlenwerte propagiert, aber 1–2 Nebenseiten könnten aktualisiert werden
-
-**Aktion:** Bericht wird ausgegeben. Autor sollte Hinweise nacharbeiten (optional).
-
 ### FAIL
-Eines oder mehrere Kriterien nicht erfüllt:
-- Part A: ≥2 wichtige betroffene Seiten wurden übersehen
-- Part B: ≥2 Seiten dokumentieren Änderungen nicht oder unvollständig
+Mindestens ein konkreter Mangel:
+- Part A: ≥1 betroffene Seite wurde übersehen
+- Part B: ≥1 Seite dokumentiert Änderungen nicht oder unvollständig
 - Part C: Alte Norm ist nicht als "ersetzt" markiert
-- Part D: ≥3 Zahlenwerte sind übersehen oder noch nicht propagiert (kritische Seiten wie Formeln, Beispiele)
+- Part D: ≥1 Zahlenwert ist nicht propagiert (auf Seiten mit Formeln, Beispielen oder Normwert-Tabellen)
 
-**Aktion:** Bericht wird ausgegeben mit Fehler-Markierung. Nutzer wird aufgefordert, fehlende Identifikationen nachzuarbeiten und Zahlenwerte zu propagieren.
+**Aktion:** Bericht wird ausgegeben mit Fehler-Markierung. Fehlende Identifikationen nacharbeiten und Zahlenwerte propagieren.
 
 ## FAIL-Kriterien (nicht verhandelbar)
 
-- **≥2 betroffene Seiten übersehen:** Part A ist unvollständig
-- **≥2 Seiten-Dokumentationen fehlend:** Part B hat Lücken (alte Aussagen nicht als veraltet gekennzeichnet)
+- **≥1 betroffene Seite übersehen:** Part A ist unvollständig
+- **≥1 Seiten-Dokumentation fehlend:** Part B hat Lücken
 - **Alte Norm nicht markiert:** Part C ist nicht erfüllt
-- **≥3 kritische Zahlenwerte nicht propagiert:** z.B. in Formeln, Bemessungs-Beispiele, Normwert-Tabellen (Part D kritisch fehlgeschlagen)
-
-## Hinweis-Kriterien (sind verhandelbar)
-
-- **1 Seite könnte überprüft werden:** Grenzwertig betroffene Seite (z.B. nur indirekte Bezüge)
-- **1 Dokumentation könnte ausführlicher sein:** Part B ist vorhanden, aber könnte Details (Grund, Auswirkung) besser erklären
-- **1–2 Seiten mit Zahlenwert-Updates:** Über-sehen, aber nicht kritisch (z.B. Hintergrund-Seiten, nicht in Beispielen verwendet)
-- **Unklar, ob Zahlenwert aktualisiert wurde:** z.B. Zahl ist in Text versteckt, nicht sofort erkennbar (für weitere Überprüfung markiert)
+- **≥1 Zahlenwert nicht propagiert:** auf Seiten mit Formeln, Bemessungs-Beispielen oder Normwert-Tabellen
 
 ## Re-Review-Limit
 

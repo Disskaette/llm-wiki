@@ -1,3 +1,7 @@
+---
+model: sonnet
+---
+
 # Subagent: Duplikat-Validator
 
 ## Governance-Zuständigkeit
@@ -208,46 +212,32 @@ Datei 2: wiki/quellen/Mueller-2020b.md
 
 ---
 
-**Gesamtergebnis:** [PASS / PASS MIT HINWEISEN / FAIL]
+**Gesamtergebnis:** [PASS / FAIL]  ← NUR diese zwei Werte. Kein "PASS MIT HINWEISEN". Hinweise gehoeren in den Befunde-Abschnitt, aendern aber das Ergebnis nicht.
 ```
 
 ## Rückgabe
 
 ### PASS
-Keine Duplikate oder Verdächte erkannt:
+Keine Duplikate erkannt:
 - Part A: Keine Quellen-Duplikate
 - Part B: Keine Konzept-Duplikate
 - Part C: Keine exakten Duplikate
 
-**Aktion:** "Alles in Ordnung" — Scan abgeschlossen, keine Maßnahmen nötig.
-
-### PASS MIT HINWEISEN
-Verdächte erkannt, aber wahrscheinlich nicht-kritisch:
-- Part A: 1–2 Quellen-Verdächte (z.B. Dissertation vs. Zeitschrifts-Publikation desselben Autors — wahrscheinlich OK)
-- Part B: 1 grenzwertiges Konzept-Duplikat (könnte konsolidiert werden, aber nicht kritisch)
-- Part C: Keine exakten Duplikate
-
-**Aktion:** Bericht wird ausgegeben mit Hinweisen. Nutzer überprüfen verdächtige Paare, treffen Entscheidung (zusammenfassen ja/nein).
+**Aktion:** Scan abgeschlossen, keine Maßnahmen nötig.
 
 ### FAIL
-Echte oder kritische Duplikate erkannt:
+Echte Duplikate erkannt:
 - Part A: ≥1 echtes Quellen-Duplikat (identisches author+year+title, zwei Datei-Einträge)
-- Part B: ≥2 echte Konzept-Duplikate (identische oder extrem überlappende Seiten)
+- Part B: ≥1 echtes Konzept-Duplikat (identische oder extrem überlappende Seiten)
 - Part C: ≥1 exaktes Duplikat
 
-**Aktion:** Bericht wird ausgegeben mit Fehler-Markierung. Duplikate werden mit `[DUPLIKAT]` markiert. Nutzer wird aufgefordert, echte Duplikate zu konsolidieren (Datei löschen, Wikilinks umleiten).
+**Aktion:** Duplikate werden mit `[DUPLIKAT]` markiert. Echte Duplikate konsolidieren (Datei löschen, Wikilinks umleiten).
 
 ## FAIL-Kriterien (nicht verhandelbar)
 
 - **≥1 echtes Quellen-Duplikat:** Zwei Datei-Einträge mit identischen author+year+title
-- **≥2 echte Konzept-Duplikate:** Seiten mit 90%+ Synonym-Überlappung oder identischen Titeln (nach Normalisierung)
+- **≥1 echtes Konzept-Duplikat:** Seiten mit 90%+ Synonym-Überlappung oder identischen Titeln (nach Normalisierung)
 - **≥1 exaktes Duplikat:** title, author, year alle identisch (Part C)
-
-## Hinweis-Kriterien (sind verhandelbar)
-
-- **1 Quellen-Verdacht:** author+year gleich, aber Titel unterscheidet sich (z.B. Konferenz-Abstract vs. Zeitschrifts-Version)
-- **1 Konzept-Verdacht:** 50–80% Synonym-Überlappung (könnte zusammengefasst werden, ist aber nicht eindeutig)
-- **Grenzwertige Nomenklatur:** Seiten sind semantisch unterschiedlich, aber Namen sind ähnlich (z.B. "Rollschubverhalten" vs. "Rollschub-Überprüfung" — sind tatsächlich unterschiedliche Themen)
 
 ## Re-Review-Limit
 

@@ -12,6 +12,23 @@ nicht ein Hook. Keine Pipeline darf ohne abgeschlossene Gates weitergehen.
 - **Ingest:** 4 Gates (Gate 1-4: vollstaendigkeits-, quellen-, konsistenz-, vokabular-pruefer)
 - **Synthese:** 3 Gates (Gate 2-4: quellen-, konsistenz-, vokabular-pruefer — kein vollstaendigkeits-pruefer)
 
+## Concurrency-Limit
+
+<NICHT-VERHANDELBAR>
+Maximal **4 Agents gleichzeitig** dispatchen. Das gilt fuer ALLE
+Agent-Dispatches dieses Plugins — Worker, Gates, Reviewer.
+
+Bei Gate-Review fuer mehrere Quellen (Batch-Nachholung, Catch-Up):
+→ SEQUENTIELL pro Quelle abarbeiten.
+→ Erst alle Gates fuer Quelle 1 (max 4 parallel), abwarten.
+→ Dann alle Gates fuer Quelle 2, abwarten.
+→ Usw.
+
+KEIN paralleles Dispatchen von Gates verschiedener Quellen.
+12 gleichzeitige Agents ueberlasten die Session und machen
+Fehler-Nachverfolgung unmoeglich.
+</NICHT-VERHANDELBAR>
+
 ## Pipeline-ID-Marker
 
 JEDER Gate-Prompt MUSS den Platzhalter `{{PIPELINE_ID_MARKER}}` enthalten.
@@ -23,10 +40,23 @@ Gate-Agents geben den Marker im Output-Bericht zurueck. `advance-pipeline-lock.s
 extrahiert ihn aus `last_assistant_message` und verifiziert gegen `_pending.json.quelle`.
 Bei Mismatch wird der Counter NICHT inkrementiert.
 
+## Modellwahl
+
+| Gate | Agent | Modell | Begruendung |
+|------|-------|--------|-------------|
+| Gate 1 | vollstaendigkeits-pruefer | **dynamisch** | PDF >200 Seiten → `model: "opus"`, sonst `model: "sonnet"` (wie Ingest-Worker) |
+| Gate 2 | quellen-pruefer | **opus** (erbt vom Parent) | 7 Parts, PDF-Spot-Checks, semantische Treue — braucht Opus |
+| Gate 3 | konsistenz-pruefer | **sonnet** (Frontmatter) | Nur Wiki-Seiten, kein PDF. Strukturierte Vergleichsaufgabe |
+| Gate 4 | vokabular-pruefer | **sonnet** (Frontmatter) | Frontmatter-Matching gegen _vokabular.md |
+
+Gate 3 und 4 haben `model: sonnet` im Agent-Frontmatter — kein Override noetig.
+Gate 1 hat KEIN Frontmatter-Model — der Dispatcher MUSS `model:` explizit setzen.
+Gate 2 erbt das Parent-Model (Opus) — kein Override noetig.
+
 ## Dispatch-Reihenfolge
 
 Gate 1-4 koennen PARALLEL dispatcht werden (sind unabhaengig voneinander).
-Alle 4 muessen PASS (oder PASS MIT HINWEISEN) bevor Phase 4 beginnt.
+Alle 4 muessen PASS bevor Phase 4 beginnt.
 
 ## Mechanische Pruefung
 
@@ -96,7 +126,7 @@ Original-PDF: {{PDF_PFAD}}
 ## Prüfbericht: Vollständigkeitsprüfer
 
 **Datei:** [Dateiname]
-**Ergebnis:** PASS / PASS MIT HINWEISEN / FAIL
+**Ergebnis:** PASS / FAIL
 
 ### Kapitelerfassung: [OK/Lücken]
 ### kapitel-index: [Vollständig/Unvollständig]
@@ -214,7 +244,7 @@ Lies den Body-Text und prüfe auf verbleibende ASCII-Umlaut-Ersetzungen:
 ## Prüfbericht: Quellenprüfer
 
 **Datei:** [Dateiname]
-**Ergebnis:** PASS / PASS MIT HINWEISEN / FAIL
+**Ergebnis:** PASS / FAIL
 
 ### Kontextuelle Checks
 - Zahlenwerte ohne Quelle: [n gefunden, davon m echte Mängel]
@@ -287,7 +317,7 @@ Wiki-Root: {{WIKI_ROOT}}
 ## Prüfbericht: Konsistenzprüfer
 
 **Datei:** [Dateiname]
-**Ergebnis:** PASS / PASS MIT HINWEISEN / FAIL
+**Ergebnis:** PASS / FAIL
 
 ### Widersprüche: [n gefunden, alle markiert: ja/nein]
 ### Wikilinks: [n geprüft, m ungültig]
@@ -345,7 +375,7 @@ Vokabular: {{VOKABULAR_PFAD}}
 ## Prüfbericht: Vokabulärprüfer
 
 **Datei:** [Dateiname]
-**Ergebnis:** PASS / PASS MIT HINWEISEN / FAIL
+**Ergebnis:** PASS / FAIL
 
 ### Vokabular: [n Terme, alle definiert: ja/nein]
 ### Synonyme: [keine Synonyme als Tags / n gefunden]
@@ -376,9 +406,3 @@ Vokabular: {{VOKABULAR_PFAD}}
 4. Re-Dispatche das fehlgeschlagene Gate (max 3×)
 5. Nach 3× FAIL: Eskalation an Nutzer
 
-### PASS MIT HINWEISEN
-
-Behandle wie PASS, aber notiere Hinweise in _log.md:
-```
-- Gates: 4/4 PASS (quellen: PASS MIT HINWEISEN — 2 Seitenangaben könnten präziser sein)
-```
