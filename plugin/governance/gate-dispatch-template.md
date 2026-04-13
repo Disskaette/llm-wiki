@@ -311,6 +311,37 @@ Wiki-Root: {{WIKI_ROOT}}
 3. **Duplikate:** Gibt es im Wiki bereits eine Seite für denselben
    Sachverhalt unter anderem Namen?
 
+4. **Discovery-Check (NUR bei Synthese-Gates, nicht bei Ingest):**
+
+   Pruefe nur wenn der Pipeline-ID-Marker mit [SYNTHESE-ID:...] beginnt.
+   Bei [INGEST-ID:...]: Part D ueberspringen, "N/A (Ingest)" melden.
+
+   a) Hat der Worker einen [DISCOVERY]-Block im Output geliefert?
+      → FEHLT komplett: FAIL — "[DISCOVERY]-Block fehlt im Worker-Output"
+
+   b) Wenn "keine" bei Kandidaten/Vorschlaegen:
+      Gibt es eine KEINE-DISCOVERY-BEGRUENDUNG?
+      → FEHLT: FAIL — "Leerer Discovery-Block ohne Begruendung"
+      → Ist die Begruendung plausibel? Nicht nur "nichts gefunden" —
+        muss erklaeren WARUM nichts entdeckt wurde.
+
+   c) Wenn Konzept-Kandidaten gemeldet:
+      → Ist fuer jeden Kandidat mindestens eine Quelle mit Kontext angegeben?
+      → Existiert der Term bereits als Konzeptseite im Wiki? → kein Kandidat.
+
+   d) Wenn Schlagwort-Vorschlaege gemeldet:
+      → Sind die als "neu" vorgeschlagenen Terme tatsaechlich NICHT in _vokabular.md?
+      → Sind die fehlenden Zuordnungen plausibel? (Quelle behandelt Thema wirklich?)
+
+   e) Wenn Vokabular-Ergaenzungen gemeldet:
+      → Lies _vokabular.md und pruefe: Steht der neue Term jetzt drin?
+      → Falls nicht: FAIL — "Vokabular-Ergaenzung gemeldet aber nicht geschrieben"
+
+   f) Wenn Schlagwort-Patches gemeldet:
+      → Lies das schlagworte:-Feld der gepatchten Quellenseite.
+      → Wurde das Schlagwort tatsaechlich ergaenzt?
+      → Wurden bestehende Schlagworte entfernt? → FAIL — "Nicht-additiver Patch"
+
 ## Output
 
 ```markdown
@@ -322,6 +353,7 @@ Wiki-Root: {{WIKI_ROOT}}
 ### Widersprüche: [n gefunden, alle markiert: ja/nein]
 ### Wikilinks: [n geprüft, m ungültig]
 ### Duplikate: [keine / Verdachtsfälle]
+### Discovery: [PASS/FAIL/N/A] — [Befunde]
 
 **Befunde:** [Konkrete Liste]
 ```
