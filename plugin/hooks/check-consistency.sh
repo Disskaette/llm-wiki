@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-consistency.sh — 21 Plugin-interne Konsistenzpruefungen
+# check-consistency.sh — 22 Plugin-interne Konsistenzpruefungen
 # Aufruf: ./check-consistency.sh [plugin-root]
 #
 # Exit 0 = alles konsistent
@@ -301,6 +301,21 @@ if [ -f "$DG_FILE" ] && [ -f "$HG_FILE" ]; then
     fi
 else
     check FAIL "21-domain-gates-valid" "Dateien nicht gefunden (domain-gates: $([ -f "$DG_FILE" ] && echo ja || echo nein), hard-gates: $([ -f "$HG_FILE" ] && echo ja || echo nein))"
+fi
+
+# --- Check 22: Synthese-Template hat Discovery-Platzhalter ---
+if [ -f "$ROOT/governance/synthese-dispatch-template.md" ]; then
+    DISC_PH=0
+    grep -q '{{KONZEPT_REIFE_INHALT}}' "$ROOT/governance/synthese-dispatch-template.md" && DISC_PH=$((DISC_PH+1))
+    grep -q '{{SCHLAGWORT_VORSCHLAEGE_INHALT}}' "$ROOT/governance/synthese-dispatch-template.md" && DISC_PH=$((DISC_PH+1))
+    grep -q '\[DISCOVERY\]' "$ROOT/governance/synthese-dispatch-template.md" && DISC_PH=$((DISC_PH+1))
+    if [ "$DISC_PH" -ge 3 ]; then
+        check PASS "22-discovery-template" ""
+    else
+        check FAIL "22-discovery-template" "Synthese-Template: nur $DISC_PH/3 Discovery-Elemente (Platzhalter + Block)"
+    fi
+else
+    check FAIL "22-discovery-template" "Synthese-Template fehlt"
 fi
 
 # --- Ergebnis ---
