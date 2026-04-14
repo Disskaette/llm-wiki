@@ -68,7 +68,14 @@ Pfad:   {{QUELLEN_PFAD}}
 
 Lese-Strategie:
 - pdf: Read-Tool mit pages-Parameter. Jede Seite lesen.
-  Seitenangaben im Text: (S. 42), (S. 42-48)
+  WICHTIG — Seitenangaben beziehen sich IMMER auf die PHYSISCHE PDF-Seite
+  (= die Zahl die du dem Read-Tool als pages-Parameter uebergibst),
+  NICHT auf die im Buch gedruckte Seitennummer. Viele Buecher haben
+  Vorwort/Inhaltsverzeichnis die einen Offset erzeugen.
+  Beispiel: Du liest Read(pages: "42"). Auf der Seite steht gedruckt "30".
+  Du schreibst: [[datei.pdf#page=42|Autor Jahr, S. 42]]
+  (NICHT S. 30 — Obsidian navigiert mit #page= zur physischen PDF-Seite)
+  (siehe Link-Konventionen unten — NICHT als Plaintext "(S. 42)")
 - markdown: Read-Tool direkt auf gesamte Datei.
   Abschnitts-Referenzen statt Seiten: (Abschnitt "Titel")
 - url: WebFetch-Tool. HTML als Text extrahieren.
@@ -89,8 +96,10 @@ AUFTRAG
 REGELN — NICHT VERHANDELBAR
 ═══════════════════════════════════════════════════════
 
-- Jede Aussage MIT Seitenangabe.
-- Jeder Zahlenwert MIT Quelle + Seite.
+- Jede Aussage MIT Seitenangabe als PDF-Link: [[datei.pdf#page=N|Autor Jahr, S. N]]
+  (N = PHYSISCHE PDF-Seite vom Read-Tool, NICHT gedruckte Buchnummer)
+  (bei Markdown/URL-Quellen: Abschnitts-Referenz statt PDF-Link)
+- Jeder Zahlenwert MIT Quelle + Seite (als PDF-Link bei PDF-Quellen).
 - Jeder Normbezug MIT Abschnittsnummer.
 - Deutsche Umlaute (ae, oe, ue, ss) in Wiki-Text, ASCII in Dateinamen.
 - Schlagworte NUR aus dem kontrollierten Vokabular (siehe oben).
@@ -184,6 +193,8 @@ LINK-KONVENTIONEN (3 TYPEN)
 
 1. Beleg im Fliesstext (direkt ins PDF):
    [[datei.pdf#page=N|Autor Jahr, S. N]]
+   N = PHYSISCHE PDF-Seite (Read-Tool pages-Parameter).
+   Obsidian oeffnet die PDF an genau dieser Stelle.
 
 2. Fachbegriff (Konzeptseite):
    [[konzeptname|Anzeigename]]

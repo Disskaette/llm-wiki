@@ -69,7 +69,7 @@ ERLAUBT: `wiki/moc/moc-querkraft.md` (Praefix unterscheidet)
 
 | Nr | Typ | Quellformat | Syntax |
 |----|-----|-------------|--------|
-| 1 | PDF-Beleg | PDF | `[[datei.pdf#page=N\|Autor Jahr, S. N]]` |
+| 1 | PDF-Beleg | PDF | `[[datei.pdf#page=N\|Autor Jahr, S. N]]` (N = physische PDF-Seite, nicht gedruckte Buchnummer) |
 | 2 | Fachbegriff | Alle | `[[konzeptname\|Anzeigename]]` |
 | 3 | Normverweis | Alle (nur bei aktivem norm-Typ) | `[[normseite\|Norm, §X.Y]]` |
 | 4 | Markdown-Beleg | Markdown | `[[datei.md#heading\|Autor Jahr, Abschnitt "Titel"]]` |

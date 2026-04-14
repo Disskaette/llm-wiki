@@ -210,6 +210,8 @@ LINK-KONVENTIONEN (3 TYPEN)
 
 1. Beleg im Fliesstext (direkt ins PDF):
    [[datei.pdf#page=N|Autor Jahr, S. N]]
+   N = PHYSISCHE PDF-Seite (Read-Tool pages-Parameter, nicht gedruckte Buchnummer).
+   Obsidian oeffnet die PDF an genau dieser Stelle.
 
 2. Fachbegriff (Konzeptseite):
    [[konzeptname|Anzeigename]]
@@ -234,6 +236,7 @@ REGELN — NICHT VERHANDELBAR
 ═══════════════════════════════════════════════════════
 
 - Jede Aussage MIT Seitenangabe als PDF-Link: [[datei.pdf#page=N|Autor Jahr, S. N]]
+  (N = PHYSISCHE PDF-Seite, nicht gedruckte Buchnummer)
   (Seitenangabe IMMER als klickbarer Link, nie als Plaintext "(S. N)")
 - Jeder Zahlenwert MIT Quelle + Seite (als PDF-Link).
 - Jeder Normbezug MIT Abschnittsnummer.

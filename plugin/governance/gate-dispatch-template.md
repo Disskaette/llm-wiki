@@ -221,7 +221,12 @@ Diese Checks können NUR du bewerten — das Shell-Script gibt nur WARN:
 ### B: Spot-Check (min. 5 Stichproben bei pdf/markdown, min. 3 bei url)
 
 Spot-Check-Strategie je nach Quellen-Format (aus {{QUELLEN_FORMAT}}):
-- **pdf:** 5 zufaellige Seitenangaben gegen PDF-Seiten verifizieren
+- **pdf:** 5 zufaellige Seitenangaben gegen PDF-Seiten verifizieren.
+  WICHTIG: #page=N in Wikilinks ist die PHYSISCHE PDF-Seite (Read-Tool pages-Parameter),
+  NICHT die im Buch gedruckte Seitennummer. Beim Spot-Check: Read(pages: "N") ausfuehren
+  und pruefen ob der zitierte Inhalt auf dieser physischen Seite steht.
+  Falls der Ingest-Worker faelschlicherweise gedruckte Buchnummern statt physische
+  PDF-Seiten verwendet hat → FAIL (Seitenangaben stimmen nicht mit PDF ueberein).
 - **markdown:** 5 zufaellige Abschnitts-Referenzen gegen Datei verifizieren
 - **url:** WebFetch erneut ausfuehren + 3 Stichproben pruefen (Inhalt kann sich seit Ingest geaendert haben)
 

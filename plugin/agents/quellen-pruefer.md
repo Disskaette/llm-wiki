@@ -109,7 +109,12 @@ Minimum 5 Spot-Checks, skaliert mit Zitationsanzahl:
 - Zitationen aus Kapiteln die als "niedrig relevant" markiert wurden
 
 **Pro Spot-Check:**
-- Navigiere zur angegebenen Seite im Quellen-PDF
+- Navigiere zur angegebenen Seite im Quellen-PDF: Read(pages: "N") wobei N aus #page=N
+- WICHTIG: #page=N ist die PHYSISCHE PDF-Seite (Read-Tool pages-Parameter),
+  NICHT die gedruckte Buchnummer. Viele Buecher haben einen Offset durch
+  Vorwort/Inhaltsverzeichnis. Falls Read(pages: "N") nicht den zitierten
+  Inhalt zeigt, hat der Ingest-Worker moeglicherweise die gedruckte
+  Buchnummer statt der physischen PDF-Seite verwendet → FAIL
 - Prüfe, ob die zitierte Aussage tatsächlich dort vorhanden ist
 - Prüfe, ob die Seitennummer realistisch ist (z.B. nicht "S. 500" bei 300-seitigen PDF)
 - Prüfe, ob zitierte Normen-Abschnitte auf der angegebenen Seite tatsächlich erwähnt werden
