@@ -77,10 +77,12 @@ Falls `_schlagwort-vorschlaege.md` nicht existiert:
    - Alle Norm-Paragraph-Verweise
    - Dateilisten erstellen: welche PDFs muessen geladen werden?
 
-3. **Token-Budget pruefen:**
-   - Zaehlen: Zielseite + alle Quell-Kapitel?
-   - Falls >700K Tokens: Split-Plan erstellen (Quelle 1-2, dann 3-4, ...)
-   - Falls <100K Tokens: Single-Shot moeglich
+3. **Token-Budget einordnen:**
+   - Opus-Worker hat 1M Tokens. Sonnet-Worker hat 200K.
+   - Synthese-Worker laeuft IMMER auf Opus (1M).
+   - Typisches Quellenmaterial fuer ein Konzept: 50-400K Tokens.
+   - Split NUR wenn Quellenmaterial > 700K Tokens (>20 ausfuehrliche Quellen).
+   - Bei <700K: KEIN Split, KEIN Batch, alles in einen Worker.
 
 ---
 
@@ -208,6 +210,7 @@ Subagent-Prompts werden NICHT frei formuliert. IMMER Template verwenden.
 <NICHT-VERHANDELBAR>
 KEIN INFORMATIONSVERLUST: Fuer JEDE Quellenseite gilt:
 - Jede Formel → muss in der Konzeptseite landen
+- Jede Aussage die von MEHREREN Quellen gestuetzt wird → ALLE Quellen zitieren (Sammelzitat mit Semikolon)
 - Jeder Zahlenwert → muss in der Vergleichstabelle landen
 - Jede Randbedingung → muss dokumentiert sein
 - Jeder Normbezug → muss mit Abschnitt erfasst sein

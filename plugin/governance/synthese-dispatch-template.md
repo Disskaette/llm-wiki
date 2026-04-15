@@ -59,6 +59,21 @@ deine PRIMAERE Datenbasis.
 {{QUELLENSEITEN_INHALT}}
 
 ═══════════════════════════════════════════════════════
+CONTEXT-BUDGET — FAKTEN
+═══════════════════════════════════════════════════════
+
+Du laeuft als Opus-Worker mit 1.000.000 Tokens Context.
+Die inline eingefuegten Quellenseiten belegen typischerweise 50-400K Tokens.
+Du hast IMMER genug Platz fuer alle Quellen eines Konzepts.
+
+KEIN SPLIT erforderlich wenn Quellenmaterial < 700K Tokens.
+KEIN Aufteilen auf mehrere Agents.
+KEIN "ich mache das in Batches".
+
+Wenn du glaubst der Context reicht nicht: Du hast 1M Tokens.
+Lies die Quellen. Schreib die Seite. Fertig.
+
+═══════════════════════════════════════════════════════
 DISCOVERY-KONTEXT (INLINE)
 ═══════════════════════════════════════════════════════
 
@@ -86,6 +101,9 @@ LESESTRATEGIE — NICHT VERHANDELBAR
 Schritt 1: Wiki-Quellenseiten lesen (IMMER)
    → Alle inline eingefuegten Quellenseiten durcharbeiten
    → Extrahiere: Formeln, Zahlenwerte, Normbezuege, Widersprueche
+   → Extrahiere: PDF-Dateinamen (aus Frontmatter `pdf:`-Feld) und
+     physische Seitenzahlen (aus den [[datei.pdf#page=N|...]]-Links).
+     Diese brauchst du fuer die Dual-Links auf der Konzeptseite.
 
 Schritt 2: Vergleichende Analyse
    → Formeln nebeneinanderstellen
@@ -111,6 +129,32 @@ Fuer JEDE Quellenseite gilt:
 - Jeder Zahlenwert → muss in der Vergleichstabelle erscheinen
 - Jede Randbedingung → muss dokumentiert werden
 - Jeder Normbezug → muss Abschnittsnummer enthalten
+
+═══════════════════════════════════════════════════════
+ALLE STUETZENDEN QUELLEN ZITIEREN — NICHT VERHANDELBAR
+═══════════════════════════════════════════════════════
+
+Wenn MEHRERE Quellen dieselbe Aussage stuetzen, muessen ALLE zitiert
+werden — nicht nur eine. Die Evidenzbreite ist fuer die Masterarbeit
+entscheidend: Ein Konsens aus 4 Quellen ist staerker als 1 Einzelbeleg.
+
+FALSCH (1 Quelle, obwohl 4 es sagen):
+  Die gesamte Auflagerkraft muss aufgehaengt werden
+  ([[zilch2010|Zilch 2010]], [[pdf#page=268|S. 268]])
+
+RICHTIG (alle stuetzenden Quellen):
+  Die gesamte Auflagerkraft muss aufgehaengt werden
+  ([[zilch2010|Zilch 2010]], [[pdf#page=268|S. 268]];
+   [[fingerloos2016|Fingerloos 2016]], [[pdf#page=335|S. 335]];
+   [[beer2015|Beer 2015]], [[pdf#page=186|S. 186]];
+   [[isb2013|ISB 2013]], [[pdf#page=13|S. 13]])
+
+Vorgehen:
+1. Beim Lesen der Quellenseiten: Notiere welche Aussagen in
+   MEHREREN Quellen vorkommen (gleiche Kernaussage, evtl. andere Worte)
+2. Beim Schreiben: Sammelzitat mit Semikolon-Trennung
+3. Wenn Quellen sich leicht unterscheiden (gleiche Aussage, andere
+   Randbedingung oder Zahlenwert): Einzelzitate MIT Differenzierung
 
 Im Zweifel: EINSCHLIESSEN. Weglassen nur mit expliziter Begruendung.
 
@@ -167,7 +211,7 @@ wissen WANN es gilt, dann WIE man rechnet):
 
 ### [Formelname / Anwendungsfall]
 [Formel]
-- **Quelle:** [[quellenseite|Autor Jahr]], S. N
+- **Quelle:** [[quellenseite|Autor Jahr]], [[datei.pdf#page=N|S. N]]
 - **Annahmen:** [Liste]
 - **Parameter:** [[parameter-konzept|Symbol]] = Beschreibung
 - **Gueltig fuer:** [Randbedingungen]
@@ -178,7 +222,7 @@ wissen WANN es gilt, dann WIE man rechnet):
 
 | Parameter | Wert | Einheit | Quelle | Bereich |
 |-----------|------|---------|--------|---------|
-| ... | ... | ... | [[quellenseite|Autor]], S. N | ... |
+| ... | ... | ... | [[quellenseite|Autor]], [[datei.pdf#page=N|S. N]] | ... |
 
 ## Norm-Referenzen
 
@@ -188,8 +232,8 @@ wissen WANN es gilt, dann WIE man rechnet):
 ## Widersprueche
 
 > [!CAUTION] Widerspruch: [[quelle-a|Quelle A]] vs. [[quelle-b|Quelle B]]
-> - **A sagt:** [Aussage] ([[quelle-a|Autor A]], S. N)
-> - **B sagt:** [Aussage] ([[quelle-b|Autor B]], S. M)
+> - **A sagt:** [Aussage] ([[quelle-a|Autor A]], [[datei-a.pdf#page=N|S. N]])
+> - **B sagt:** [Aussage] ([[quelle-b|Autor B]], [[datei-b.pdf#page=M|S. M]])
 > - **Erklaerung:** [Moegliche Ursachen]
 
 [Obsidian Callout-Syntax: farbkodiert, foldable in der UI]
@@ -201,23 +245,68 @@ wissen WANN es gilt, dann WIE man rechnet):
 
 ## Quellen
 
-- [[quellenseite-a|Autor A Jahr]] — Kap. X, S. N–M
-- [[quellenseite-b|Autor B Jahr]] — Kap. Y, S. N–M
+- [[quellenseite-a|Autor A Jahr]] — Kap. X, [[datei-a.pdf#page=N|S. N–M]]
+- [[quellenseite-b|Autor B Jahr]] — Kap. Y, [[datei-b.pdf#page=N|S. N–M]]
 
 ═══════════════════════════════════════════════════════
 LINK-KONVENTIONEN (3 TYPEN)
 ═══════════════════════════════════════════════════════
 
-1. Beleg im Fliesstext (direkt ins PDF):
-   [[datei.pdf#page=N|Autor Jahr, S. N]]
-   N = PHYSISCHE PDF-Seite (Read-Tool pages-Parameter, nicht gedruckte Buchnummer).
-   Obsidian oeffnet die PDF an genau dieser Stelle.
+1. Quellenbeleg auf Konzeptseiten (Dual-Link):
+   [[quellenseite|Autor Jahr]], [[datei.pdf#page=N|S. N]]
+   Autor-Name verlinkt auf die Wiki-Quellenseite (Zusammenfassung).
+   Seitenzahl verlinkt direkt ins PDF (Obsidian oeffnet die Stelle).
+   N = PHYSISCHE PDF-Seite (aus den Quellenseiten uebernehmen,
+   nicht selbst berechnen). Der Leser WAEHLT: Wiki oder PDF-Original.
+   Bei Nicht-PDF-Quellen: nur [[quellenseite|Autor Jahr]] (kein PDF-Link).
 
 2. Fachbegriff (Konzeptseite):
    [[konzeptname|Anzeigename]]
 
 3. Quellen-Abschnitt (Wiki-Quellenseite):
    [[quellenseite|Autor Jahr]]
+
+═══════════════════════════════════════════════════════
+TABELLEN — NICHT VERHANDELBAR
+═══════════════════════════════════════════════════════
+
+Zahlenwerte-Tabellen und Norm-Referenzen-Tabellen verwenden
+DIESELBEN PDF-Deeplinks wie der Fliesstext. Keine Quellen-Wikilinks
+([[quellenkey|...]]) in Tabellen — immer PDF-Links ([[datei.pdf#page=N|...]]).
+
+PIPE-ESCAPING: In Markdown-Tabellen MUSS das | im Wikilink escaped
+werden, sonst bricht die Tabelle:
+  FALSCH: | [[datei.pdf#page=5|Autor, S. 5]] |  ← 3 Pipes = kaputte Spalten
+  RICHTIG: | [[datei.pdf#page=5\|Autor, S. 5]] | ← \| escaped den Link-Pipe
+
+Norm-Referenzen-Tabelle: Der Abschnitt (§X.Y) MUSS ein klickbarer
+PDF-Link sein, nicht nur Text:
+  FALSCH: | EC2:2025 (E) | §12.3.4 | ...
+  RICHTIG: | EC2:2025 (E) | [[PDF.pdf#page=222\|§12.3.4]] | ...
+
+═══════════════════════════════════════════════════════
+NORM-LABELS — NICHT VERHANDELBAR
+═══════════════════════════════════════════════════════
+
+| Typ                    | Format                    | Beispiel                |
+|------------------------|---------------------------|-------------------------|
+| Gueltige Norm          | Kurzname                  | EC2, EC5, CEN/TS 19103 |
+| Norm-Entwurf           | Kurzname:Jahr (E)         | EC2:2025 (E)            |
+| Lehrbuch / Kommentar   | Autor Jahr                | Fingerloos 2016         |
+| Forschungsbericht      | Autor Jahr                | Sieder 2025             |
+
+(E) = Entwurf, normenueblich im deutschen Bauwesen.
+IMMER "Autor Jahr" — nie nur "Autor" ohne Jahreszahl.
+NIEMALS "CEN/TC" als Label — das ist das technische Komitee, nicht die Norm.
+
+═══════════════════════════════════════════════════════
+PAGE-OFFSET-WARNUNG
+═══════════════════════════════════════════════════════
+
+page-offset im Frontmatter der Quellenseiten kann VARIABEL sein
+(z.B. durch Farbseiten-Einschuebe in Buechern). NIEMALS page-offset
+selbst anwenden — die #page=N Werte in den Wiki-Quellenseiten sind
+bereits PHYSISCHE PDF-Seiten. Direkt uebernehmen.
 
 ═══════════════════════════════════════════════════════
 KONZEPT-KANDIDATEN PRUEFEN
@@ -235,10 +324,12 @@ Wenn dieses Konzept bisher nur als konzept-kandidat existiert
 REGELN — NICHT VERHANDELBAR
 ═══════════════════════════════════════════════════════
 
-- Jede Aussage MIT Seitenangabe als PDF-Link: [[datei.pdf#page=N|Autor Jahr, S. N]]
-  (N = PHYSISCHE PDF-Seite, nicht gedruckte Buchnummer)
-  (Seitenangabe IMMER als klickbarer Link, nie als Plaintext "(S. N)")
-- Jeder Zahlenwert MIT Quelle + Seite (als PDF-Link).
+- Jede Aussage MIT Dual-Link: [[quellenseite|Autor Jahr]], [[datei.pdf#page=N|S. N]]
+  (Autor → Wiki-Quellenseite, Seitenzahl → PDF-Direktlink)
+  (N = PHYSISCHE PDF-Seite — aus den Quellenseiten uebernehmen, nicht selbst berechnen)
+  (Seitenangabe IMMER als klickbarer PDF-Link, nie als Plaintext "(S. N)")
+  (Bei Nicht-PDF-Quellen: nur [[quellenseite|Autor Jahr]], kein PDF-Link)
+- Jeder Zahlenwert MIT Quelle + Seite (als Dual-Link).
 - Jeder Normbezug MIT Abschnittsnummer.
 - Schlagworte NUR aus dem kontrollierten Vokabular (siehe oben).
   Wenn ein Begriff fehlt → als konzept-kandidat melden, NICHT erfinden.

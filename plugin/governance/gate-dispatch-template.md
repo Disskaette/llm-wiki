@@ -53,6 +53,15 @@ Gate 3 und 4 haben `model: sonnet` im Agent-Frontmatter — kein Override noetig
 Gate 1 hat KEIN Frontmatter-Model — der Dispatcher MUSS `model:` explizit setzen.
 Gate 2 erbt das Parent-Model (Opus) — kein Override noetig.
 
+## Context-Budget-Referenz
+
+| Modell | Context | Typischer Einsatz |
+|--------|---------|-------------------|
+| Opus   | 1.000.000 Tokens | Synthese-Worker, Zuordnung-Worker, Quellen-Pruefer |
+| Sonnet | 200.000 Tokens | Konsistenz-Pruefer, Vokabular-Pruefer, Vollstaendigkeits-Pruefer (kleine PDFs) |
+
+Split-Schwelle: 700K Tokens Quellenmaterial. Darunter: KEIN Split.
+
 ## Dispatch-Reihenfolge
 
 Gate 1-4 koennen PARALLEL dispatcht werden (sind unabhaengig voneinander).
@@ -234,6 +243,14 @@ Prüfe bei jeder Stichprobe:
 - Steht die zitierte Aussage tatsächlich an der angegebenen Stelle?
 - Ist die Paraphrase semantisch treu (keine Qualifier weggelassen)?
 - Stimmt die Seitenangabe bzw. Abschnittsreferenz?
+
+### H: Sammelzitat-Prüfung (NUR bei Synthese-Reviews)
+
+Falls dies ein Synthese-Gate ist (nicht Ingest): Prüfe ob Kernaussagen
+von mehreren Quellen gestützt werden aber nur eine zitiert ist.
+- 3-5 Kernaussagen identifizieren
+- Gegen die im Quellen-Abschnitt gelisteten Quellenseiten gegenlesen
+- Fehlende Korroborationen als HINWEIS melden (nicht FAIL)
 
 ### C: Umlaute (Shell-Check 09)
 
