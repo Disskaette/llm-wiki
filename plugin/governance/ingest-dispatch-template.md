@@ -146,6 +146,8 @@ type: quelle
 title: "Vollstaendiger Buchtitel"
 autor: [Nachname1, Vorname1; Nachname2, Vorname2]
 jahr: 2021
+bibtex-key: ""               # Optional. BibTeX-Key aus externem Literaturverwaltungssystem.
+                              # Wird NICHT vom Ingest-Worker gesetzt — nachtraeglich pflegen.
 verlag: "Verlagsname"
 seiten: 842
 kategorie: Fachgebiet  # Level-1-Term aus wiki/_vokabular.md — kein festes Enum
