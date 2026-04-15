@@ -380,7 +380,7 @@ oder unter `Masterarbeit/literatur/` existiert.
 - Zaehle: X von Y Quellenseiten haben bibtex-key
 - Falls fehlende:
   → WARN: "X von Y Quellenseiten ohne bibtex-key. Fuer Wiki-Bridge-Integration
-  (SPEC-006) muessen bibtex-keys nachgepflegt werden."
+  (SPEC-013) muessen bibtex-keys nachgepflegt werden."
 - KEIN FAIL — rein informativ. Fehlende bibtex-keys verhindern kein Review.
 
 ---
