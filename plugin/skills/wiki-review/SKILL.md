@@ -371,6 +371,18 @@ uebersprungen wird.
   - NEIN → ERROR: "[Term] als 'erstellt' markiert, aber Konzeptseite existiert nicht."
 - **Output:** `| Term | Status | Konzeptseite existiert | Ergebnis |`
 
+**3b.7 BIBTEX-KEY-CHECK (bedingt):**
+
+Nur aktiv wenn `literatur.bib` ODER `literatur/QUELLEN-MATRIX.md` im Projekt-Root
+oder unter `Masterarbeit/literatur/` existiert.
+
+- Fuer JEDE Wiki-Quellenseite: Hat sie ein `bibtex-key:` Feld im Frontmatter?
+- Zaehle: X von Y Quellenseiten haben bibtex-key
+- Falls fehlende:
+  → WARN: "X von Y Quellenseiten ohne bibtex-key. Fuer Wiki-Bridge-Integration
+  (SPEC-006) muessen bibtex-keys nachgepflegt werden."
+- KEIN FAIL — rein informativ. Fehlende bibtex-keys verhindern kein Review.
+
 ---
 
 ### Phase 4: Abdeckungs-Check
