@@ -187,7 +187,7 @@ fi
 # --- Check 15: Widerspruchs-Marker vollstaendig ---
 WIDERSPRUCH_INCOMPLETE=$(awk '
     /\[WIDERSPRUCH/ {
-        if ($0 !~ /Quelle [AB]/ && $0 !~ /[A-Z][a-z]+ [0-9]{4}.*[A-Z][a-z]+ [0-9]{4}/) {
+        if ($0 !~ /Quelle [AB]/ && $0 !~ /[A-Z][A-Za-z\/.-]+ [0-9]{4}.*[A-Z][A-Za-z\/.-]+ [0-9]{4}/) {
             print "  Z." NR ": Unvollstaendiger WIDERSPRUCH-Marker"
         }
     }
@@ -240,6 +240,39 @@ if [ "$FM_TYPE" = "konzept" ]; then
     fi
 else
     check PASS "18-discovery-dateien" "(Typ $FM_TYPE — nicht erforderlich)"
+fi
+
+# --- Check 19: Keine Pandoc-Zitat-Syntax auf Konzeptseiten ---
+if [ "$FM_TYPE" = "konzept" ] || [ "$FM_TYPE" = "verfahren" ] || [ "$FM_TYPE" = "baustoff" ]; then
+    PANDOC_REFS=$(grep -cE '\[@[a-z_]+[0-9]*' "$FILE" 2>/dev/null) || PANDOC_REFS=0
+    if [ "$PANDOC_REFS" -gt 0 ]; then
+        check FAIL "19-kein-pandoc" "Pandoc-Zitate gefunden ($PANDOC_REFS Stellen). Dual-Links verwenden: [[quellenseite|Autor]], [[datei.pdf#page=N|S. N]]"
+    else
+        check PASS "19-kein-pandoc" ""
+    fi
+else
+    check PASS "19-kein-pandoc" "(Typ $FM_TYPE — nicht erforderlich)"
+fi
+
+# --- Check 20: Deterministische Umlaut-Pruefung ---
+UMLAUT_WORDS_FILE="$(dirname "$0")/config/umlaut-woerter.txt"
+if [ -f "$UMLAUT_WORDS_FILE" ]; then
+    BODY=$(awk '/^---$/{n++; next} n>=2{print}' "$FILE")
+    UMLAUT_ISSUES=""
+    while IFS= read -r word; do
+        [ -z "$word" ] && continue
+        [[ "$word" == \#* ]] && continue
+        if echo "$BODY" | grep -qw "$word" 2>/dev/null; then
+            UMLAUT_ISSUES="${UMLAUT_ISSUES}${word}, "
+        fi
+    done < "$UMLAUT_WORDS_FILE"
+    if [ -n "$UMLAUT_ISSUES" ]; then
+        check FAIL "20-umlaute-body" "ASCII-Umlaute im Body-Text: ${UMLAUT_ISSUES%, }"
+    else
+        check PASS "20-umlaute-body" ""
+    fi
+else
+    check WARN "20-umlaute-body" "Woerterliste nicht gefunden: $UMLAUT_WORDS_FILE"
 fi
 
 # --- Ergebnis ---

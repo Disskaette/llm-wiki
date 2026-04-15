@@ -1,0 +1,30 @@
+# Woerter die im Wiki-Body-Text IMMER Umlaute haben muessen.
+# Nur Woerter ohne Homographen (kein "aktuell", "manuell", "virtuell").
+# Eine Zeile pro Wort. Kommentare mit #.
+fuer
+ueber
+Laenge
+Staerke
+Traeger
+Stuetze
+Hoehe
+Breite
+Flaeche
+genuegt
+muesste
+waere
+koennte
+Gueltigkeit
+Pruefung
+Ausfuehrung
+Einfuehrung
+Buegel
+stuetzend
+Zulaessig
+Groesse
+Uebergang
+Uebertragung
+aendern
+Aenderung
+Naherung
+Naherungsverfahren
