@@ -71,11 +71,11 @@ Falls `_schlagwort-vorschlaege.md` nicht existiert:
    - Frontmatter auslesen (aktuelle Quellen, Review-Status)
    - Existierende Wikilinks + Schlagworte notieren
 
-2. **Referenzierte Quellen identifizieren:**
-   - Alle Quellenangaben im Text durchlaufen
-   - Alle Wikilinks zu Quellenseiten ([quellen/...])
-   - Alle Norm-Paragraph-Verweise
-   - Dateilisten erstellen: welche PDFs muessen geladen werden?
+2. **Quellen aus Mapping laden:**
+   - Lies `wiki/_quellen-mapping.md`
+   - Alle dort fuer das Zielkonzept gelisteten Quellen UND Kandidaten-Zuordnungen
+   - KEIN eigenes Suchen per Schlagwort — Mapping ist Single Source of Truth
+   - Falls Mapping veraltet: `/zuordnung` zuerst ausfuehren (Hook blockiert sonst)
 
 3. **Token-Budget einordnen:**
    - Opus-Worker hat 1M Tokens. Sonnet-Worker hat 200K.
