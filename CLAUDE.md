@@ -61,6 +61,7 @@ Verwaiste Cache-Ordner (`~/.claude/plugins/cache/llm-wiki-local/`) mit
    - `inject-lock-warning.sh` (UserPromptSubmit) — injiziert passive Lock-Warnung mit Typ, Quelle, Stufe und Gates-Zaehler als `additionalContext`
    - `check-wiki-output.sh` — wird von den Gate-Agents selbst aufgerufen (seit Commit `f7b08d7`)
    - `guard-dispatch-template.sh` (PreToolUse Agent) — blockiert `bibliothek:*-worker`-Dispatches wenn das zugehoerige Dispatch-Template nicht im Transcript gelesen wurde. Mapping: ingest-worker→ingest-template, synthese-worker→synthese-template, zuordnung-worker→zuordnung-template.
+   - `guard-mapping-freshness.sh` (PreToolUse Agent) — blockiert `bibliothek:synthese-worker` wenn `_quellen-mapping.md` veraltet ist (Quellen- oder Konzepte-Stand stimmt nicht). Erzwingt `/zuordnung` vor `/synthese`.
 
 Bedingte Gates: `KEIN-NORMBEZUG-OHNE-ABSCHNITT` ist nur aktiv wenn Domain-Typ
 "norm" in seitentypen.md existiert. Universelle Gates gelten immer.
@@ -114,6 +115,7 @@ bash tests/test-create-pipeline-lock.sh            # 30/30 PASS?
 bash tests/test-integration-pipeline.sh            # 164/164 PASS?
 bash tests/test-check-wiki-output-discovery.sh     # 17/17 PASS?
 bash tests/test-guard-dispatch-template.sh          # 10/10 PASS?
+bash tests/test-guard-mapping-freshness.sh            # 10/10 PASS?
 ```
 
 Session-Neustart noetig nach Hook-Aenderungen (Claude Code cached im RAM).

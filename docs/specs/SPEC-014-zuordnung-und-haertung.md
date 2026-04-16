@@ -1,6 +1,6 @@
 # SPEC-014: Quellen-Zuordnung + Enforcement-Haertung
 
-**Status:** In Progress
+**Status:** Done
 **Version:** 1.2
 **Erstellt:** 2026-04-16
 **Aktualisiert:** 2026-04-16
@@ -491,38 +491,38 @@ Template nicht gelesen wurde, ist der Lock-Check irrelevant.
 ## Akzeptanzkriterien
 
 ### Paket 1: /zuordnung
-- [ ] Skill-Definition `zuordnung/SKILL.md` existiert mit Phasen-Beschreibung
-- [ ] Agent-Definition `zuordnung-worker.md` mit Tools: Read, Write, Edit, Grep, Glob
-- [ ] Dispatch-Template mit 6 Platzhaltern, ausgefuelltes Template wird an Worker uebergeben
-- [ ] Worker liest ALLE Quellen-Zusammenfassungen (Frontmatter + Body-Anfang)
-- [ ] Worker liest ALLE Konzeptseiten (Frontmatter + Zusammenfassung)
-- [ ] Worker liest `_konzept-reife.md` und beruecksichtigt reife Kandidaten bei der Zuordnung
-- [ ] `_quellen-mapping.md` wird geschrieben mit vollstaendiger Matrix
-- [ ] Jede Quelle in `wiki/quellen/` taucht in der Matrix auf (kein Orphan)
-- [ ] Schlagwort-Patches werden direkt auf Quellenseiten geschrieben (nur additiv)
-- [ ] Neue Vokabular-Terme werden in `_vokabular.md` geschrieben (nur additiv)
-- [ ] Neue Konzept-Kandidaten werden in `_konzept-reife.md` eingetragen
-- [ ] `check-zuordnung-output.sh` verifiziert das Ergebnis (deterministisch)
-- [ ] Synthese Phase 0 liest Mapping statt eigene Schlagwort-Suche
-- [ ] `guard-wiki-writes.sh` Whitelist enthaelt `zuordnung`
-- [ ] `guard-pipeline-lock.sh` case-Liste enthaelt `bibliothek:zuordnung-worker`
-- [ ] using-bibliothek SKILL.md Skill-Routing-Tabelle enthaelt `/zuordnung`
-- [ ] using-bibliothek SKILL.md Meta-Dateien-Auflistung enthaelt `_quellen-mapping.md`
-- [ ] Neue Kandidaten werden in `_konzept-reife.md` geschrieben (nicht nur in Mapping)
-- [ ] `relevant-fuer:` Feld auf Quellenseiten gepatcht (nur additiv)
-- [ ] Jede Quellenseite mit Konzept-Zuordnung hat `relevant-fuer:` im Frontmatter
-- [ ] SPEC-009 wird nach Umsetzung aktualisiert (Phase 0 → Mapping)
-- [ ] Kein SubagentStop-Hook fuer zuordnung-worker (kein _pending.json)
+- [x] Skill-Definition `zuordnung/SKILL.md` existiert mit Phasen-Beschreibung
+- [x] Agent-Definition `zuordnung-worker.md` mit Tools: Read, Write, Edit, Grep, Glob
+- [x] Dispatch-Template mit 6 Platzhaltern, ausgefuelltes Template wird an Worker uebergeben
+- [x] Worker liest ALLE Quellen-Zusammenfassungen (Frontmatter + Body-Anfang)
+- [x] Worker liest ALLE Konzeptseiten (Frontmatter + Zusammenfassung)
+- [x] Worker liest `_konzept-reife.md` und beruecksichtigt reife Kandidaten bei der Zuordnung
+- [x] `_quellen-mapping.md` wird geschrieben mit vollstaendiger Matrix
+- [x] Jede Quelle in `wiki/quellen/` taucht in der Matrix auf (kein Orphan)
+- [x] Schlagwort-Patches werden direkt auf Quellenseiten geschrieben (nur additiv)
+- [x] Neue Vokabular-Terme werden in `_vokabular.md` geschrieben (nur additiv)
+- [x] Neue Konzept-Kandidaten werden in `_konzept-reife.md` eingetragen
+- [x] `check-zuordnung-output.sh` verifiziert das Ergebnis (deterministisch)
+- [x] Synthese Phase 0 liest Mapping statt eigene Schlagwort-Suche
+- [x] `guard-wiki-writes.sh` Whitelist enthaelt `zuordnung`
+- [x] `guard-pipeline-lock.sh` case-Liste enthaelt `bibliothek:zuordnung-worker`
+- [x] using-bibliothek SKILL.md Skill-Routing-Tabelle enthaelt `/zuordnung`
+- [x] using-bibliothek SKILL.md Meta-Dateien-Auflistung enthaelt `_quellen-mapping.md`
+- [x] Neue Kandidaten werden in `_konzept-reife.md` geschrieben (nicht nur in Mapping)
+- [x] `relevant-fuer:` Feld auf Quellenseiten gepatcht (nur additiv)
+- [x] Jede Quellenseite mit Konzept-Zuordnung hat `relevant-fuer:` im Frontmatter
+- [x] SPEC-009 wird nach Umsetzung aktualisiert (Phase 0 → Mapping)
+- [x] Kein SubagentStop-Hook fuer zuordnung-worker (kein _pending.json)
 
 ### Paket 2: Mapping-Aktualitaet
-- [ ] `guard-mapping-freshness.sh` existiert und ist in hooks.json registriert
-- [ ] Hook prueft: `_quellen-mapping.md` existiert
-- [ ] Hook prueft: Mapping nicht aelter als juengster `_log.md`-Eintrag
-- [ ] Hook prueft: `quellen-stand` == Anzahl Dateien in `wiki/quellen/`
-- [ ] Hook prueft: `konzepte-stand` == Anzahl Dateien in `wiki/konzepte/`
-- [ ] Hook blockiert Synthese-Dispatch bei veraltetem Mapping (exit 2 + stderr)
-- [ ] Hook laesst Ingest, Vokabular, Normenupdate, Wiki-Review durch
-- [ ] Test-Suite: `tests/test-guard-mapping-freshness.sh` mit >=10 Tests
+- [x] `guard-mapping-freshness.sh` existiert und ist in hooks.json registriert
+- [x] Hook prueft: `_quellen-mapping.md` existiert
+- [x] Hook prueft: Mapping nicht aelter als juengster `_log.md`-Eintrag
+- [x] Hook prueft: `quellen-stand` == Anzahl Dateien in `wiki/quellen/`
+- [x] Hook prueft: `konzepte-stand` == Anzahl Dateien in `wiki/konzepte/`
+- [x] Hook blockiert Synthese-Dispatch bei veraltetem Mapping (exit 2 + stderr)
+- [x] Hook laesst Ingest, Vokabular, Normenupdate, Wiki-Review durch
+- [x] Test-Suite: `tests/test-guard-mapping-freshness.sh` mit >=10 Tests
 
 ### Paket 3: Shell-Check-Haertung
 - [x] Check 19: `[@`-Syntax auf Konzeptseiten → FAIL
