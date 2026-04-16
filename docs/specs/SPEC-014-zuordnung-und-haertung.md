@@ -525,46 +525,46 @@ Template nicht gelesen wurde, ist der Lock-Check irrelevant.
 - [ ] Test-Suite: `tests/test-guard-mapping-freshness.sh` mit >=10 Tests
 
 ### Paket 3: Shell-Check-Haertung
-- [ ] Check 19: `[@`-Syntax auf Konzeptseiten → FAIL
-- [ ] Check 19: Kein False Positive auf `[WIDERSPRUCH]`, `[DISCOVERY]`
-- [ ] Check 20: ASCII-Umlaute im Body-Text → FAIL (Woerterliste aus config/)
-- [ ] Check 20: Frontmatter und Dateinamen nicht betroffen
-- [ ] Check 15: WIDERSPRUCH-Regex matched ISB, EC2, NA, CEN/TS, Zilch/Zehetmaier
-- [ ] Bestehende Tests weiterhin PASS (keine Regression)
-- [ ] Neue Tests fuer Check 19 + 20 in `tests/test-check-wiki-output-discovery.sh`
+- [x] Check 19: `[@`-Syntax auf Konzeptseiten → FAIL
+- [x] Check 19: Kein False Positive auf `[WIDERSPRUCH]`, `[DISCOVERY]`
+- [x] Check 20: ASCII-Umlaute im Body-Text → FAIL (Woerterliste aus config/)
+- [x] Check 20: Frontmatter und Dateinamen nicht betroffen
+- [x] Check 15: WIDERSPRUCH-Regex matched ISB, EC2, NA, CEN/TS, Zilch/Zehetmaier
+- [x] Bestehende Tests weiterhin PASS (keine Regression)
+- [x] Neue Tests fuer Check 19 + 20 in `tests/test-check-wiki-output-discovery.sh`
 
 ### Paket 4: Context-Budget
-- [ ] synthese-dispatch-template.md hat CONTEXT-BUDGET-Sektion mit 1M Tokens explizit
-- [ ] SKILL.md Phase 0 sagt "Split NUR ueber 700K" statt "Split-Plan erstellen"
-- [ ] gate-dispatch-template.md hat Context-Budget-Referenz-Tabelle
-- [ ] Kein Dispatch-Template enthaelt "Batches", "mehrere Sessions" oder aehnliches
+- [x] synthese-dispatch-template.md hat CONTEXT-BUDGET-Sektion mit 1M Tokens explizit
+- [x] SKILL.md Phase 0 sagt "Split NUR ueber 700K" statt "Split-Plan erstellen"
+- [x] gate-dispatch-template.md hat Context-Budget-Referenz-Tabelle
+- [x] Kein Dispatch-Template enthaelt "Batches", "mehrere Sessions" oder aehnliches
 
 ### Paket 5: Template-Lese-Pflicht
-- [ ] `guard-dispatch-template.sh` existiert und ist in hooks.json registriert
-- [ ] Hook matched auf `bibliothek:*-worker` Dispatches
-- [ ] Hook prueft: zugehoeriges Dispatch-Template wurde im Transcript gelesen (Read-Call)
-- [ ] Hook blockiert bei fehlendem Template-Read (exit 2 + stderr mit Template-Pfad)
-- [ ] Hook laesst Non-Worker-Agents durch (Gate-Agents, Reviewer etc.)
-- [ ] Template-Mapping: ingest-worker→ingest-template, synthese-worker→synthese-template, zuordnung-worker→zuordnung-template
-- [ ] Test-Suite: `tests/test-guard-dispatch-template.sh` mit >=10 Tests
-- [ ] Kein False Positive wenn Template in frueherer Conversation gelesen aber nicht in dieser Session
+- [x] `guard-dispatch-template.sh` existiert und ist in hooks.json registriert
+- [x] Hook matched auf `bibliothek:*-worker` Dispatches
+- [x] Hook prueft: zugehoeriges Dispatch-Template wurde im Transcript gelesen (Read-Call)
+- [x] Hook blockiert bei fehlendem Template-Read (exit 2 + stderr mit Template-Pfad)
+- [x] Hook laesst Non-Worker-Agents durch (Gate-Agents, Reviewer etc.)
+- [x] Template-Mapping: ingest-worker→ingest-template, synthese-worker→synthese-template, zuordnung-worker→zuordnung-template
+- [x] Test-Suite: `tests/test-guard-dispatch-template.sh` mit >=10 Tests
+- [x] Kein False Positive wenn Template in frueherer Conversation gelesen aber nicht in dieser Session
 
 ### Paket 6: Session-Befund-Nachzuegler
-- [ ] Synthese-Skill Phase 5 prueft `_pending.json` auf `stufe: "sideeffects"` vor Start
-- [ ] Bei `stufe: "gates"` → Fehlermeldung "Gates nicht bestanden, re-dispatchen"
-- [ ] Bei fehlender `_pending.json` → Fehlermeldung "Pipeline-Lock fehlt"
-- [ ] gate-dispatch-template.md sagt explizit: "Manuelles Fixen + Shell-Check ≠ Gate-PASS"
-- [ ] konsistenz-pruefer.md Part C sucht global unter wiki/ (nicht nur quellen/+konzepte/)
-- [ ] Keine hartcodierten Verzeichnisnamen in der Link-Suche
-- [ ] gate-dispatch-template.md: "Bei Step 0 FAIL alle Parts trotzdem durchfuehren"
-- [ ] Gate-Pruefberichte listen ALLE Maengel (nicht nur den ersten)
+- [x] Synthese-Skill Phase 5 prueft `_pending.json` auf `stufe: "sideeffects"` vor Start
+- [x] Bei `stufe: "gates"` → Fehlermeldung "Gates nicht bestanden, re-dispatchen"
+- [x] Bei fehlender `_pending.json` → Fehlermeldung "Pipeline-Lock fehlt"
+- [x] gate-dispatch-template.md sagt explizit: "Manuelles Fixen + Shell-Check ≠ Gate-PASS"
+- [x] konsistenz-pruefer.md Part C sucht global unter wiki/ (nicht nur quellen/+konzepte/)
+- [x] Keine hartcodierten Verzeichnisnamen in der Link-Suche
+- [x] gate-dispatch-template.md: "Bei Step 0 FAIL alle Parts trotzdem durchfuehren"
+- [x] Gate-Pruefberichte listen ALLE Maengel (nicht nur den ersten)
 
 ### Paket 7: Dual-Link ueberall
-- [ ] Check 21 in check-wiki-output.sh: PDF-Links ohne Quellenseiten-Link → FAIL (auf Konzeptseiten)
-- [ ] Gilt fuer Fliesstext UND Tabellen (eine Regel, keine Ausnahmen)
-- [ ] synthese-dispatch-template.md: "Keine Quellen-Wikilinks in Tabellen" gestrichen
-- [ ] Stattdessen: "Dual-Link UEBERALL — auch in Tabellen. Pipe-Escaping beachten."
-- [ ] Kein False Positive auf Quellen-Abschnitt (dort sind nur Quellenseiten-Links ohne PDF OK)
+- [x] Check 21 in check-wiki-output.sh: PDF-Links ohne Quellenseiten-Link → FAIL (auf Konzeptseiten)
+- [x] Gilt fuer Fliesstext UND Tabellen (eine Regel, keine Ausnahmen)
+- [x] synthese-dispatch-template.md: "Keine Quellen-Wikilinks in Tabellen" gestrichen
+- [x] Stattdessen: "Dual-Link UEBERALL — auch in Tabellen. Pipe-Escaping beachten."
+- [x] Kein False Positive auf Quellen-Abschnitt (dort sind nur Quellenseiten-Links ohne PDF OK)
 
 ---
 

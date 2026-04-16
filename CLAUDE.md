@@ -10,11 +10,11 @@ des Projekts wo es installiert ist. Keine externen Abhaengigkeiten.
 
 ```
 llm-wiki/
-├── plugin/              ← Plugin-Laufzeit (wird gecacht/verlinkt)
+├── plugin/              ← Plugin-Laufzeit (direkt aus Repo geladen)
 │   ├── .claude-plugin/  ← Plugin-Manifest
-│   ├── hooks/           ← Shell-Hooks (Pre/PostToolUse, SessionStart)
-│   ├── skills/          ← 8 Skill-Definitionen (SKILL.md)
-│   ├── agents/          ← 8 Subagent-Definitionen
+│   ├── hooks/           ← Shell-Hooks (Pre/PostToolUse, SessionStart, SubagentStop)
+│   ├── skills/          ← 10 Skill-Definitionen (SKILL.md)
+│   ├── agents/          ← 9 Subagent-Definitionen
 │   ├── governance/      ← Hard Gates, Templates, Konventionen
 │   └── commands/        ← Slash-Commands
 ├── docs/                ← Specs, Plans (Dev-only)
@@ -27,14 +27,19 @@ llm-wiki/
 **Plugin-Installation:** Claude Code laedt das Plugin direkt aus diesem Repo.
 Registrierung in `~/.claude/plugins/installed_plugins.json`:
 ```
-"bibliothek@llm-wiki-local" → installPath: /Users/maximilianstark/Projects/llm-wiki/plugin
+"bibliothek@llm-wiki-local" → scope: "user", installPath: /Users/maximilianstark/Projects/llm-wiki/plugin
 ```
 Kein Cache-Symlink, kein Sync-Script. Aenderungen an `plugin/` greifen nach
 Session-Neustart automatisch (Hooks werden im RAM gecacht).
 
-Der Ordner `~/.claude/plugins/cache/llm-wiki-local/.../1.1.0/` ist verwaist
-(`.orphaned_at`-Marker) und wird nicht mehr verwendet — Relikt aus der Zeit
-vor dem `plugin/`-Subdirectory-Refactor (Commit 4766b13).
+**WICHTIG — kein local-scope Eintrag:** Das Plugin ist als `scope: "user"` (global)
+registriert und zeigt direkt auf das Repo. KEIN zusaetzlicher `scope: "local"` Eintrag
+fuer einzelne Projekte (z.B. Masterarbeit) — das erzeugt einen Cache-Snapshot der
+nicht automatisch aktualisiert wird und zu Drift fuehrt (Befund 2026-04-14:
+22 Dateien waren im Cache veraltet, Discovery-Logik fehlte im Runtime).
+
+Verwaiste Cache-Ordner (`~/.claude/plugins/cache/llm-wiki-local/`) mit
+`.orphaned_at`-Marker koennen geloescht werden.
 
 ## Architektur-Prinzipien
 
@@ -55,6 +60,7 @@ vor dem `plugin/`-Subdirectory-Refactor (Commit 4766b13).
    - `create-pipeline-lock.sh` (SubagentStop auf Worker-Agents) — erzeugt `wiki/_pending.json` automatisch nach Ingest-/Synthese-Worker-Ende. Extrahiert quelle aus `[INGEST-ID:xxx]` / `[SYNTHESE-ID:xxx]` im Worker-Output. Ueberschreibt bestehende Locks nicht.
    - `inject-lock-warning.sh` (UserPromptSubmit) — injiziert passive Lock-Warnung mit Typ, Quelle, Stufe und Gates-Zaehler als `additionalContext`
    - `check-wiki-output.sh` — wird von den Gate-Agents selbst aufgerufen (seit Commit `f7b08d7`)
+   - `guard-dispatch-template.sh` (PreToolUse Agent) — blockiert `bibliothek:*-worker`-Dispatches wenn das zugehoerige Dispatch-Template nicht im Transcript gelesen wurde. Mapping: ingest-worker→ingest-template, synthese-worker→synthese-template, zuordnung-worker→zuordnung-template.
 
 Bedingte Gates: `KEIN-NORMBEZUG-OHNE-ABSCHNITT` ist nur aktiv wenn Domain-Typ
 "norm" in seitentypen.md existiert. Universelle Gates gelten immer.
@@ -107,6 +113,7 @@ bash tests/test-advance-pipeline-lock.sh           # 20/20 PASS?
 bash tests/test-create-pipeline-lock.sh            # 30/30 PASS?
 bash tests/test-integration-pipeline.sh            # 164/164 PASS?
 bash tests/test-check-wiki-output-discovery.sh     # 17/17 PASS?
+bash tests/test-guard-dispatch-template.sh          # 10/10 PASS?
 ```
 
 Session-Neustart noetig nach Hook-Aenderungen (Claude Code cached im RAM).
