@@ -6,6 +6,21 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
+# --- Cache-Drift-Schutz: ALLE verwaisten bibliothek-Caches loeschen ---
+# Claude Code legt Cache-Snapshots unter verschiedenen Pfaden an:
+#   cache/llm-wiki-local/bibliothek/...
+#   cache/masterarbeit-local/bibliothek/...
+#   cache/<projekt>-local/bibliothek/...
+# Alle sind veraltet — Source-of-Truth ist IMMER das Repo.
+CACHE_WARNING=""
+CACHE_BASE="${HOME}/.claude/plugins/cache"
+if [ -d "$CACHE_BASE" ]; then
+    for stale in $(find "$CACHE_BASE" -maxdepth 2 -type d -name "bibliothek" 2>/dev/null); do
+        rm -rf "$stale"
+        CACHE_WARNING="[CACHE-DRIFT BEHOBEN] Verwaister Plugin-Cache unter ${stale} geloescht. Source-of-Truth ist ${PLUGIN_ROOT}."
+    done
+fi
+
 # Read using-bibliothek content — fail closed if not found
 SKILL_FILE="${PLUGIN_ROOT}/skills/using-bibliothek/SKILL.md"
 if [ ! -f "$SKILL_FILE" ]; then
@@ -27,7 +42,12 @@ escape_for_json() {
 }
 
 using_bibliothek_escaped=$(escape_for_json "$using_bibliothek_content")
-session_context="<EXTREMELY_IMPORTANT>\nDu hast das Bibliothek-Plugin geladen.\n\n**Nachfolgend der vollstaendige Inhalt des 'bibliothek:using-bibliothek' Skills. Fuer alle anderen Skills nutze das Skill-Tool:**\n\n${using_bibliothek_escaped}\n</EXTREMELY_IMPORTANT>"
+cache_warning_escaped=""
+if [ -n "$CACHE_WARNING" ]; then
+    cache_warning_escaped="\\n\\n**WARNUNG:** $(escape_for_json "$CACHE_WARNING")\\n"
+fi
+
+session_context="<EXTREMELY_IMPORTANT>\nDu hast das Bibliothek-Plugin geladen.${cache_warning_escaped}\n\n**Nachfolgend der vollstaendige Inhalt des 'bibliothek:using-bibliothek' Skills. Fuer alle anderen Skills nutze das Skill-Tool:**\n\n${using_bibliothek_escaped}\n</EXTREMELY_IMPORTANT>"
 
 # Output context injection as JSON
 if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
