@@ -79,14 +79,20 @@ Das passt in Opus locker. In Sonnet wird es knapp.
    - Reife Kandidaten (>= 2 Quellen) merken — Worker beruecksichtigt sie beim Mapping
 
 4. **Alle Quellenseiten identifizieren:**
-   - `ls wiki/quellen/*.md` → Dateiliste
+   - Glob `wiki/quellen/*.md` → Dateiliste
+   - AUSSCHLIESSEN: Dateien mit `_`-Prefix (`_index.md`, `_template.md` etc.)
+   - Zaehle exakt: `QUELLEN_ANZAHL` = Anzahl verbleibender Dateien
    - Fuer jede Quelle: Frontmatter + erste 50 Zeilen Body laden
    - Extrakt: `bibtex-key`, `titel`, `schlagworte`, `zusammenfassung`
+   - Melde dem Nutzer: "N Quellenseiten gefunden."
 
 5. **Alle Konzeptseiten identifizieren:**
-   - `ls wiki/konzepte/*.md` (falls Verzeichnis existiert) → Dateiliste
+   - Glob `wiki/konzepte/*.md` (falls Verzeichnis existiert) → Dateiliste
+   - AUSSCHLIESSEN: Dateien mit `_`-Prefix
+   - Zaehle exakt: `KONZEPTE_ANZAHL` = Anzahl verbleibender Dateien
    - Fuer jede Konzeptseite: Frontmatter + `## Zusammenfassung` Abschnitt laden
    - Extrakt: Dateiname, `title`, `schlagworte`, `quellen`, Zusammenfassungstext
+   - Melde dem Nutzer: "M Konzeptseiten gefunden."
 
 6. **Dispatch-Template laden:**
    - Lies `governance/zuordnung-dispatch-template.md` vollstaendig
