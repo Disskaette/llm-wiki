@@ -33,20 +33,21 @@ fi
 # Wurde ein Bibliothek-Skill in dieser Session via Skill-Tool geladen?
 # Zwei-stufig: erst Zeilen mit Skill-Tool-Calls filtern, dann Skill-Name pruefen.
 # Verhindert False-Positives wenn "ingest" in Gespraechen/File-Reads vorkommt.
-if grep '"name":"Skill"' "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE '"skill":"(bibliothek:)?(ingest|synthese|normenupdate|vokabular|wiki-review)"'; then
+if grep '"name":"Skill"' "$TRANSCRIPT_PATH" 2>/dev/null | grep -qE '"skill":"(bibliothek:)?(ingest|synthese|normenupdate|vokabular|wiki-review|obsidian-setup|zuordnung)"'; then
   exit 0
 fi
 
 cat >&2 << 'BLOCK_MSG'
 WIKI-GATE: Direkte Wiki-Writes sind nicht erlaubt.
 
-Wiki-Dateien (wiki/**/*.md) duerfen nur innerhalb eines der vier Schreib-Skills
+Wiki-Dateien (wiki/**/*.md) duerfen nur innerhalb eines der fuenf Schreib-Skills
 geaendert werden:
 
   /ingest          — Neue Quellenseiten aus PDFs
   /synthese        — Konzeptseiten vertiefen
   /normenupdate    — Normseiten aktualisieren
   /vokabular       — _vokabular.md pflegen
+  /obsidian-setup  — Vault-Konfiguration + home.md
 
 Rufe zuerst eines davon auf, dann ist der Write erlaubt.
 BLOCK_MSG

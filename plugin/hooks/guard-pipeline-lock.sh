@@ -12,7 +12,7 @@ SUBAGENT_TYPE=$(echo "$INPUT" | jq -r '.tool_input.subagent_type // empty')
 
 # Nur Pipeline-Worker-Dispatches betrachten (Ingest + Synthese)
 case "$SUBAGENT_TYPE" in
-  bibliothek:ingest-worker|bibliothek:synthese-worker) ;;
+  bibliothek:ingest-worker|bibliothek:synthese-worker|bibliothek:zuordnung-worker) ;;
   *) exit 0 ;;
 esac
 

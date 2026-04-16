@@ -34,6 +34,7 @@ Wiki-Verzeichnis: `wiki/` (relativ zum Projekt-Root, wird bei erstem /ingest ang
 Teilindizes: `wiki/_index/quellen.md`, `wiki/_index/konzepte.md`, etc.
 Kontrolliertes Vokabular: `wiki/_vokabular.md`
 Aenderungsprotokoll: `wiki/_log.md`
+Quellen-Zuordnung: `wiki/_quellen-mapping.md`
 
 Falls `wiki/` nicht existiert:
 → Sage das offen und fuehre `/ingest` auf das erste Buch aus — Bootstrap ist in Phase 0 integriert.
@@ -61,6 +62,8 @@ Falls `wiki/` existiert:
 | Konzeptseite vertiefen | /synthese | "Erklaer mir ... genauer", "Vertiefe die Seite..." |
 | Normstand aktualisieren | /normenupdate | "Neue Norm-Ausgabe", "EC2 aktualisiert" |
 | Wiki-Inhalte exportieren | /export | "Exportiere...", "Erstelle Uebersicht als..." |
+| Obsidian-Vault konfigurieren | /obsidian-setup | "Obsidian einrichten", "Graph-Farben", ".obsidian fehlt" |
+| Quellen-Zuordnung pruefen | /zuordnung | "Quellen zuordnen", "Mapping aktualisieren", "Welche Quellen passen zu..." |
 
 **Fachfragen ohne expliziten Skill-Aufruf** → Wiki-Awareness (siehe oben).
 Das LLM sucht im Wiki und antwortet direkt. Kein Skill-Aufruf noetig.
@@ -230,6 +233,7 @@ Wiki-Seiten (wiki/**/*.md) werden AUSSCHLIESSLICH ueber Skills erstellt/geaender
 - /synthese — Konzeptseiten vertiefen
 - /normenupdate — Normseiten aktualisieren
 - /vokabular — _vokabular.md pflegen
+- /obsidian-setup — Vault-Konfiguration + home.md
 
 Direkte Write/Edit-Aufrufe auf wiki/**/*.md OHNE Skill-Kontext sind VERBOTEN.
 Mechanische Durchsetzung: PostToolUse-Hook prueft jede Write/Edit-Operation
