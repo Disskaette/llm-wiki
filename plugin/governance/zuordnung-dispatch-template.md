@@ -143,6 +143,36 @@ Beispiel Frontmatter nach Patch:
   relevant-fuer: [aufhaengebewehrung, indirekte-auflagerung, direkte-auflagerung]
 
 ═══════════════════════════════════════════════════════
+MINDEST-OUTPUT PRO JOB — NICHT VERHANDELBAR
+═══════════════════════════════════════════════════════
+
+JEDER Job MUSS substantiellen Output liefern. "0 Befunde" bei >30 Quellen
+ist fast sicher ein Zeichen fuer uebersprungene Analyse, nicht fuer Perfektion.
+
+Job 1 (Mapping):
+  - JEDE Quelle muss in der Matrix ODER unter "Nicht zugeordnet" stehen
+  - Zaehle: Quellen in Matrix + Nicht-Zugeordnete = Quellen-Gesamtzahl
+  - Bei Diskrepanz: Du hast eine Quelle vergessen. Nochmal pruefen.
+
+Job 2 (Schlagwort-Audit):
+  - Mindestens 1 fehlende Zuordnung ODER explizit: "Audit: alle N Quellen
+    geprueft, keine Luecke gefunden — Begruendung: [...]"
+  - NEUE TERME AKTIV SUCHEN: Gibt es Fachbegriffe die in >=2 Quellen
+    als Kapitel-Ueberschrift oder Haupt-Thema auftauchen aber NICHT im
+    Vokabular stehen? Typische Kandidaten: Berechnungsverfahren, Werkstoff-
+    Bezeichnungen, Normen-Kurzformen, Versagensarten.
+  - Bei >50 Quellen und 0 neuen Termen: Begruendung PFLICHT.
+
+Job 3 (Konzept-Kandidaten):
+  - Pruefe JEDES Thema das in >=2 Quellen substanziell vorkommt:
+    Existiert dafuer eine Konzeptseite? Existiert ein Kandidat in
+    _konzept-reife.md? Falls NEIN → neuer Kandidat.
+  - Bei >50 Quellen und 0 neuen Kandidaten: Begruendung PFLICHT.
+    "Alle relevanten Themen sind bereits als Konzeptseite oder Kandidat
+    erfasst" ist nur glaubwuerdig wenn du die bestehenden Konzepte und
+    Kandidaten explizit gegen die Quellen-Themen abgeglichen hast.
+
+═══════════════════════════════════════════════════════
 REGELN — NICHT VERHANDELBAR
 ═══════════════════════════════════════════════════════
 
@@ -168,11 +198,15 @@ type: meta
 title: "Quellen-Zuordnung"
 updated: YYYY-MM-DD
 mapping-version: N
-quellen-stand: N
-konzepte-stand: N
-kandidaten-stand: N
+quellen-stand: N      ← Anzahl .md-Dateien in wiki/quellen/ (ZAEHLE SELBST, nicht schaetzen)
+konzepte-stand: N     ← Anzahl .md-Dateien in wiki/konzepte/ (ZAEHLE SELBST, nicht schaetzen)
+kandidaten-stand: N   ← Anzahl reifer Kandidaten in _konzept-reife.md
 letzter-log-hash: "{{LOG_HASH}}"
 ---
+
+ZAEHLUNG: quellen-stand = Zeilen in Matrix + Nicht-Zugeordnete.
+Diese Zahl MUSS mit den inline eingefuegten Quellen uebereinstimmen.
+Bei Diskrepanz hast du eine Quelle vergessen.
 
 Body-Struktur:
 # Quellen-Zuordnung
