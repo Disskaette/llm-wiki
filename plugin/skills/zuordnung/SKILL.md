@@ -158,7 +158,22 @@ Subagent-Prompts werden NICHT frei formuliert. IMMER Template verwenden.
 4. **`check-zuordnung-output.sh` ausfuehren:**
    - Deterministischer Shell-Check (Orphan-Erkennung, Datei-Existenz-Pruefung,
      Vokabular-Check fuer Patch-Terme, Rueckverweis-Konsistenz)
-   - Bei FAIL: Befunde melden, Worker-Ergebnis nicht akzeptieren
+   - Bei FAIL — korrekter Ablauf pro Check:
+
+     <NICHT-VERHANDELBAR>
+     **Check 06 (rueckverweis):** Fehlende `relevant-fuer:` auf Quellenseiten
+     → NACHTRAGEN (Edit-Tool), nicht ignorieren.
+
+     **Check 07 (vokabular-patch):** Terme in Audit-Tabelle die nicht im
+     Vokabular stehen → IN `_vokabular.md` EINTRAGEN (Edit-Tool, additiv).
+     NIEMALS die Terme aus der Audit-Tabelle loeschen um den Check zu bestehen.
+     Die Audit-Tabelle ist das Ergebnis der Worker-Analyse. Wenn der Worker
+     einen Term als fehlend identifiziert hat, ist die Loesung: Term ins
+     Vokabular aufnehmen — nicht die Evidenz vernichten.
+
+     **Allgemein:** FAIL bedeutet "behebe die Ursache", nicht "loesche die
+     Daten bis der Check PASS zeigt".
+     </NICHT-VERHANDELBAR>
 
 5. **`_log.md` Eintrag schreiben:**
    ```markdown

@@ -120,8 +120,10 @@ Behandelt sie ein Thema ausfuehrlich das NICHT in ihren schlagworte: steht?
 → Patch-Vorschlag mit Evidenz (Kapitelverweis)
 
 Neue Terme: Fachbegriffe die in >=2 Quellen substanziell vorkommen
-und im Vokabular fehlen → Vorschlag fuer _vokabular.md
-(Eintrag direkt schreiben, nur additiv).
+und im Vokabular fehlen → DIREKT in _vokabular.md SCHREIBEN (Edit-Tool,
+nur additiv, ans Ende der passenden Kategorie). Nicht nur auflisten.
+Format: `### Termname` + Synonym-Liste darunter.
+Jeden geschriebenen Term in der Audit-Tabelle mit Status "eingetragen" markieren.
 
 Rueckwaertsverteilung PFLICHT: Wenn ein neues Schlagwort eingefuehrt wird,
 ALLE Quellen im Wiki identifizieren die es erhalten sollten — nicht nur
@@ -160,8 +162,12 @@ Job 2 (Schlagwort-Audit):
   - NEUE TERME AKTIV SUCHEN: Gibt es Fachbegriffe die in >=2 Quellen
     als Kapitel-Ueberschrift oder Haupt-Thema auftauchen aber NICHT im
     Vokabular stehen? Typische Kandidaten: Berechnungsverfahren, Werkstoff-
-    Bezeichnungen, Normen-Kurzformen, Versagensarten.
-  - Bei >50 Quellen und 0 neuen Termen: Begruendung PFLICHT.
+    Bezeichnungen, Normen-Kurzformen, Versagensarten, Modellbezeichnungen
+    (z.B. Stabwerkmodell, Spannungsfeldmodell, Gamma-Verfahren).
+  - Gefundene Terme DIREKT in _vokabular.md eintragen (Edit-Tool), nicht
+    nur in der Audit-Tabelle auflisten. Status "eingetragen" setzen.
+  - Bei >30 Quellen und 0 neuen Termen: Begruendung PFLICHT — nenne
+    5 konkrete Terme die du geprueft und im Vokabular gefunden hast.
 
 Job 3 (Konzept-Kandidaten):
   - Pruefe JEDES Thema das in >=2 Quellen substanziell vorkommt:
