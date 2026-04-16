@@ -1,5 +1,112 @@
 # Changelog — Bibliothek-Plugin
 
+## [2.0.1] — 2026-04-16
+
+### SPEC-014: Enforcement-Haertung + Quellen-Zuordnung
+
+**Neuer Skill:**
+- `/zuordnung` — Quellen-Zuordnungs-Matrix, Schlagwort-Audit, Konzept-Rueckverweise
+- `zuordnung-worker` (Opus, 1M) — sieht alle Quellen + alle Konzepte gleichzeitig
+- `zuordnung-dispatch-template.md` — 6 Platzhalter, 3 Jobs (Mapping, Audit, Patches)
+- `wiki/_quellen-mapping.md` — zentrales Artefakt, Single Source of Truth fuer Synthese
+
+**Neue Hooks:**
+- `guard-dispatch-template.sh` (PreToolUse Agent) — blockiert Worker-Dispatches ohne Template-Read
+- `guard-mapping-freshness.sh` (PreToolUse Agent) — blockiert Synthese bei veraltetem Mapping
+
+**Shell-Check-Haertung:**
+- Check 15: Regex fuer WIDERSPRUCH-Marker erweitert (ISB, CEN/TS, Zilch/Zehetmaier)
+- Check 19: Pandoc-Zitat-Syntax `[@key]` auf Konzeptseiten = FAIL
+- Check 20: ASCII-Umlaute im Body-Text = FAIL (deterministische Woerterliste)
+- Check 21: Dual-Link-Pflicht (PDF-Link ohne Quellenseiten-Link = FAIL)
+- `config/umlaut-woerter.txt` — 27 Woerter ohne Homographen-Risiko
+
+**Prompt-Haertung:**
+- Context-Budget 1M explizit in allen Dispatch-Templates
+- Phase-5-Guard: Nebeneffekte nur wenn stufe=sideeffects
+- Gate-Collect-All: Gates sammeln ALLE Maengel, brechen nicht nach erstem FAIL ab
+- Manuelles Fixen ist kein Gate-PASS (erfordert Re-Dispatch)
+- Konsistenz-Pruefer: globale Link-Suche (nicht nur konzepte/ + quellen/)
+- Tabellen-Sonderregel gestrichen: Dual-Link ueberall
+
+**Pipeline-Integration:**
+- Synthese Phase 0 liest Mapping statt Schlagwort-Suche
+- guard-wiki-writes.sh: +zuordnung in Whitelist
+- guard-pipeline-lock.sh: +zuordnung-worker in Worker-Liste
+
+**Tests:**
+- 33 neue Shell-Check-Tests (test-check-wiki-output-haertung.sh)
+- 10 guard-dispatch-template Tests
+- 10 guard-mapping-freshness Tests
+
+**Statistiken:**
+- Befehle: 8 | Skills: 11 | Agents: 10 | Hard Gates: 10
+- Output-Checks: 21 (19 aktiv + 2 deferred) | Konsistenz-Checks: 22
+- Aktive Hooks: 8 | Tests gesamt: 53 neu (+ 276 bestehend = 329)
+
+---
+
+## [2.0.0] — 2026-04-14
+
+### Cache-Drift-Fix + Spec-Bereinigung
+
+**Kritisch:**
+- Plugin-Registrierung auf `scope: "user"` vereinheitlicht (kein `scope: "local"` mehr)
+- Verwaister Cache unter `~/.claude/plugins/cache/llm-wiki-local/bibliothek/2.0.0/`
+  war 22 Dateien hinter dem Repo — Discovery-Logik, Domain-Agnostik, Multi-Format
+  fehlten im Runtime. Ursache: local-scope erzeugt Cache-Snapshot ohne Auto-Sync.
+- commands/ingest.md + synthese.md Gate-Nummerierung aktualisiert (altes 1-10 Schema → benannte Gates)
+- vokabular/SKILL.md: Discovery-Rueckkanal (`_schlagwort-vorschlaege.md`) als Input in Phase 0
+
+**Spec-Bereinigung:**
+- CHANGELOG nachgefuehrt (fehlende Eintraege fuer SPEC-002 bis SPEC-006)
+- CLAUDE.md Plugin-Installations-Doku aktualisiert (Warnung vor local-scope)
+
+**Statistiken:**
+- Befehle: 10 | Skills: 10 | Agents: 9 | Hard Gates: 10
+- Output-Checks: 18 (16 aktiv + 2 deferred) | Konsistenz-Checks: 22
+- Aktive Hooks: 6 (SessionStart + 2 PreToolUse + 2 SubagentStop + 1 UserPromptSubmit)
+
+---
+
+## 2026-04-14 — SPEC-004: Wiki-Review-Skill
+
+- Neuer Skill `/wiki-review` (semantische Analyse + Discovery-Gesundheit)
+- Zweistufig: Quick-Scan (exhaustiv Obsidian-Layer + Stichprobe Content-Layer) → Full-Audit (batchweise)
+- Self-Referential: Pflicht-Felder dynamisch aus aktuellen Templates extrahiert
+- Discovery-Gesundheit (v1.1): 6 Checks (DATEIEN, STALE, REIFE, RUECKSTAU, KONSISTENZ, GHOST)
+- Reports in `wiki/_reviews/review-YYYY-MM-DD.md`
+- Neuer Command: `/obsidian-setup` (Vault-Konfiguration aus Governance-Dateien)
+- guard-wiki-writes.sh: `/wiki-review` + `/obsidian-setup` als erlaubte Schreib-Skills
+
+---
+
+## 2026-04-13 — SPEC-003 v2.0: Discovery-Logik
+
+- `[DISCOVERY]`-Block als Pflicht-Output im Synthese-Worker (4 Sektionen)
+- `{{KONZEPT_REIFE_INHALT}}` + `{{SCHLAGWORT_VORSCHLAEGE_INHALT}}` Platzhalter
+- Phase 2e: Worker schreibt `_vokabular.md` (additiv) + patcht Quellenseiten-Schlagworte
+- konsistenz-pruefer Part D: Discovery-Vollstaendigkeits-Check (nur bei SYNTHESE-ID)
+- check-wiki-output.sh Check 18: Discovery-Dateien-Existenz fuer type:konzept
+- check-consistency.sh Check 22: Synthese-Template Discovery-Platzhalter
+- Ingest Phase 4: Konzept-Kandidaten → `_konzept-reife.md` (Reife-Berechnung)
+- Synthese Phase 0.0: `_konzept-reife.md` als primaere Discovery-Quelle
+- Synthese Phase 5: Discovery-Persistierung (Tracking-Metadaten nach Gate-Verifikation)
+
+---
+
+## 2026-04-13 — SPEC-002: Pipeline-Lock-Enforcement
+
+- `guard-pipeline-lock.sh` (PreToolUse Agent): blockiert neue Worker-Dispatches bei offenem Lock
+- `advance-pipeline-lock.sh` (SubagentStop auf Gate-Agents): Counter-Inkrement + Stufen-Wechsel
+- `create-pipeline-lock.sh` (SubagentStop auf Worker-Agents): Auto-Lock nach Worker-Ende
+- INGEST-ID/SYNTHESE-ID Matching: Counter nur bei korrekter Pipeline-Zuordnung
+- Gate-FAIL-Detection: Counter wird bei FAIL nicht inkrementiert
+- Gegenseitige Blockade: Ingest blockiert Synthese und umgekehrt
+- 10/10 + 30/30 + 20/20 Hook-Tests + 164/164 Integration-Tests
+
+---
+
 ## 2026-04-13 — SPEC-006: Multi-Format-Ingest
 
 - Format-Erkennung in Phase 0 (PDF/Markdown/URL)

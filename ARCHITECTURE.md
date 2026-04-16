@@ -6,9 +6,10 @@
 graph LR
     A["📄 PDF / Markdown / URL\n(Normen, Papers,\nForschungsberichte,\nWeb-Artikel)"] -->|"/ingest\n(Format-Erkennung\nin Phase 0)"| B["📖 Wiki-Seiten\n(Quellen, Konzepte,\nNormen, Baustoffe)"]
     B -->|/vokabular| C["📋 Kontrolliertes\nVokabular\n(_vokabular.md)"]
+    B -->|/zuordnung| Z["🔗 Quellen-Mapping\n(_quellen-mapping.md)"]
     B -->|/katalog| D["🗂️ Katalog-Index\n(Quellenliste,\nAbdeckungsanalyse)"]
     B -->|/wiki-lint| E["✅ Qualitäts-Check\n(12 Output-Checks,\n19 Konsistenz-Checks)"]
-    D -->|/synthese| F["📝 Synthesetext\n(Quellenvergleich,\nWidersprüche)"]
+    Z -->|/synthese| F["📝 Synthesetext\n(Quellenvergleich,\nWidersprüche)"]
     F -->|/export| G["📊 Export\n(Zusammenfassungen,\nTabellen, Formeln)"]
     E -->|/export| G
     C -->|/export| G
@@ -27,14 +28,16 @@ graph LR
 | `vokabular` | Wiki-Seiten | wiki/_vokabular.md | ← ingest, synthese | VOKABULAR_ENFORCEMENT |
 | `katalog` | Wiki-Seiten + Metadaten | INDEX.md, literatur.bib-Vorschlag | ← ingest, normenupdate | KATALOG_CONSISTENCY |
 | `wiki-lint` | Alle Wiki-Seiten | Fehlerbericht, Fixes | ← katalog | WIKI_LINT_RULES |
-| `synthese` | Thema, Wiki-Seiten, katalog | Synthesetext (.md) | → export | SYNTHESE_INTEGRITY |
+| `zuordnung` | Alle Quellen + Konzepte | _quellen-mapping.md, Frontmatter-Patches | ← ingest, → synthese | ZUORDNUNG_CONSISTENCY |
+| `synthese` | Thema, Wiki-Seiten, Mapping | Synthesetext (.md) | → export | SYNTHESE_INTEGRITY |
 | `normenupdate` | Alte vs. neue Norm-PDFs | Norm-Wiki-Update, Diff-Report | → katalog | NORMEN_ACCURACY |
 | `export` | Wiki-Seiten, katalog, _vokabular.md | Zusammenfassungen, Tabellen, Formeln | ← synthese, wiki-lint | EXPORT_INTEGRITY |
+| `wiki-review` | Wiki-Seiten + Governance-Dateien | Quick-Scan / Full-Audit Report | — | Kein (read-only, diagnostisch) |
 | `using-bibliothek` | Session-Hook (Governance) | — | — | Governance-Injection |
 
 ## Agent-Taxonomie
 
-Es gibt 9 Subagents, aufgeteilt in 4 Rollen (siehe `governance/naming-konvention.md`):
+Es gibt 10 Subagents, aufgeteilt in 4 Rollen (siehe `governance/naming-konvention.md`):
 
 ### Pruefer (PASS/FAIL — blockierend)
 
@@ -58,6 +61,7 @@ Es gibt 9 Subagents, aufgeteilt in 4 Rollen (siehe `governance/naming-konvention
 |-------|---------------|---------|
 | `ingest-worker` | /ingest (Phase 0.6) | Quelle vollstaendig lesen (PDF/Markdown/URL), Quellenseite erstellen |
 | `synthese-worker` | /synthese (Phase 0.6) | Konzeptseite aus Wiki-Quellenseiten vertiefen |
+| `zuordnung-worker` | /zuordnung (Phase 1) | Quellen-Mapping, Schlagwort-Audit, relevant-fuer: Patches |
 
 ### Validator (Format-Check)
 
@@ -91,7 +95,8 @@ Es gibt 9 Subagents, aufgeteilt in 4 Rollen (siehe `governance/naming-konvention
 │ Schicht 4: Subagent-Instanz (Dispatch)                      │
 │ → Agent (z.B. ingest-Agent) mit lokalen Constraints        │
 │ → Dispatch via ingest-dispatch-template.md /               │
-│   synthese-dispatch-template.md (parametrisierter Prompt)  │
+│   synthese-dispatch-template.md /                          │
+│   zuordnung-dispatch-template.md (parametrisierter Prompt) │
 │ → Output läuft durch Shell-Check + Consistency-Check       │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -133,19 +138,22 @@ Format-Erkennung in Phase 0 (deterministisch). Split-Trigger: PDF >10 MB, Markdo
 
 ## Shell-Checks und Hooks
 
-### Aktive Hooks (Stand SPEC-003, 2026-04-11)
+### Aktive Hooks (Stand SPEC-014, 2026-04-16)
 
 | Hook | Event | Matcher | Zweck |
 |------|-------|---------|-------|
-| `session-start` | SessionStart | startup\|resume\|clear\|compact | Governance-Context injizieren via using-bibliothek |
-| `guard-wiki-writes.sh` | PreToolUse | Edit\|Write | Blockiert `wiki/**/*.md`-Writes ausserhalb der 4 Schreib-Skills (Transcript-Check) |
-| `guard-pipeline-lock.sh` | PreToolUse | Agent | Blockiert ingest-worker/synthese-worker bei offenem _pending.json (gegenseitige Blockade) |
+| `session-start` | SessionStart | startup\|resume\|clear\|compact | Governance-Context injizieren via using-bibliothek + Cache-Drift-Schutz (loescht verwaiste Cache-Ordner unter `~/.claude/plugins/cache/llm-wiki-local/`) |
+| `guard-wiki-writes.sh` | PreToolUse | Edit\|Write | Blockiert `wiki/**/*.md`-Writes ausserhalb der Schreib-Skills (Transcript-Check) |
+| `guard-dispatch-template.sh` | PreToolUse | Agent | Blockiert Worker-Dispatches wenn Dispatch-Template nicht im Transcript gelesen wurde |
+| `guard-mapping-freshness.sh` | PreToolUse | Agent | Blockiert Synthese-Worker wenn _quellen-mapping.md veraltet ist |
+| `guard-pipeline-lock.sh` | PreToolUse | Agent | Blockiert ingest/synthese/zuordnung-worker bei offenem _pending.json |
 | `advance-pipeline-lock.sh` | SubagentStop | Gate-Agents | Zaehlt gates_passed, wechselt Stufe, verifiziert INGEST-ID/SYNTHESE-ID |
+| `create-pipeline-lock.sh` | SubagentStop | Worker-Agents | Erzeugt _pending.json nach Worker-Ende |
 | `inject-lock-warning.sh` | UserPromptSubmit | — | Passive Warnung mit Typ, Quelle, Stufe, Gates-Zaehler |
 
 **Selbst-Check im Subagent:** Gate-Agents rufen `check-wiki-output.sh` nach jeder Datei selbst auf. Kontextuelle Checks (Zahlenwerte, Normbezuege, Seitenangaben, Umlaute) werden von den Gate-Agents direkt durchgefuehrt — das Shell-Script prueft nur deterministische Aspekte.
 
-### 12 Output-Checks (check-wiki-output.sh)
+### 15 Output-Checks (check-wiki-output.sh)
 
 1. **Frontmatter-Type**: Feld `type:` muss im YAML-Frontmatter vorhanden sein
 2. **Seitentyp-Validierung**: `type:` muss einer der definierten Typen sein (config/valid-types.txt)
@@ -160,6 +168,10 @@ Format-Erkennung in Phase 0 (deterministisch). Split-Trigger: PDF >10 MB, Markdo
 15. **Widerspruch-Marker**: [WIDERSPRUCH]-Marker muessen zwei Quellen nennen
 16. **Review-Status**: Feld `reviewed:` sollte im Frontmatter vorhanden sein
 17. **Quellpfad-Validierung**: Quellenseiten brauchen genau ein Quellpfad-Feld (`pdf:`, `quelle-datei:` oder `url:`)
+18. **Discovery-Dateien**: Konzeptseiten brauchen Discovery-Referenzen
+19. **Pandoc-Syntax**: Keine `[@key]`-Zitate auf Konzept-/Verfahrens-/Baustoffseiten
+20. **Umlaute-Body**: ASCII-Umlaute im Body-Text (deterministisch per Woerterliste)
+21. **Dual-Link**: Jeder PDF-Link braucht begleitenden Quellenseiten-Link
 
 Entfernte heuristische Checks (brauchen Kontext, den Gate-Agents liefern):
 - ~~04 Zahlenwert-Quelle~~ → Gate 2 (quellen-pruefer), Part A
@@ -214,6 +226,8 @@ Prueft die interne Konsistenz des Plugins selbst (nicht der Wiki-Daten):
 | normenupdate | 4, 7, 8, 9, 10 |
 | katalog | 10 (read-only Skill) |
 | wiki-lint | 8, 9, 10 (diagnostisch) |
+| wiki-review | Keine (read-only, diagnostisch — prueft alle Gates aber erzwingt keine) |
+| zuordnung | 6, 9, 10 |
 | vokabular | 6, 10 |
 | export | 10 (read-only Skill) |
 
@@ -226,6 +240,7 @@ Prueft die interne Konsistenz des Plugins selbst (nicht der Wiki-Daten):
 | Kontrolliertes Vokabular | Markdown | `wiki/_vokabular.md` | /vokabular | /ingest (Check), /wiki-lint |
 | Aenderungsprotokoll | Markdown | `wiki/_log.md` | Alle schreibenden Skills | /wiki-lint (Audit-Trail) |
 | BibTeX-Katalog | BibTeX | `Masterarbeit/literatur.bib` | /katalog (Export-Proposal, NICHT direkt schreiben!) | Pandoc (Kapitel-Build) |
+| Quellen-Mapping | Markdown + YAML | `wiki/_quellen-mapping.md` | /zuordnung | /synthese (Phase 0 Quellenauswahl), `guard-mapping-freshness.sh` (Freshness-Check) |
 | Pipeline-Lock | JSON | `wiki/_pending.json` | /ingest, /synthese (Lock-Datei waehrend Verarbeitung, gegenseitige Blockade) | `guard-pipeline-lock.sh` (blockiert), `advance-pipeline-lock.sh` (zaehlt Gates), `inject-lock-warning.sh` (warnt) |
 
 > **Scope-Regel:** Das Bibliothek-Plugin arbeitet ausschliesslich in `wiki/`.
@@ -237,13 +252,13 @@ Prueft die interne Konsistenz des Plugins selbst (nicht der Wiki-Daten):
 
 ## Statistiken
 
-- **Befehle:** 7 (ingest, katalog, wiki-lint, vokabular, synthese, normenupdate, export)
-- **Skills:** 8 (7 Befehls-Skills + using-bibliothek Governance-Skill)
-- **Agents:** 9 (4 Pruefer + 2 Reviewer + 1 Validator + 2 Worker)
+- **Befehle:** 8 (ingest, katalog, wiki-lint, vokabular, synthese, normenupdate, export, zuordnung)
+- **Skills:** 11 (8 Befehls-Skills + using-bibliothek Governance-Skill + wiki-review Diagnose-Skill + obsidian-setup Konfigurations-Skill)
+- **Agents:** 10 (4 Pruefer + 2 Reviewer + 1 Validator + 3 Worker)
 - **Hard Gates:** 10 (definiert in `governance/hard-gates.md`)
-- **Output-Checks:** 12 (check-wiki-output.sh, davon 10 aktiv + 2 deferred; kontextuelle via Gate-Agents)
-- **Konsistenz-Checks:** 19 (check-consistency.sh)
-- **Aktive Hooks:** 5 (SessionStart + PreToolUse Edit|Write + PreToolUse Agent + SubagentStop + UserPromptSubmit)
+- **Output-Checks:** 21 (check-wiki-output.sh, davon 19 aktiv + 2 deferred; kontextuelle via Gate-Agents)
+- **Konsistenz-Checks:** 22 (check-consistency.sh)
+- **Aktive Hooks:** 8 (SessionStart + PreToolUse Edit|Write + 3× PreToolUse Agent + 2× SubagentStop + UserPromptSubmit)
 - **Governance-Schichten:** 4 (Hook → Using → Gate → Subagent)
 
 ## Wiki-Verzeichnisstruktur
@@ -288,6 +303,8 @@ wiki/
 │   ├── baustoffe.md
 │   └── verfahren.md
 ├── _vokabular.md      ← Kontrolliertes Fachvokabular (Gate 6)
+├── _quellen-mapping.md ← Quellen-Zuordnungs-Matrix (/zuordnung)
+├── _konzept-reife.md  ← Konzept-Kandidaten Reife-Tracker
 └── _log.md            ← Chronologisches Aenderungsprotokoll
 ```
 
@@ -298,4 +315,4 @@ was davon wohin uebernommen wird.
 
 ---
 
-**Version:** 2.0.0 | **Stand:** 2026-04-13
+**Version:** 2.0.1 | **Stand:** 2026-04-16
