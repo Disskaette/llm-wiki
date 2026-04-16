@@ -282,6 +282,44 @@ OUT=$(bash "$CHECK_OUTPUT" "$KONZEPT_QUELLE_AB" "$VOKABULAR" "$WIKI_DIR/" 2>&1)
 assert_not_contains "C15-5: Quelle A/B kein FAIL 15" "FAIL.*15-widerspruch-marker" "$OUT"
 
 # =====================================================================
+echo ""
+echo "=== Tests: Check 21 (Dual-Link) ==="
+echo ""
+
+# --- Test C21-1: Dual-Link korrekt (Quellenseite + PDF-Link) → PASS ---
+KONZEPT_DUAL_OK="$WIKI_DIR/konzepte/dual-link-ok.md"
+make_konzept "$KONZEPT_DUAL_OK" "Die Auflagerkraft muss aufgehaengt werden ([[fingerloos2016|Fingerloos 2016]], [[EC2.pdf#page=352|S. 352]]).\n\nQuerverweise: [[Stahlbeton]]"
+
+OUT=$(bash "$CHECK_OUTPUT" "$KONZEPT_DUAL_OK" "$VOKABULAR" "$WIKI_DIR/" 2>&1)
+RC=$?
+assert_not_contains "C21-1: Dual-Link korrekt → kein FAIL 21-dual-link" "FAIL.*21-dual-link" "$OUT"
+assert_contains "C21-1: Check 21 PASS" "21-dual-link" "$OUT"
+
+# --- Test C21-2: Nur PDF-Link ohne Quellenseite → FAIL ---
+KONZEPT_SOLO_PDF="$WIKI_DIR/konzepte/solo-pdf.md"
+make_konzept "$KONZEPT_SOLO_PDF" "Die Auflagerkraft muss aufgehaengt werden [[EC2.pdf#page=352|S. 352]].\n\nQuerverweise: [[Stahlbeton]]"
+
+OUT=$(bash "$CHECK_OUTPUT" "$KONZEPT_SOLO_PDF" "$VOKABULAR" "$WIKI_DIR/" 2>&1)
+RC=$?
+assert "C21-2: Solo-PDF-Link → exit 1" "1" "$RC"
+assert_contains "C21-2: FAIL 21-dual-link" "FAIL.*21-dual-link" "$OUT"
+
+# --- Test C21-3: PDF-Link im Quellen-Abschnitt → kein FAIL (Quellen-Sektion ausgenommen) ---
+KONZEPT_QUELLEN_SECTION="$WIKI_DIR/konzepte/quellen-section.md"
+make_konzept "$KONZEPT_QUELLEN_SECTION" "Querverweise: [[Stahlbeton]]\n\n## Quellen\n\n- [[fingerloos2016|Fingerloos 2016]] — Kap. 8, [[EC2.pdf#page=352|S. 352-360]]"
+
+OUT=$(bash "$CHECK_OUTPUT" "$KONZEPT_QUELLEN_SECTION" "$VOKABULAR" "$WIKI_DIR/" 2>&1)
+assert_not_contains "C21-3: PDF in Quellen-Sektion kein FAIL 21" "FAIL.*21-dual-link" "$OUT"
+
+# --- Test C21-4: Quellenseite (type: quelle) wird nicht geprueft → PASS ---
+QUELLE_MIT_PDF="$WIKI_DIR/quellen/mustermann-dual.md"
+make_quelle "$QUELLE_MIT_PDF" "Verweis auf [[EC2.pdf#page=352|S. 352]] ohne Quellenseite."
+
+OUT=$(bash "$CHECK_OUTPUT" "$QUELLE_MIT_PDF" "$VOKABULAR" "$WIKI_DIR/" 2>&1)
+assert_not_contains "C21-4: Quellenseite kein FAIL 21-dual-link" "FAIL.*21-dual-link" "$OUT"
+assert_contains "C21-4: Check 21 PASS (nicht erforderlich)" "21-dual-link" "$OUT"
+
+# =====================================================================
 # --- Cleanup ---
 rm -rf "$SANDBOX"
 

@@ -275,6 +275,25 @@ else
     check WARN "20-umlaute-body" "Woerterliste nicht gefunden: $UMLAUT_WORDS_FILE"
 fi
 
+# --- Check 21: Dual-Link — jeder PDF-Link braucht begleitenden Quellenseiten-Link ---
+if [ "$FM_TYPE" = "konzept" ] || [ "$FM_TYPE" = "verfahren" ] || [ "$FM_TYPE" = "baustoff" ]; then
+    SOLO_PDF=$(awk '
+        /^## Quellen/ { in_quellen=1 }
+        /^## [^Q]/ { in_quellen=0 }
+        !in_quellen && /\[\[.*\.pdf#page=/ {
+            if ($0 !~ /\[\[[a-z_]+[0-9]*[a-z]*\|/) count++
+        }
+        END { print count+0 }
+    ' "$FILE")
+    if [ "$SOLO_PDF" -gt 0 ]; then
+        check FAIL "21-dual-link" "$SOLO_PDF PDF-Links ohne Quellenseiten-Link. Format: [[quellenseite|Autor]], [[datei.pdf#page=N|S. N]]"
+    else
+        check PASS "21-dual-link" ""
+    fi
+else
+    check PASS "21-dual-link" "(Typ $FM_TYPE — nicht erforderlich)"
+fi
+
 # --- Ergebnis ---
 echo ""
 echo "=== Ergebnis: $PASS PASS, $FAIL FAIL, $WARN WARN ==="

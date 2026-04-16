@@ -271,8 +271,9 @@ TABELLEN — NICHT VERHANDELBAR
 ═══════════════════════════════════════════════════════
 
 Zahlenwerte-Tabellen und Norm-Referenzen-Tabellen verwenden
-DIESELBEN PDF-Deeplinks wie der Fliesstext. Keine Quellen-Wikilinks
-([[quellenkey|...]]) in Tabellen — immer PDF-Links ([[datei.pdf#page=N|...]]).
+DASSELBE Dual-Link-Format wie der Fliesstext:
+[[quellenseite\|Autor Jahr]], [[datei.pdf#page=N\|S. N]]
+Pipe-Escaping (\|) in Tabellen PFLICHT fuer beide Links.
 
 PIPE-ESCAPING: In Markdown-Tabellen MUSS das | im Wikilink escaped
 werden, sonst bricht die Tabelle:
