@@ -76,13 +76,16 @@ Die [[<konzeptseite>|<Anzeigename>]] im <Fachbegriff> zeigt typische Merkmale...
 ```
 
 **Anforderungen:**
-- Link-Ziel (z.B. `<konzeptseite>`) existiert in `wiki/konzepte/` oder `wiki/quellen/` als Datei
+- Link-Ziel (z.B. `<konzeptseite>`) existiert als .md-Datei IRGENDWO unter `wiki/`
+  (Obsidian sucht global nach Dateiname, nicht in bestimmten Unterverzeichnissen)
 - Anchor-Links (z.B. `[[Seite#Abschnitt]]`) verweisen auf existente Überschriften
 - Keine Links auf nicht-existente Seiten
 
 **Validierung:**
-- Prüfe Dateibaum von `wiki/konzepte/` und `wiki/quellen/`
-- Für jeden Wikilink `[[Ziel]]` prüfe, ob `Ziel.md` existiert
+- Prüfe: `find wiki/ -name "<linkziel>.md"` — existiert mindestens ein Treffer?
+- NICHT auf bestimmte Unterverzeichnisse beschraenken (normen/, verfahren/,
+  baustoff/ etc. koennen je nach Domain existieren oder nicht)
+- Für jeden Wikilink `[[Ziel]]` prüfe, ob `Ziel.md` irgendwo unter wiki/ existiert
 - Dokumentiere tote Links
 
 **Resultat:** Alle gültig / teilweise ungültig / viele tote Links.

@@ -114,6 +114,12 @@ Original-PDF: {{PDF_PFAD}}
 0. **Mechanischer Check:** Fuehre zuerst check-wiki-output.sh auf die Quellenseite aus.
    Melde PASS/FAIL/WARN-Ergebnisse im Pruefbericht.
 
+WICHTIG: Bei Step 0 FAIL trotzdem ALLE nachfolgenden Parts ausfuehren.
+Sammle ALLE Maengel in einem Pruefbericht. Nicht nach dem ersten FAIL
+abbrechen. Das Gesamtergebnis ist FAIL wenn IRGENDEIN Part FAILt — aber
+der Bericht muss ALLE Probleme auflisten, damit sie in einem Durchgang
+behoben werden koennen.
+
 1. **Kapitelerfassung:** Pruefstrategie je nach Quellen-Format (aus {{QUELLEN_FORMAT}}):
    - **pdf:** Inhaltsverzeichnis (erste 5-10 Seiten) gegen kapitel-index pruefen
    - **markdown:** Headings (## und ###) gegen kapitel-index pruefen
@@ -191,6 +197,12 @@ Fuehre zuerst check-wiki-output.sh auf die Quellenseite aus:
 bash check-wiki-output.sh "{{QUELLENSEITE_PFAD}}" "{{WIKI_ROOT}}/_vokabular.md" "{{WIKI_ROOT}}/"
 ```
 Melde alle PASS/FAIL/WARN im Pruefbericht. Die kontextuellen Pruefungen (Zahlenwerte, Normbezuege, Seitenangaben, Umlaute) bewertest DU in den folgenden Parts — das Shell-Script prueft sie nicht.
+
+WICHTIG: Bei Step 0 FAIL trotzdem ALLE nachfolgenden Parts ausfuehren.
+Sammle ALLE Maengel in einem Pruefbericht. Nicht nach dem ersten FAIL
+abbrechen. Das Gesamtergebnis ist FAIL wenn IRGENDEIN Part FAILt — aber
+der Bericht muss ALLE Probleme auflisten, damit sie in einem Durchgang
+behoben werden koennen.
 
 ### A: Kontextuelle Quellenprüfung (ersetzt Shell-Checks 04, 05, 06)
 
@@ -320,6 +332,12 @@ Wiki-Root: {{WIKI_ROOT}}
 0. **Mechanischer Check:** Fuehre check-wiki-output.sh auf die Quellenseite aus.
    Melde PASS/FAIL/WARN im Pruefbericht.
 
+WICHTIG: Bei Step 0 FAIL trotzdem ALLE nachfolgenden Parts ausfuehren.
+Sammle ALLE Maengel in einem Pruefbericht. Nicht nach dem ersten FAIL
+abbrechen. Das Gesamtergebnis ist FAIL wenn IRGENDEIN Part FAILt — aber
+der Bericht muss ALLE Probleme auflisten, damit sie in einem Durchgang
+behoben werden koennen.
+
 1. **Widersprüche:** Vergleiche Aussagen der neuen Quellenseite mit
    bestehenden Konzeptseiten. Gibt es Widersprüche?
    - Direkter Widerspruch ("X ist wahr" vs "X ist falsch")
@@ -414,6 +432,12 @@ Vokabular: {{VOKABULAR_PFAD}}
 0. **Mechanischer Check:** Fuehre check-wiki-output.sh auf die Quellenseite aus.
    Melde PASS/FAIL/WARN im Pruefbericht.
 
+WICHTIG: Bei Step 0 FAIL trotzdem ALLE nachfolgenden Parts ausfuehren.
+Sammle ALLE Maengel in einem Pruefbericht. Nicht nach dem ersten FAIL
+abbrechen. Das Gesamtergebnis ist FAIL wenn IRGENDEIN Part FAILt — aber
+der Bericht muss ALLE Probleme auflisten, damit sie in einem Durchgang
+behoben werden koennen.
+
 1. **Vokabular-Abdeckung:** Jedes schlagworte-Feld muss als ### Heading
    in _vokabular.md existieren.
 
@@ -459,4 +483,16 @@ Vokabular: {{VOKABULAR_PFAD}}
 3. Dispatche Korrektur-Agent ODER korrigiere selbst
 4. Re-Dispatche das fehlgeschlagene Gate (max 3×)
 5. Nach 3× FAIL: Eskalation an Nutzer
+
+### NICHT-VERHANDELBAR: Manuelles Fixen ist kein Gate-PASS
+
+Wenn der Orchestrator nach einem Gate-FAIL die Wiki-Datei manuell editiert
+und `check-wiki-output.sh` manuell ausfuehrt: Das ist KEIN Gate-PASS.
+Nur ein Gate-Agent der PASS zurueckgibt zaehlt. `advance-pipeline-lock.sh`
+inkrementiert nur bei Agent-SubagentStop mit "Ergebnis: PASS" im Output.
+
+Korrekter Ablauf bei FAIL:
+1. Orchestrator korrigiert die Maengel (direkt oder via Agent)
+2. Re-Dispatch des fehlgeschlagenen Gate-Agents (max 3×)
+3. Gate-Agent prueft erneut und meldet PASS oder FAIL
 

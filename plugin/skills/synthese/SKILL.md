@@ -353,6 +353,16 @@ Ergebnis ist PASS oder FAIL — kein Mittelweg.
 
 ### Phase 5: Nebeneffekte
 
+<NICHT-VERHANDELBAR>
+BEVOR Phase 5 (Nebeneffekte) beginnt:
+1. Pruefe `wiki/_pending.json`: Feld `stufe` MUSS "sideeffects" sein.
+2. Wenn `stufe` noch "gates": Gates sind NICHT bestanden.
+   → Fehlgeschlagene Gates RE-DISPATCHEN (nicht manuell fixen + Shell-Check).
+   → Shell-Check ist KEIN Ersatz fuer Gate-Agents.
+3. Wenn `_pending.json` nicht existiert: Phase 5 NICHT starten.
+   → Meldung: "Pipeline-Lock fehlt. Gates muessen erst laufen."
+</NICHT-VERHANDELBAR>
+
 **Pflicht:**
 - [ ] **Seite speichern** (mit Seitenangaben, Formeln, Widersprueche)
 - [ ] **_index aktualisieren** (Konzeptseite hinzufuegen falls neu)
