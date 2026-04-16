@@ -36,6 +36,31 @@ hat keine eigene Gate-Pipeline. Sie wird jedoch durch bestehende Locks blockiert
 
 ---
 
+## Context-Budget — Orchestrator
+
+<NICHT-VERHANDELBAR>
+DU (der Orchestrator, der diesen Skill ausfuehrt) hast ein Kontextfenster:
+- **Opus:** 1.000.000 Tokens
+- **Sonnet:** 200.000 Tokens
+
+/zuordnung laedt ALLE Quellen + ALLE Konzepte in den Worker-Prompt.
+Typische Groessenordnung: 94 Quellen × 55 Zeilen ≈ 150K Tokens.
+Das passt in Opus locker. In Sonnet wird es knapp.
+
+**Modellwahl fuer den Orchestrator:**
+- Opus empfohlen (>50 Quellen → viel Sammelarbeit in Phase 0/1)
+- Sonnet moeglich bei <30 Quellen — dann Zusammenfassungen kuerzen (30 statt 50 Zeilen)
+
+**Regeln:**
+1. Read-Tool liest max 2000 Zeilen pro Aufruf — mehrere Aufrufe machen.
+2. Alle Zusammenfassungen INLINE in den Worker-Prompt einfuegen.
+3. KEIN Ausweichen auf /tmp-Dateien oder "Worker liest selbst".
+4. KEIN "das ist zu gross" — RECHNE NACH: Zeilen × 1.3 ≈ Tokens.
+5. Der WORKER hat IMMER 1M Tokens (laeuft auf Opus).
+</NICHT-VERHANDELBAR>
+
+---
+
 ## Phasen
 
 ### Phase 0: Context laden

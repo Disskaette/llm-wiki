@@ -26,6 +26,28 @@ description: "Konzeptseiten vertiefen — Quellen vergleichen, Formeln ausarbeit
 
 ---
 
+## Context-Budget — Orchestrator
+
+<NICHT-VERHANDELBAR>
+DU (der Orchestrator, der diesen Skill ausfuehrt) hast ein Kontextfenster:
+- **Opus:** 1.000.000 Tokens
+- **Sonnet:** 200.000 Tokens
+
+Pruefe dein eigenes Modell (`model` in der Session-Info).
+94 Quellenseiten × 55 Zeilen ≈ 150K Tokens. Das passt in Opus locker,
+in Sonnet wird es knapp — dann Zusammenfassungen kuerzen (30 statt 50 Zeilen).
+
+**Regeln:**
+1. Read-Tool liest max 2000 Zeilen pro Aufruf — mehrere Aufrufe machen.
+2. Alle Quellen-Zusammenfassungen INLINE in den Worker-Prompt einfuegen.
+3. KEIN Ausweichen auf /tmp-Dateien oder "Worker liest selbst".
+4. KEIN "das ist zu gross" — RECHNE NACH: Zeilen × 1.3 ≈ Tokens.
+5. Split NUR wenn Quellenmaterial > 700K Tokens (Opus) oder > 150K (Sonnet).
+6. Der WORKER hat IMMER 1M Tokens (laeuft auf Opus).
+</NICHT-VERHANDELBAR>
+
+---
+
 ## Phasen
 
 ### Phase 0.0: Konzept-Discovery auswerten
@@ -77,12 +99,12 @@ Falls `_schlagwort-vorschlaege.md` nicht existiert:
    - KEIN eigenes Suchen per Schlagwort — Mapping ist Single Source of Truth
    - Falls Mapping veraltet: `/zuordnung` zuerst ausfuehren (Hook blockiert sonst)
 
-3. **Token-Budget einordnen:**
-   - Opus-Worker hat 1M Tokens. Sonnet-Worker hat 200K.
-   - Synthese-Worker laeuft IMMER auf Opus (1M).
+3. **Token-Budget einordnen (Worker):**
+   - Synthese-Worker laeuft IMMER auf Opus (1M Tokens).
    - Typisches Quellenmaterial fuer ein Konzept: 50-400K Tokens.
    - Split NUR wenn Quellenmaterial > 700K Tokens (>20 ausfuehrliche Quellen).
    - Bei <700K: KEIN Split, KEIN Batch, alles in einen Worker.
+   - Siehe "Context-Budget — Orchestrator" oben fuer DEIN eigenes Budget.
 
 ---
 
